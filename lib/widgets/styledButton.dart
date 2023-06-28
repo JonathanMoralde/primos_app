@@ -1,15 +1,22 @@
 import 'package:flutter/material.dart';
 
+//this button can take 4 parameters, btnText & onClick is required
+// example1:   StyleButton(btnText: "Test", onClick: (){})
+// example2:   StyleButton(btnText: "Test", onClick: (){}, btnIcon: Icon(Icons.login), btnWidth: 250)
+// 250 is the default width
+
 class StyledButton extends StatelessWidget {
   final String btnText;
-  Function()? onClick;
-  final btnIcon;
+  final Function()? onClick;
+  final dynamic btnIcon;
+  final double? btnWidth;
 
-  StyledButton({
+  const StyledButton({
     super.key,
     required this.btnText,
     required this.onClick,
     this.btnIcon,
+    this.btnWidth,
   });
 
   @override
@@ -18,7 +25,7 @@ class StyledButton extends StatelessWidget {
     if (btnIcon != null) {
       return SizedBox(
         height: 45,
-        width: 250,
+        width: btnWidth ?? 250,
         child: ElevatedButton.icon(
           onPressed: onClick,
           style: ElevatedButton.styleFrom(
@@ -38,11 +45,12 @@ class StyledButton extends StatelessWidget {
       // BUTTON WITHOUT ICON
       return SizedBox(
         height: 45,
-        width: 250,
+        width: btnWidth ?? 250,
         child: ElevatedButton(
           onPressed: onClick,
           style: ElevatedButton.styleFrom(
             // fixedSize: const Size(250, 32),
+
             shape:
                 RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
             backgroundColor: const Color.fromARGB(255, 226, 181, 99),

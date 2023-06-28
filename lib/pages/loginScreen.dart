@@ -84,12 +84,13 @@ class LoginSreen extends StatelessWidget {
                 const SizedBox(
                   height: 20,
                 ),
+
+                // Sign in button
                 StyledButton(
                   btnText: btnText,
                   onClick: handleSignin,
                   btnIcon: const Icon(Icons.login),
-                )
-                // Sign in button
+                ),
               ],
             ),
           ),
