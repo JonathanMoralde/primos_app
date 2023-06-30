@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:primos_app/widgets/styledButton.dart';
 import 'package:primos_app/widgets/styledTextField.dart';
 
+import 'package:primos_app/pages/admin/salesReport.dart';
+
 class LoginSreen extends StatelessWidget {
   LoginSreen({super.key});
 
@@ -9,12 +11,21 @@ class LoginSreen extends StatelessWidget {
   final passwordController = TextEditingController();
 
   final String btnText = "SIGN IN";
-  void handleSignin() {
-    print("You have pressed the button"); //SIGN IN HANDLER
-  }
 
   @override
   Widget build(BuildContext context) {
+    void handleSignin() {
+      Navigator.of(context).pushReplacement(
+        //pushReplacement prevents user to go back to login screen
+
+        MaterialPageRoute(
+          builder: (BuildContext context) {
+            return SalesReportPage();
+          },
+        ),
+      );
+    }
+
     return Scaffold(
       backgroundColor: const Color(0xFFF8F8F7),
       body: Container(
