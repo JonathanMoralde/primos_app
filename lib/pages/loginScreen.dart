@@ -7,23 +7,27 @@ import 'package:primos_app/pages/admin/salesReport.dart';
 class LoginSreen extends StatelessWidget {
   LoginSreen({super.key});
 
-  final usernameController = TextEditingController();
-  final passwordController = TextEditingController();
+  final usernameController =
+      TextEditingController(); //* to access the input value for auth, usernameController.text
+  final passwordController =
+      TextEditingController(); //* passwordController.text
 
   final String btnText = "SIGN IN";
 
   @override
   Widget build(BuildContext context) {
     void handleSignin() {
+      // TODO ADD AUTHENTICATION BEFORE EXECUTING NAVIGATOR
       Navigator.of(context).pushReplacement(
         //pushReplacement prevents user to go back to login screen
 
         MaterialPageRoute(
           builder: (BuildContext context) {
-            return SalesReportPage();
+            return SalesReportPage(); //* Replace page depending on user type
           },
         ),
       );
+      // TODO
     }
 
     return Scaffold(

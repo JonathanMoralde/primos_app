@@ -9,6 +9,7 @@ class SalesReportPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     // admin side menu pages
+    // creating an array/list to be passed in sideMenu
     List<SideMenuPage> adminPages = [
       SideMenuPage(
           name: "Sales Report",

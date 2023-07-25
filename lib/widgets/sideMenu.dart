@@ -1,3 +1,6 @@
+//preconfigured with pageObject.dart
+// TODO edit the header
+
 import 'package:flutter/material.dart';
 import 'package:primos_app/widgets/pageObject.dart';
 import 'package:primos_app/pages/loginScreen.dart';
