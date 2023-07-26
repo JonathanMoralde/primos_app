@@ -8,31 +8,6 @@ class SalesReportPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    // admin side menu pages
-    // creating an array/list to be passed in sideMenu
-    List<SideMenuPage> adminPages = [
-      SideMenuPage(
-          name: "Sales Report",
-          onTap: () {
-            print("Sales");
-          }),
-      SideMenuPage(
-          name: "Menu",
-          onTap: () {
-            print("Menu");
-          }),
-      SideMenuPage(
-          name: "Table",
-          onTap: () {
-            print("Table");
-          }),
-      SideMenuPage(
-          name: "Employee",
-          onTap: () {
-            print("Employee");
-          }),
-    ];
-
     return Scaffold(
       backgroundColor: const Color(0xFFF8F8F7),
       drawer: SideMenu(

@@ -21,6 +21,7 @@ class StyledTextField extends StatelessWidget {
         style: const TextStyle(fontSize: 14.0),
         controller: controller, //controller
         obscureText: obscureText, //obscureText
+        cursorColor: Color(0xFF252525),
         decoration: InputDecoration(
           contentPadding:
               const EdgeInsets.only(bottom: 16, left: 10, right: 10),
