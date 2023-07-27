@@ -10,6 +10,7 @@ class StyledButton extends StatelessWidget {
   final Function()? onClick;
   final dynamic btnIcon;
   final double? btnWidth;
+  final double? btnHeight;
   final dynamic btnColor;
 
   const StyledButton({
@@ -18,6 +19,7 @@ class StyledButton extends StatelessWidget {
     required this.onClick,
     this.btnIcon,
     this.btnWidth,
+    this.btnHeight,
     this.btnColor,
   });
 
@@ -26,7 +28,7 @@ class StyledButton extends StatelessWidget {
     // BUTTON WITH ICON
     if (btnIcon != null) {
       return SizedBox(
-        height: 45,
+        height: btnHeight ?? 45,
         width: btnWidth,
         child: ElevatedButton.icon(
           onPressed: onClick,
@@ -46,7 +48,7 @@ class StyledButton extends StatelessWidget {
     } else {
       // BUTTON WITHOUT ICON
       return SizedBox(
-        height: 45,
+        height: btnHeight ?? 45,
         width: btnWidth,
         child: ElevatedButton(
           onPressed: onClick,

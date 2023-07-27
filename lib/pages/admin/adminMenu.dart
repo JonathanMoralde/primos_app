@@ -1,4 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:primos_app/pages/admin/adminMenu_Form.dart';
+import 'package:primos_app/widgets/bottomBar.dart';
+import 'package:primos_app/widgets/itemCard.dart';
 import 'package:primos_app/widgets/pageObject.dart';
 
 import 'package:primos_app/widgets/sideMenu.dart';
@@ -32,7 +35,7 @@ class _AdminMenuPageState extends State<AdminMenuPage> {
             children: [
               const CustomSearchBar(),
               Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 16),
+                padding: const EdgeInsets.only(left: 16),
                 child: SizedBox(
                   height: 45,
                   child: ListView.builder(
@@ -59,7 +62,58 @@ class _AdminMenuPageState extends State<AdminMenuPage> {
                         );
                       }),
                 ),
-              )
+              ),
+              const Padding(
+                padding: EdgeInsets.all(16),
+                child: SizedBox(
+                  width: double.infinity,
+                  child: Wrap(
+                    alignment: WrapAlignment.start,
+                    spacing: 10,
+                    runSpacing: 10,
+                    children: [
+                      ItemCard(),
+                      ItemCard(),
+                      ItemCard(),
+                    ],
+                  ),
+                ),
+              ),
+            ],
+          ),
+        ),
+      ),
+      bottomNavigationBar: BottomBar(
+        height: 100,
+        child: Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 16),
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Expanded(
+                flex: 1,
+                child: StyledButton(
+                  btnText: "New Item",
+                  onClick: () {
+                    Navigator.of(context).push(
+                        MaterialPageRoute(builder: (BuildContext context) {
+                      return AdminMenuForm();
+                    }));
+                  },
+                  btnColor: const Color(0xfff8f8f7),
+                ),
+              ),
+              const SizedBox(
+                width: 10, //gap between the two btns
+              ),
+              Expanded(
+                flex: 1,
+                child: StyledButton(
+                  btnText: "New Category",
+                  onClick: () {},
+                  btnColor: const Color(0xfff8f8f7),
+                ),
+              ),
             ],
           ),
         ),
