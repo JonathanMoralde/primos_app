@@ -38,3 +38,35 @@ List<SideMenuPage> adminPages = [
 ];
 
 // END OF ADMIN PAGES
+
+//! temp? reused the class
+// Category Buttons
+List<SideMenuPage> category = [
+  SideMenuPage(
+      name: "All",
+      onTap: () {
+        print("All");
+      }),
+  SideMenuPage(
+      name: "Salads & Starters",
+      onTap: () {
+        print("Salads & Starters");
+      }),
+  SideMenuPage(
+      name: "Pizza & Pasta",
+      onTap: () {
+        print("Pizza & Pasta");
+      }),
+  SideMenuPage(
+      name: "Sandwich Board",
+      onTap: () {
+        print("Sandwich Board");
+      }),
+  SideMenuPage(
+      name: "Oddle Noodle",
+      onTap: () {
+        print("Oddle Noodle");
+      }),
+];
+
+// END OF Category Buttons

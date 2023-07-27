@@ -107,6 +107,7 @@ class LoginSreen extends StatelessWidget {
                   btnText: btnText,
                   onClick: handleSignin,
                   btnIcon: const Icon(Icons.login),
+                  btnWidth: 250,
                 ),
               ],
             ),

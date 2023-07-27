@@ -10,6 +10,7 @@ class StyledButton extends StatelessWidget {
   final Function()? onClick;
   final dynamic btnIcon;
   final double? btnWidth;
+  final dynamic btnColor;
 
   const StyledButton({
     super.key,
@@ -17,6 +18,7 @@ class StyledButton extends StatelessWidget {
     required this.onClick,
     this.btnIcon,
     this.btnWidth,
+    this.btnColor,
   });
 
   @override
@@ -25,14 +27,14 @@ class StyledButton extends StatelessWidget {
     if (btnIcon != null) {
       return SizedBox(
         height: 45,
-        width: btnWidth ?? 250,
+        width: btnWidth,
         child: ElevatedButton.icon(
           onPressed: onClick,
           style: ElevatedButton.styleFrom(
             // fixedSize: const Size(250, 32),
             shape:
                 RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
-            backgroundColor: const Color.fromARGB(255, 226, 181, 99),
+            backgroundColor: btnColor ?? const Color(0xFFE2B563),
             foregroundColor: const Color.fromARGB(255, 37, 37, 37),
             textStyle: const TextStyle(
                 letterSpacing: 1, fontWeight: FontWeight.w500, fontSize: 16),
@@ -45,7 +47,7 @@ class StyledButton extends StatelessWidget {
       // BUTTON WITHOUT ICON
       return SizedBox(
         height: 45,
-        width: btnWidth ?? 250,
+        width: btnWidth,
         child: ElevatedButton(
           onPressed: onClick,
           style: ElevatedButton.styleFrom(
@@ -53,12 +55,16 @@ class StyledButton extends StatelessWidget {
 
             shape:
                 RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
-            backgroundColor: const Color.fromARGB(255, 226, 181, 99),
+            backgroundColor:
+                btnColor ?? const Color.fromARGB(255, 226, 181, 99),
             foregroundColor: const Color.fromARGB(255, 37, 37, 37),
             textStyle: const TextStyle(
                 letterSpacing: 1, fontWeight: FontWeight.w500, fontSize: 16),
           ),
-          child: Text(btnText),
+          child: Text(
+            btnText,
+            overflow: TextOverflow.ellipsis,
+          ),
         ),
       );
     }

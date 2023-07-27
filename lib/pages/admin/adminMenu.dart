@@ -7,8 +7,15 @@ import 'package:primos_app/widgets/searchBar.dart';
 
 import 'package:primos_app/widgets/styledButton.dart';
 
-class AdminMenuPage extends StatelessWidget {
+class AdminMenuPage extends StatefulWidget {
   const AdminMenuPage({super.key});
+
+  @override
+  State<AdminMenuPage> createState() => _AdminMenuPageState();
+}
+
+class _AdminMenuPageState extends State<AdminMenuPage> {
+  int _activeButtonIndex = 0;
 
   @override
   Widget build(BuildContext context) {
@@ -29,18 +36,28 @@ class AdminMenuPage extends StatelessWidget {
                 child: SizedBox(
                   height: 45,
                   child: ListView.builder(
-                    itemCount: adminPages.length, //temporary using adminPages
-                    scrollDirection: Axis.horizontal,
-                    itemBuilder: (context, index) => Padding(
-                      padding: const EdgeInsets.only(right: 10),
-                      child: StyledButton(
-                        btnText: adminPages[index]
-                            .name, //temporarry using adminpages
-                        onClick: adminPages[index].onTap,
-                        btnWidth: 100,
-                      ),
-                    ),
-                  ),
+                      itemCount: category.length, //temporary using adminPages
+                      scrollDirection: Axis.horizontal,
+                      itemBuilder: (context, index) {
+                        final bool isActive = index == _activeButtonIndex;
+
+                        return Padding(
+                          padding: const EdgeInsets.only(right: 10),
+                          child: StyledButton(
+                            btnText: category[index].name, //temporary
+                            onClick: () {
+                              setState(() {
+                                _activeButtonIndex = index;
+                              });
+
+                              category[index].onTap;
+                            },
+                            btnColor: isActive
+                                ? const Color(0xFFFE3034)
+                                : const Color(0xFFE2B563),
+                          ),
+                        );
+                      }),
                 ),
               )
             ],
