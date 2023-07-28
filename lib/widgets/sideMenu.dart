@@ -32,7 +32,13 @@ class SideMenu extends StatelessWidget {
           ...pages.map((page) {
             return ListTile(
               title: Text(page.name),
-              onTap: page.onTap,
+              onTap: () {
+                Navigator.of(context).push(
+                  MaterialPageRoute(
+                    builder: (context) => page.page,
+                  ),
+                );
+              },
               minLeadingWidth: 0,
             );
           }).toList(),

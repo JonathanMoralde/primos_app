@@ -1,6 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:image_picker/image_picker.dart';
 import 'package:primos_app/widgets/styledButton.dart';
+import 'package:primos_app/widgets/styledDropdown.dart';
 import 'package:primos_app/widgets/styledTextField.dart';
+import 'package:primos_app/widgets/uploadImage_input.dart';
 
 class AdminMenuForm extends StatefulWidget {
   AdminMenuForm({super.key});
@@ -20,10 +23,31 @@ class _AdminMenuFormState extends State<AdminMenuForm> {
 
   String? category;
 
+  String? selectedImagePath; // Store the selected image path here
+
+  // Function to handle image selection
+  Future<void> _pickImage() async {
+    final ImagePicker _picker = ImagePicker();
+    final XFile? image = await _picker.pickImage(source: ImageSource.gallery);
+
+    if (image != null) {
+      setState(() {
+        selectedImagePath = image.path; // Store the selected image path
+      });
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+        backgroundColor: const Color(0xFFf7f7f7),
         appBar: AppBar(
+          leading: IconButton(
+            //manual handle back button
+            icon: const Icon(Icons.keyboard_arrow_left),
+            iconSize: 35,
+            onPressed: () => Navigator.of(context).pop(),
+          ),
           title: const Text("ADD ITEM"),
         ),
         body: SafeArea(
@@ -36,61 +60,31 @@ class _AdminMenuFormState extends State<AdminMenuForm> {
                     controller: itemNameController,
                     hintText: "Item Name",
                     obscureText: false),
-                SizedBox(
+                const SizedBox(
                   height: 10,
                 ),
                 StyledTextField(
                     controller: itemPriceController,
                     hintText: "Item Price",
                     obscureText: false),
-                SizedBox(
+                const SizedBox(
                   height: 10,
                 ),
-                Container(
-                  height: 45,
-                  width: 250,
-                  padding: EdgeInsets.only(left: 8, right: 8),
-                  decoration: BoxDecoration(
-                      color: Colors.grey.shade300,
-                      borderRadius: BorderRadius.all(Radius.circular(8))),
-                  child: DropdownButton(
-                      underline: Container(),
-                      hint: const Text(
-                        "Category",
-                        style: TextStyle(fontSize: 14),
-                      ),
-                      value: category,
-                      isExpanded: true,
-                      items: const [
-                        DropdownMenuItem(
-                          value: "Cat1",
-                          child: Text(
-                            "Cat1",
-                            style: TextStyle(fontSize: 14),
-                          ),
-                        ),
-                        DropdownMenuItem(
-                          value: "Cat2",
-                          child: Text(
-                            "Cat2",
-                            style: TextStyle(fontSize: 14),
-                          ),
-                        ),
-                      ],
-                      onChanged: (String? newValue) {
-                        setState(() {
-                          category = newValue;
-                        });
-                      }),
-                ),
-                SizedBox(
+                StyledDropdown(
+                    value: category,
+                    onChange: (String? newValue) {
+                      setState(() {
+                        category = newValue;
+                      });
+                    }),
+                const SizedBox(
                   height: 10,
                 ),
-                StyledTextField(
-                    controller: itemImageController,
-                    hintText: "Image",
-                    obscureText: false),
-                SizedBox(
+                UploadImage(
+                  onPressed: _pickImage,
+                  text: selectedImagePath,
+                ),
+                const SizedBox(
                   height: 20,
                 ),
                 StyledButton(

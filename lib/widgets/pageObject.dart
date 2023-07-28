@@ -1,11 +1,14 @@
-// It creates an instance of an object with name, and onTap function
+// It creates an instance of an object with name, and widget
 // used for adding pages in sideMenu.dart
+import 'package:flutter/material.dart';
+import 'package:primos_app/pages/admin/adminMenu.dart';
+import 'package:primos_app/pages/admin/salesReport.dart';
 
 class SideMenuPage {
   final String name;
-  final Function()? onTap;
+  final Widget page; //used for navigator
 
-  SideMenuPage({required this.name, required this.onTap});
+  SideMenuPage({required this.name, required this.page});
 }
 
 // TODO CREATE THE LIST OF PAGES BELOW
@@ -15,58 +18,8 @@ class SideMenuPage {
 // ADMIN PAGES
 
 List<SideMenuPage> adminPages = [
-  SideMenuPage(
-      name: "Sales Report",
-      onTap: () {
-        print("Sales");
-      }),
-  SideMenuPage(
-      name: "Menu",
-      onTap: () {
-        print("Menu");
-      }),
-  SideMenuPage(
-      name: "Table",
-      onTap: () {
-        print("Table");
-      }),
-  SideMenuPage(
-      name: "Employee",
-      onTap: () {
-        print("Employee");
-      }),
+  SideMenuPage(name: "Sales Report", page: SalesReportPage()),
+  SideMenuPage(name: "Menu", page: AdminMenuPage()),
 ];
 
 // END OF ADMIN PAGES
-
-//! temp? reused the class
-// Category Buttons
-List<SideMenuPage> category = [
-  SideMenuPage(
-      name: "All",
-      onTap: () {
-        print("All");
-      }),
-  SideMenuPage(
-      name: "Salads & Starters",
-      onTap: () {
-        print("Salads & Starters");
-      }),
-  SideMenuPage(
-      name: "Pizza & Pasta",
-      onTap: () {
-        print("Pizza & Pasta");
-      }),
-  SideMenuPage(
-      name: "Sandwich Board",
-      onTap: () {
-        print("Sandwich Board");
-      }),
-  SideMenuPage(
-      name: "Oddle Noodle",
-      onTap: () {
-        print("Oddle Noodle");
-      }),
-];
-
-// END OF Category Buttons
