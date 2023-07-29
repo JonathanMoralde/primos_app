@@ -1,8 +1,13 @@
 import 'package:flutter/material.dart';
+import 'package:primos_app/pages/admin/adminMenu_Form.dart';
 import 'package:primos_app/widgets/styledButton.dart';
 
 class ItemCard extends StatelessWidget {
-  const ItemCard({super.key});
+  final String productName;
+  final double productPrice;
+
+  const ItemCard(
+      {super.key, required this.productName, required this.productPrice});
 
   @override
   Widget build(BuildContext context) {
@@ -34,15 +39,15 @@ class ItemCard extends StatelessWidget {
             child: SizedBox(
               width: double.infinity,
               child: Padding(
-                padding: EdgeInsets.all(8.0),
+                padding: const EdgeInsets.all(8.0),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    const Text("Product Name"),
+                    Text(productName),
                     const SizedBox(
                       height: 8,
                     ),
-                    const Text("PHP Price"),
+                    Text("$productPrice PHP"),
                     const SizedBox(
                       height: 8,
                     ),
@@ -51,12 +56,22 @@ class ItemCard extends StatelessWidget {
                       children: [
                         StyledButton(
                           btnText: "Edit",
-                          onClick: () {},
+                          onClick: () {
+                            Navigator.of(context).push(
+                              MaterialPageRoute(
+                                  builder: (BuildContext context) {
+                                return AdminMenuForm(
+                                  productName: productName,
+                                  productPrice: productPrice,
+                                );
+                              }),
+                            );
+                          },
                           btnHeight: 30,
                         ),
                         StyledButton(
                           btnText: "Delete",
-                          onClick: () {},
+                          onClick: () {}, //TODO DELETE OR REMOVE FUNCTION
                           btnHeight: 30,
                         ),
                       ],

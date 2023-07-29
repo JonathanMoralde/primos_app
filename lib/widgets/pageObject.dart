@@ -3,6 +3,7 @@
 import 'package:flutter/material.dart';
 import 'package:primos_app/pages/admin/adminMenu.dart';
 import 'package:primos_app/pages/admin/salesReport.dart';
+import 'package:primos_app/pages/admin/table.dart';
 
 class SideMenuPage {
   final String name;
@@ -18,8 +19,18 @@ class SideMenuPage {
 // ADMIN PAGES
 
 List<SideMenuPage> adminPages = [
-  SideMenuPage(name: "Sales Report", page: SalesReportPage()),
-  SideMenuPage(name: "Menu", page: AdminMenuPage()),
+  SideMenuPage(
+    name: "Sales Report",
+    page: SalesReportPage(),
+  ),
+  SideMenuPage(
+    name: "Menu",
+    page: AdminMenuPage(),
+  ),
+  SideMenuPage(
+    name: "Table",
+    page: TablePage(),
+  ),
 ];
 
 // END OF ADMIN PAGES

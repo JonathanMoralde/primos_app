@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:primos_app/pages/admin/adminMenu_CatForm.dart';
 import 'package:primos_app/pages/admin/adminMenu_Form.dart';
 import 'package:primos_app/widgets/bottomBar.dart';
 import 'package:primos_app/widgets/itemCard.dart';
@@ -73,9 +74,19 @@ class _AdminMenuPageState extends State<AdminMenuPage> {
                     spacing: 10,
                     runSpacing: 10,
                     children: [
-                      ItemCard(),
-                      ItemCard(),
-                      ItemCard(),
+                      // TODO WRAP ITEMCARD WITH LISTVIEW BUILDER AND CREATE A DYNAMIC ITEMCARD
+                      ItemCard(
+                        productName: "Turingan",
+                        productPrice: 69,
+                      ),
+                      ItemCard(
+                        productName: "Sinapot",
+                        productPrice: 69,
+                      ),
+                      ItemCard(
+                        productName: "Turon",
+                        productPrice: 69,
+                      ),
                     ],
                   ),
                 ),
@@ -97,9 +108,10 @@ class _AdminMenuPageState extends State<AdminMenuPage> {
                   btnText: "New Item",
                   onClick: () {
                     Navigator.of(context).push(
-                        MaterialPageRoute(builder: (BuildContext context) {
-                      return AdminMenuForm();
-                    }));
+                      MaterialPageRoute(builder: (BuildContext context) {
+                        return AdminMenuForm();
+                      }),
+                    );
                   },
                   btnColor: const Color(0xfff8f8f7),
                 ),
@@ -111,7 +123,13 @@ class _AdminMenuPageState extends State<AdminMenuPage> {
                 flex: 1,
                 child: StyledButton(
                   btnText: "New Category",
-                  onClick: () {},
+                  onClick: () {
+                    Navigator.of(context).push(
+                      MaterialPageRoute(builder: (BuildContext context) {
+                        return AdminMenuCatForm();
+                      }),
+                    );
+                  },
                   btnColor: const Color(0xfff8f8f7),
                 ),
               ),

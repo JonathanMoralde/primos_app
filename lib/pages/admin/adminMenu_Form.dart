@@ -6,7 +6,10 @@ import 'package:primos_app/widgets/styledTextField.dart';
 import 'package:primos_app/widgets/uploadImage_input.dart';
 
 class AdminMenuForm extends StatefulWidget {
-  AdminMenuForm({super.key});
+  final String? productName;
+  final double? productPrice;
+
+  AdminMenuForm({super.key, this.productName, this.productPrice});
 
   @override
   State<AdminMenuForm> createState() => _AdminMenuFormState();
@@ -24,6 +27,16 @@ class _AdminMenuFormState extends State<AdminMenuForm> {
   String? category;
 
   String? selectedImagePath; // Store the selected image path here
+
+  @override
+  void initState() {
+    super.initState();
+    // Set the initial values for the text fields
+    itemNameController.text =
+        widget.productName ?? ''; // If productName is null, set an empty string
+    itemPriceController.text = widget.productPrice?.toString() ??
+        ''; // If productPrice is null, set an empty string
+  }
 
   // Function to handle image selection
   Future<void> _pickImage() async {
@@ -48,7 +61,9 @@ class _AdminMenuFormState extends State<AdminMenuForm> {
             iconSize: 35,
             onPressed: () => Navigator.of(context).pop(),
           ),
-          title: const Text("ADD ITEM"),
+          title: widget.productName != null && widget.productPrice != null
+              ? Text("EDIT ITEM")
+              : Text("ADD ITEM"),
         ),
         body: SafeArea(
           child: SizedBox(
