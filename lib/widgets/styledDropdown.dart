@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 class StyledDropdown extends StatelessWidget {
   final String? value;
   final void Function(String?) onChange;
+  final String hintText;
 
   /*
   *   ONCHANGE
@@ -17,6 +18,7 @@ class StyledDropdown extends StatelessWidget {
     super.key,
     required this.value,
     required this.onChange,
+    required this.hintText,
   });
 
   @override
@@ -31,9 +33,9 @@ class StyledDropdown extends StatelessWidget {
       child: DropdownButton(
         icon: const Icon(Icons.keyboard_arrow_down),
         underline: Container(),
-        hint: const Text(
-          "Category",
-          style: TextStyle(fontSize: 14),
+        hint: Text(
+          hintText,
+          style: const TextStyle(fontSize: 14),
         ),
         value: value,
         isExpanded: true,

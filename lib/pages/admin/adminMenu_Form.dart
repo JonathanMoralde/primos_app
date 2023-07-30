@@ -86,12 +86,14 @@ class _AdminMenuFormState extends State<AdminMenuForm> {
                   height: 10,
                 ),
                 StyledDropdown(
-                    value: category,
-                    onChange: (String? newValue) {
-                      setState(() {
-                        category = newValue;
-                      });
-                    }),
+                  value: category,
+                  onChange: (String? newValue) {
+                    setState(() {
+                      category = newValue;
+                    });
+                  },
+                  hintText: "Category",
+                ),
                 const SizedBox(
                   height: 10,
                 ),

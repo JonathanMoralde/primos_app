@@ -2,6 +2,7 @@
 // used for adding pages in sideMenu.dart
 import 'package:flutter/material.dart';
 import 'package:primos_app/pages/admin/adminMenu.dart';
+import 'package:primos_app/pages/admin/employee.dart';
 import 'package:primos_app/pages/admin/salesReport.dart';
 import 'package:primos_app/pages/admin/table.dart';
 
@@ -30,6 +31,10 @@ List<SideMenuPage> adminPages = [
   SideMenuPage(
     name: "Table",
     page: TablePage(),
+  ),
+  SideMenuPage(
+    name: "Employee",
+    page: EmployeePage(),
   ),
 ];
 

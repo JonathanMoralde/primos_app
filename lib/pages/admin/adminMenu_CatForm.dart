@@ -42,6 +42,5 @@ class AdminMenuCatForm extends StatelessWidget {
             ),
           ),
         ));
-    ;
   }
 }

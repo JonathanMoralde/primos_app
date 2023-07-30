@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
 
 class TableDisplay extends StatelessWidget {
-  const TableDisplay({super.key});
+  final int tableNum;
+
+  const TableDisplay({super.key, required this.tableNum});
 
   @override
   Widget build(BuildContext context) {
@@ -19,10 +21,13 @@ class TableDisplay extends StatelessWidget {
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           crossAxisAlignment: CrossAxisAlignment.center,
           children: [
-            Text("T-1"),
+            Text("Table $tableNum"),
             IconButton(
               icon: const Icon(Icons.delete),
-              onPressed: () {},
+              onPressed: () {
+                // TODO ADD API
+                print(tableNum);
+              },
             ),
           ],
         ),
