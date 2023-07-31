@@ -86,6 +86,7 @@ class _TablePageState extends State<TablePage> {
                     ]),
               ),
               StyledButton(
+                noShadow: true,
                 btnText: "ADD",
                 onClick: () {
                   // TODO ADD API

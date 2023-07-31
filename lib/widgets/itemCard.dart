@@ -15,6 +15,14 @@ class ItemCard extends StatelessWidget {
       height: 220,
       width: 174,
       decoration: BoxDecoration(
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withOpacity(0.25),
+            spreadRadius: 0,
+            blurRadius: 5,
+            offset: const Offset(0, 2), // Changes the position of the shadow
+          ),
+        ],
         borderRadius: BorderRadius.circular(8),
         color: Colors.grey.shade300,
       ),
@@ -55,6 +63,7 @@ class ItemCard extends StatelessWidget {
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
                         StyledButton(
+                          noShadow: true,
                           btnText: "Edit",
                           onClick: () {
                             Navigator.of(context).push(
@@ -70,6 +79,7 @@ class ItemCard extends StatelessWidget {
                           btnHeight: 30,
                         ),
                         StyledButton(
+                          noShadow: true,
                           btnText: "Delete",
                           onClick: () {}, //TODO DELETE OR REMOVE FUNCTION
                           btnHeight: 30,

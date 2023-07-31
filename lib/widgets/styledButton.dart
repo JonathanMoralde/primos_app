@@ -12,6 +12,7 @@ class StyledButton extends StatelessWidget {
   final double? btnWidth;
   final double? btnHeight;
   final dynamic btnColor;
+  final bool? noShadow;
 
   const StyledButton({
     super.key,
@@ -21,6 +22,7 @@ class StyledButton extends StatelessWidget {
     this.btnWidth,
     this.btnHeight,
     this.btnColor,
+    this.noShadow,
   });
 
   @override
@@ -34,6 +36,7 @@ class StyledButton extends StatelessWidget {
           onPressed: onClick,
           style: ElevatedButton.styleFrom(
             // fixedSize: const Size(250, 32),
+            elevation: noShadow == true ? 0 : 2,
             shape:
                 RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
             backgroundColor: btnColor ?? const Color(0xFFE2B563),
@@ -54,6 +57,7 @@ class StyledButton extends StatelessWidget {
           onPressed: onClick,
           style: ElevatedButton.styleFrom(
             // fixedSize: const Size(250, 32),
+            elevation: noShadow == true ? 0 : 2,
 
             shape:
                 RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),

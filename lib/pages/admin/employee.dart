@@ -46,6 +46,7 @@ class EmployeePage extends StatelessWidget {
                 Expanded(
                   flex: 1,
                   child: StyledButton(
+                    noShadow: true,
                     btnText: "NEW EMPLOYEE",
                     onClick: () {
                       Navigator.of(context).push(
@@ -54,7 +55,6 @@ class EmployeePage extends StatelessWidget {
                       }));
                     },
                     btnColor: const Color(0xFFf8f8f7),
-                    // btnWidth: 250,
                     btnHeight: 45,
                   ),
                 ),

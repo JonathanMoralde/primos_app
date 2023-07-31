@@ -41,7 +41,7 @@ class _AdminMenuPageState extends State<AdminMenuPage> {
                 child: SizedBox(
                   height: 45,
                   child: ListView.builder(
-                      itemCount: category.length, //temporary using adminPages
+                      itemCount: category.length, //from btnObject import
                       scrollDirection: Axis.horizontal,
                       itemBuilder: (context, index) {
                         final bool isActive = index == _activeButtonIndex;
@@ -49,7 +49,7 @@ class _AdminMenuPageState extends State<AdminMenuPage> {
                         return Padding(
                           padding: const EdgeInsets.only(right: 10),
                           child: StyledButton(
-                            btnText: category[index].name, //temporary
+                            btnText: category[index].name,
                             onClick: () {
                               setState(() {
                                 _activeButtonIndex = index;
@@ -105,6 +105,7 @@ class _AdminMenuPageState extends State<AdminMenuPage> {
               Expanded(
                 flex: 1,
                 child: StyledButton(
+                  noShadow: true,
                   btnText: "New Item",
                   onClick: () {
                     Navigator.of(context).push(
@@ -122,6 +123,7 @@ class _AdminMenuPageState extends State<AdminMenuPage> {
               Expanded(
                 flex: 1,
                 child: StyledButton(
+                  noShadow: true,
                   btnText: "New Category",
                   onClick: () {
                     Navigator.of(context).push(

@@ -13,12 +13,20 @@ class EmployeeDisplay extends StatelessWidget {
       decoration: BoxDecoration(
         boxShadow: [
           BoxShadow(
-            color: Colors.grey.withOpacity(0.5),
-            spreadRadius: 2,
-            blurRadius: 10,
-            offset: const Offset(0, 3), // Changes the position of the shadow
+            color: Colors.black.withOpacity(0.25),
+            spreadRadius: 0,
+            blurRadius: 5,
+            offset: const Offset(0, 2), // Changes the position of the shadow
           ),
         ],
+        // boxShadow: [
+        //   BoxShadow(
+        //     color: Colors.grey.withOpacity(0.5),
+        //     spreadRadius: 2,
+        //     blurRadius: 10,
+        //     offset: const Offset(0, 3), // Changes the position of the shadow
+        //   ),
+        // ],
         color: const Color(0xFFE2B563),
         borderRadius: const BorderRadius.all(
           Radius.circular(8),

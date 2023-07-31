@@ -4,8 +4,6 @@ import 'package:primos_app/widgets/styledTextField.dart';
 
 // admin pages
 import 'package:primos_app/pages/admin/salesReport.dart';
-import 'package:primos_app/pages/admin/adminMenu.dart';
-import 'package:primos_app/pages/admin/adminMenu_Form.dart';
 
 class LoginSreen extends StatelessWidget {
   LoginSreen({super.key});
@@ -26,7 +24,7 @@ class LoginSreen extends StatelessWidget {
 
         MaterialPageRoute(
           builder: (BuildContext context) {
-            return AdminMenuPage(); //* Replace page depending on user type
+            return SalesReportPage(); //* Replace page depending on user type
           },
         ),
       );
