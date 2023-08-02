@@ -5,17 +5,21 @@ DateTime? selectedDate;
 
   void onDateSelected(DateTime? date) {
     setState(() {
+      isReset = false;
       selectedDate = date;
     });
   }
 
+?implementation with riverpod is different
   */
 
 class StyledDatepicker extends StatefulWidget {
   final void Function(DateTime? date)
       onDateSelected; //to send selectedDate to parent widget
+  final bool isReset;
 
-  const StyledDatepicker({super.key, required this.onDateSelected});
+  const StyledDatepicker(
+      {super.key, required this.onDateSelected, this.isReset = false});
 
   @override
   State<StyledDatepicker> createState() => _StyledDatepickerState();
@@ -24,11 +28,14 @@ class StyledDatepicker extends StatefulWidget {
 class _StyledDatepickerState extends State<StyledDatepicker> {
   DateTime initalDate = DateTime.now();
   DateTime? selectedDate;
+
   @override
   Widget build(BuildContext context) {
+    if (widget.isReset) {
+      selectedDate = null;
+    }
     return SizedBox(
       height: 45,
-      // width: 250,
       child: ElevatedButton(
         style: ButtonStyle(
           padding: const MaterialStatePropertyAll(
@@ -60,8 +67,8 @@ class _StyledDatepickerState extends State<StyledDatepicker> {
                 selectedDate = dateTime;
               },
             );
+            widget.onDateSelected(dateTime);
           }
-          widget.onDateSelected(dateTime);
         },
         child: Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -83,6 +90,5 @@ class _StyledDatepickerState extends State<StyledDatepicker> {
         ),
       ),
     );
-    ;
   }
 }

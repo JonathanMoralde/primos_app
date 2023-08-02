@@ -12,7 +12,7 @@ class SalesCard extends StatelessWidget {
       width: 360,
       height: 183,
       decoration: BoxDecoration(
-        color: const Color(0xFFE2B563),
+        color: const Color(0xffffffff),
         borderRadius: const BorderRadius.all(
           Radius.circular(8),
         ),
@@ -85,7 +85,7 @@ class SalesCard extends StatelessWidget {
               btnText: "Details",
               onClick: () {},
               btnWidth: double.infinity,
-              btnColor: const Color(0xfff8f8f7),
+              btnColor: const Color(0xFFE2B563),
               noShadow: true,
             )
           ],
