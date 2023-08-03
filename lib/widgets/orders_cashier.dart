@@ -1,10 +1,11 @@
 import 'package:flutter/material.dart';
+import 'package:primos_app/pages/cashier/orders_view.dart';
 
 class OrdersCashier extends StatelessWidget {
   final int orderNum;
-  void Function()? onPressed;
+  final void Function()? onPressed;
 
-  OrdersCashier({super.key, required this.orderNum, this.onPressed});
+  const OrdersCashier({super.key, required this.orderNum, this.onPressed});
 
   @override
   Widget build(BuildContext context) {
@@ -19,8 +20,8 @@ class OrdersCashier extends StatelessWidget {
         width: double.infinity,
         child: ElevatedButton(
           style: ElevatedButton.styleFrom(
-            backgroundColor: Color(0xFFE2B563),
-            foregroundColor: Color(0xFF252525),
+            backgroundColor: const Color(0xFFE2B563),
+            foregroundColor: const Color(0xFF252525),
             shape:
                 RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
           ),
@@ -31,7 +32,13 @@ class OrdersCashier extends StatelessWidget {
               Text("Table $orderNum"),
             ],
           ),
-          onPressed: () {},
+          onPressed: () {
+            Navigator.of(context).push(
+              MaterialPageRoute(
+                builder: (context) => OrderViewPage(),
+              ),
+            );
+          },
         ),
       ),
     );

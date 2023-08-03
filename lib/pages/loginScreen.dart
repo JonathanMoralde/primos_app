@@ -25,7 +25,7 @@ class LoginSreen extends StatelessWidget {
 
         MaterialPageRoute(
           builder: (BuildContext context) {
-            return SalesReportPage(); //* Replace page depending on user type
+            return OrdersPage(); //* Replace page depending on user type
           },
         ),
       );

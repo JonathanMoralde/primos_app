@@ -4,8 +4,6 @@ import 'package:primos_app/widgets/salesCard.dart';
 
 import 'package:primos_app/widgets/sideMenu.dart'; //side menu
 import 'package:primos_app/widgets/pageObject.dart';
-import 'package:primos_app/widgets/styledButton.dart';
-import 'package:primos_app/widgets/styledDatepicker.dart';
 
 class SalesReportPage extends StatefulWidget {
   const SalesReportPage({super.key});
@@ -28,29 +26,29 @@ class _SalesReportPageState extends State<SalesReportPage> {
       body: const SafeArea(
         child: SingleChildScrollView(
           child: Padding(
-            padding: const EdgeInsets.all(16.0),
+            padding: EdgeInsets.all(16.0),
             child: Column(
               children: [
                 FilterExpansion(),
-                const SizedBox(
+                SizedBox(
                   height: 20,
                 ),
                 SalesCard(
                   date: "July 31, 2023",
                 ),
-                const SizedBox(
+                SizedBox(
                   height: 10,
                 ),
                 SalesCard(
                   date: "July 31, 2023",
                 ),
-                const SizedBox(
+                SizedBox(
                   height: 10,
                 ),
                 SalesCard(
                   date: "July 31, 2023",
                 ),
-                const SizedBox(
+                SizedBox(
                   height: 10,
                 ),
                 SalesCard(

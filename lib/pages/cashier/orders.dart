@@ -12,11 +12,11 @@ class OrdersPage extends StatelessWidget {
       backgroundColor: const Color(0xfff8f8f7),
       appBar: AppBar(title: const Text("ORDERS")),
       drawer: SideMenu(pages: cashierPages),
-      body: SafeArea(
+      body: const SafeArea(
           child: SingleChildScrollView(
         child: Column(
           children: [
-            const SizedBox(
+            SizedBox(
               height: 16,
             ),
             OrdersCashier(orderNum: 1),
