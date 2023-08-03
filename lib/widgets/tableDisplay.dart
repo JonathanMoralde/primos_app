@@ -12,7 +12,7 @@ class TableDisplay extends StatelessWidget {
           borderRadius: BorderRadius.all(
             Radius.circular(8),
           ),
-          color: Colors.amber),
+          color: Color(0xFFE2B563)),
       height: 45,
       width: 175,
       child: Padding(

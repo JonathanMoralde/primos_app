@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:primos_app/pages/cashier/orders.dart';
 import 'package:primos_app/widgets/styledButton.dart';
 import 'package:primos_app/widgets/styledTextField.dart';
 
@@ -24,7 +25,7 @@ class LoginSreen extends StatelessWidget {
 
         MaterialPageRoute(
           builder: (BuildContext context) {
-            return SalesReportPage(); //* Replace page depending on user type
+            return OrdersPage(); //* Replace page depending on user type
           },
         ),
       );

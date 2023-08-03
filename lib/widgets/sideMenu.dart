@@ -1,5 +1,4 @@
 //preconfigured with pageObject.dart
-// TODO edit the header
 
 import 'package:flutter/material.dart';
 import 'package:primos_app/widgets/pageObject.dart';
@@ -25,7 +24,16 @@ class SideMenu extends StatelessWidget {
             decoration: BoxDecoration(
               color: Color(0xFFE2B563),
             ),
-            child: Text("Test"),
+            child: Column(
+                crossAxisAlignment: CrossAxisAlignment.center,
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Icon(
+                    Icons.account_circle,
+                    size: 85,
+                  ),
+                  Text("Jonathan Moralde"),
+                ]),
           ),
 
           // DYNAMIC PAGES

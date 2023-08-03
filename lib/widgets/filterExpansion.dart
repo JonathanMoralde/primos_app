@@ -12,10 +12,6 @@ class FilterExpansion extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    // final selectedDate1 = ref.watch(selectedDateProvider1.notifier);
-    // final selectedDate2 = ref.watch(selectedDateProvider2.notifier);
-    // final selectedDate3 = ref.watch(selectedDateProvider3.notifier);
-
     final isExpanded = ref.watch(isExpandedProvider);
 
     void onDateSelected1(DateTime? date) {
@@ -115,6 +111,7 @@ class FilterExpansion extends ConsumerWidget {
                       SizedBox(
                         width: double.infinity,
                         child: StyledButton(
+                            noShadow: true,
                             btnText: "FILTER",
                             onClick: () {
                               // TODO FILTER BY DATE RANGE API
@@ -145,6 +142,7 @@ class FilterExpansion extends ConsumerWidget {
                           Expanded(
                             flex: 1,
                             child: StyledButton(
+                              noShadow: true,
                               btnText: "FILTER",
                               onClick: () {
                                 //TODO FILTER BY SINGLE DATE API
@@ -159,9 +157,9 @@ class FilterExpansion extends ConsumerWidget {
                       SizedBox(
                         width: double.infinity,
                         child: StyledButton(
+                            noShadow: true,
                             btnText: "RESET DATE",
                             onClick: () {
-                              // TODO RESET DISPLAY AND STATE
                               ref.read(selectedDate1Provider.notifier).state =
                                   null;
                               ref.read(selectedDate2Provider.notifier).state =
