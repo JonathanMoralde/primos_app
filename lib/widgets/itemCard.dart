@@ -2,12 +2,24 @@ import 'package:flutter/material.dart';
 import 'package:primos_app/pages/admin/adminMenu_Form.dart';
 import 'package:primos_app/widgets/styledButton.dart';
 
+// ! TO CHANGE THE FOOTER SECTION
+// PASS A WIDGET, EXAMPLE:
+/* 
+Row(
+mainAxisAlignment: MainAxisAlignment.spaceBetween,
+children:[Text("TEST"), Text("TEST")]), 
+*/
+
 class ItemCard extends StatelessWidget {
   final String productName;
   final double productPrice;
+  final Widget? widget;
 
   const ItemCard(
-      {super.key, required this.productName, required this.productPrice});
+      {super.key,
+      required this.productName,
+      required this.productPrice,
+      this.widget});
 
   @override
   Widget build(BuildContext context) {
@@ -59,33 +71,36 @@ class ItemCard extends StatelessWidget {
                     const SizedBox(
                       height: 8,
                     ),
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        StyledButton(
-                          noShadow: true,
-                          btnText: "Edit",
-                          onClick: () {
-                            Navigator.of(context).push(
-                              MaterialPageRoute(
-                                  builder: (BuildContext context) {
-                                return AdminMenuForm(
-                                  productName: productName,
-                                  productPrice: productPrice,
-                                );
-                              }),
-                            );
-                          },
-                          btnHeight: 30,
-                        ),
-                        StyledButton(
-                          noShadow: true,
-                          btnText: "Delete",
-                          onClick: () {}, //TODO DELETE OR REMOVE FUNCTION
-                          btnHeight: 30,
-                        ),
-                      ],
-                    )
+                    // !FOOTER SECTION
+                    widget != null
+                        ? widget!
+                        : Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            children: [
+                              StyledButton(
+                                noShadow: true,
+                                btnText: "Edit",
+                                onClick: () {
+                                  Navigator.of(context).push(
+                                    MaterialPageRoute(
+                                        builder: (BuildContext context) {
+                                      return AdminMenuForm(
+                                        productName: productName,
+                                        productPrice: productPrice,
+                                      );
+                                    }),
+                                  );
+                                },
+                                btnHeight: 30,
+                              ),
+                              StyledButton(
+                                noShadow: true,
+                                btnText: "Delete",
+                                onClick: () {}, //TODO DELETE OR REMOVE FUNCTION
+                                btnHeight: 30,
+                              ),
+                            ],
+                          )
                   ],
                 ),
               ),
