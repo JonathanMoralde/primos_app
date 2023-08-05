@@ -5,7 +5,7 @@ import 'package:primos_app/widgets/bottomBar.dart';
 import 'package:primos_app/widgets/filterBtns.dart';
 import 'package:primos_app/widgets/itemCard.dart';
 import 'package:primos_app/widgets/pageObject.dart';
-import 'package:primos_app/widgets/btnObject.dart';
+// import 'package:primos_app/widgets/btnObject.dart';
 
 import 'package:primos_app/widgets/sideMenu.dart';
 
@@ -21,7 +21,7 @@ class AdminMenuPage extends StatefulWidget {
 }
 
 class _AdminMenuPageState extends State<AdminMenuPage> {
-  int _activeButtonIndex = 0;
+  // int _activeButtonIndex = 0;
 
   @override
   Widget build(BuildContext context) {
