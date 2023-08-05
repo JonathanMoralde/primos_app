@@ -2,14 +2,17 @@ import 'package:flutter/material.dart';
 import 'package:primos_app/pages/cashier/orders.dart';
 import 'package:primos_app/widgets/styledButton.dart';
 import 'package:primos_app/widgets/styledTextField.dart';
+import 'package:firebase_auth/firebase_auth.dart';
+import 'login_services.dart';
 
 // admin pages
 import 'package:primos_app/pages/admin/salesReport.dart';
 
 class LoginSreen extends StatelessWidget {
   LoginSreen({super.key});
+  final User? user = Auth().currentUser;
 
-  final usernameController =
+  final emailController =
       TextEditingController(); //* to access the input value for auth, usernameController.text
   final passwordController =
       TextEditingController(); //* passwordController.text
@@ -19,17 +22,31 @@ class LoginSreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     void handleSignin() {
-      // TODO ADD AUTHENTICATION BEFORE EXECUTING NAVIGATOR
-      Navigator.of(context).pushReplacement(
-        //pushReplacement prevents user to go back to login screen
+      final String email =
+          emailController.text.trim(); // Remove leading/trailing whitespace
+      final String password = passwordController.text;
 
-        MaterialPageRoute(
-          builder: (BuildContext context) {
-            return OrdersPage(); //* Replace page depending on user type
-          },
-        ),
-      );
-      // TODO
+      if (email.isEmpty || password.isEmpty) {
+        // Show an error message to the user if email or password is empty
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text("Please enter both email and password")),
+        );
+        return; // Don't proceed with sign-in if inputs are empty
+      }
+      FirebaseAuth.instance
+          .signInWithEmailAndPassword(
+              email: emailController.text, password: passwordController.text)
+          .then((value) {
+        Navigator.of(context).pushReplacement(
+          //pushReplacement prevents user to go back to login screen
+
+          MaterialPageRoute(
+            builder: (BuildContext context) {
+              return SalesReportPage(); //* Replace page depending on user type
+            },
+          ),
+        );
+      });
     }
 
     return Scaffold(
@@ -86,8 +103,8 @@ class LoginSreen extends StatelessWidget {
                   height: 35,
                 ),
                 StyledTextField(
-                  controller: usernameController,
-                  hintText: 'Username',
+                  controller: emailController,
+                  hintText: 'Email',
                   obscureText: false,
                 ),
                 // Password textfield

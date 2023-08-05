@@ -1,0 +1,39 @@
+{
+  "project_info": {
+    "project_number": "66965394392",
+    "project_id": "primos-app-8f071",
+    "storage_bucket": "primos-app-8f071.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:66965394392:android:660d8dd9e471679b9198ad",
+        "android_client_info": {
+          "package_name": "com.example.primos_app"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "66965394392-gv7nrvptdf2ir07kfvpic6c6u9jig1lj.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyB076I8tGJKco_U6iFWZvMqqQDMOmTZyWE"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "66965394392-gv7nrvptdf2ir07kfvpic6c6u9jig1lj.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
