@@ -1,5 +1,5 @@
 //preconfigured with pageObject.dart
-
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:primos_app/widgets/pageObject.dart';
 import 'package:primos_app/pages/loginScreen.dart';
@@ -40,12 +40,14 @@ class SideMenu extends StatelessWidget {
           ...pages.map((page) {
             return ListTile(
               title: Text(page.name),
-              onTap: () {
-                Navigator.of(context).push(
-                  MaterialPageRoute(
-                    builder: (context) => page.page,
-                  ),
-                );
+              onTap: () async {
+                try {
+                  await FirebaseAuth.instance.signOut();
+                  Navigator.popUntil(context, (route) => route.isFirst);
+                } catch (error) {
+                  print('Error during logout: $error');
+                  // Handle error if needed
+                }
               },
               minLeadingWidth: 0,
             );
