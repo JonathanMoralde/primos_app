@@ -4,22 +4,15 @@ class StyledDropdown extends StatelessWidget {
   final String? value;
   final void Function(String?) onChange;
   final String hintText;
-
-  /*
-  *   ONCHANGE
-  (String? newValue) {
-                        setState(() {
-                          value = newValue;
-                        });
-                      }
-  */
+  final List<String> items;
 
   const StyledDropdown({
-    super.key,
+    Key? key,
     required this.value,
     required this.onChange,
     required this.hintText,
-  });
+    required this.items,
+  }) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
@@ -28,8 +21,9 @@ class StyledDropdown extends StatelessWidget {
       width: 250,
       padding: EdgeInsets.only(left: 8, right: 8),
       decoration: BoxDecoration(
-          color: Colors.grey.shade300,
-          borderRadius: const BorderRadius.all(Radius.circular(8))),
+        color: Colors.grey.shade300,
+        borderRadius: const BorderRadius.all(Radius.circular(8)),
+      ),
       child: DropdownButton(
         icon: const Icon(Icons.keyboard_arrow_down),
         underline: Container(),
@@ -39,23 +33,15 @@ class StyledDropdown extends StatelessWidget {
         ),
         value: value,
         isExpanded: true,
-        items: const [
-          // TODO CREATE A LISTVIEW.BUILDER TO MAKE THE DROPDOWN ITEM DYNAMIC
-          DropdownMenuItem(
-            value: "Cat1",
+        items: items.map((item) {
+          return DropdownMenuItem(
+            value: item,
             child: Text(
-              "Cat1",
+              item,
               style: TextStyle(fontSize: 14),
             ),
-          ),
-          DropdownMenuItem(
-            value: "Cat2",
-            child: Text(
-              "Cat2",
-              style: TextStyle(fontSize: 14),
-            ),
-          ),
-        ],
+          );
+        }).toList(),
         onChanged: onChange,
       ),
     );

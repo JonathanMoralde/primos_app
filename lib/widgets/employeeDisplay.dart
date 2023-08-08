@@ -1,11 +1,17 @@
 import 'package:flutter/material.dart';
 import 'package:primos_app/pages/admin/employee_Form.dart';
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 
 class EmployeeDisplay extends StatelessWidget {
   final String employeeName;
   final String employeeRole;
-  const EmployeeDisplay(
-      {super.key, required this.employeeName, required this.employeeRole});
+
+  const EmployeeDisplay({
+    Key? key,
+    required this.employeeName,
+    required this.employeeRole,
+  }) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
@@ -16,17 +22,9 @@ class EmployeeDisplay extends StatelessWidget {
             color: Colors.black.withOpacity(0.25),
             spreadRadius: 0,
             blurRadius: 5,
-            offset: const Offset(0, 2), // Changes the position of the shadow
+            offset: const Offset(0, 2),
           ),
         ],
-        // boxShadow: [
-        //   BoxShadow(
-        //     color: Colors.grey.withOpacity(0.5),
-        //     spreadRadius: 2,
-        //     blurRadius: 10,
-        //     offset: const Offset(0, 3), // Changes the position of the shadow
-        //   ),
-        // ],
         color: const Color(0xFFE2B563),
         borderRadius: const BorderRadius.all(
           Radius.circular(8),
@@ -35,7 +33,7 @@ class EmployeeDisplay extends StatelessWidget {
       height: 70,
       width: double.infinity,
       child: Padding(
-        padding: EdgeInsets.all(10.0),
+        padding: const EdgeInsets.all(10.0),
         child: Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
@@ -48,9 +46,10 @@ class EmployeeDisplay extends StatelessWidget {
                   Text(
                     employeeName,
                     style: const TextStyle(
-                        fontSize: 16,
-                        fontWeight: FontWeight.w600,
-                        letterSpacing: 1),
+                      fontSize: 16,
+                      fontWeight: FontWeight.w600,
+                      letterSpacing: 1,
+                    ),
                     overflow: TextOverflow.ellipsis,
                   ),
                   Text(
@@ -85,16 +84,66 @@ class EmployeeDisplay extends StatelessWidget {
                     alignment: const AlignmentDirectional(7, 0),
                     iconSize: 28,
                     onPressed: () {
-                      print("Pressed del");
+                      _showDeleteConfirmationDialog(context);
                     },
                     icon: const Icon(Icons.delete),
                   ),
                 ],
               ),
-            )
+            ),
           ],
         ),
       ),
     );
   }
+
+  // Function to show a delete confirmation dialog
+  Future<void> _showDeleteConfirmationDialog(BuildContext context) async {
+    final confirmed = await showDialog<bool>(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: const Text("Confirm Deletion"),
+          content: const Text("Are you sure you want to delete this employee?"),
+          actions: [
+            TextButton(
+              onPressed: () {
+                Navigator.of(context).pop(false); // User canceled deletion
+              },
+              child: const Text("Cancel"),
+            ),
+            TextButton(
+              onPressed: () {
+                Navigator.of(context).pop(true); // User confirmed deletion
+              },
+              child: const Text("Delete"),
+            ),
+          ],
+        );
+      },
+    );
+
+    // If user confirmed deletion, proceed to delete
+    if (confirmed == true) {
+      // _deleteEmployee();
+    }
+  }
 }
+  // Function to delete the employee from Firebase Firestore and Authentication
+//   Future<void> _deleteEmployee() async {
+//     try {
+//       final user = FirebaseAuth.instance.currentUser;
+//       if (user != null) {
+//         // Delete user from Firestore
+//         await FirebaseFirestore.instance
+//             .collection('users')
+//             .doc(user.uid)
+//             .delete();
+//         // Delete user from authentication
+//         await user.delete();
+//       }
+//     } catch (error) {
+//       print('Error during deletion: $error');
+//     }
+//   }
+// }
