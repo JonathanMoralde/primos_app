@@ -1,11 +1,35 @@
 import 'package:flutter/material.dart';
 import 'package:primos_app/widgets/styledTextField.dart';
 import 'package:primos_app/widgets/styledButton.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 
-class AdminMenuCatForm extends StatelessWidget {
+class AdminMenuCatForm extends StatefulWidget {
   AdminMenuCatForm({super.key});
 
+  @override
+  State<AdminMenuCatForm> createState() => _AdminMenuCatFormState();
+}
+
+class _AdminMenuCatFormState extends State<AdminMenuCatForm> {
   final categoryNameController = TextEditingController();
+
+  Future<void> addCategory() async {
+    String categoryName = categoryNameController.text;
+
+    try {
+      if (categoryName.isNotEmpty) {
+        Map<String, dynamic> data = {"categoryName": categoryName};
+        await FirebaseFirestore.instance.collection('categories').add(data);
+        categoryNameController.clear();
+        const ScaffoldMessenger(
+            child: SnackBar(content: Text('Category Added Successfully')));
+      } else {
+        print('Category name is empty');
+      }
+    } catch (error) {
+      print('error');
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -35,7 +59,9 @@ class AdminMenuCatForm extends StatelessWidget {
                 ),
                 StyledButton(
                   btnText: "ADD",
-                  onClick: () {},
+                  onClick: () {
+                    addCategory();
+                  },
                   btnWidth: 250,
                 )
               ],

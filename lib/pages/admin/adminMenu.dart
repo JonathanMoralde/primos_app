@@ -1,27 +1,25 @@
 import 'package:flutter/material.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:primos_app/pages/admin/adminMenu_CatForm.dart';
 import 'package:primos_app/pages/admin/adminMenu_Form.dart';
 import 'package:primos_app/widgets/bottomBar.dart';
 import 'package:primos_app/widgets/filterBtns.dart';
 import 'package:primos_app/widgets/itemCard.dart';
-import 'package:primos_app/widgets/pageObject.dart';
-// import 'package:primos_app/widgets/btnObject.dart';
-
 import 'package:primos_app/widgets/sideMenu.dart';
-
 import 'package:primos_app/widgets/searchBar.dart';
-
 import 'package:primos_app/widgets/styledButton.dart';
+import 'package:primos_app/widgets/pageObject.dart';
 
 class AdminMenuPage extends StatefulWidget {
-  const AdminMenuPage({super.key});
+  const AdminMenuPage({Key? key});
 
   @override
-  State<AdminMenuPage> createState() => _AdminMenuPageState();
+  _AdminMenuPageState createState() => _AdminMenuPageState();
 }
 
 class _AdminMenuPageState extends State<AdminMenuPage> {
-  // int _activeButtonIndex = 0;
+  final CollectionReference itemsCollection =
+      FirebaseFirestore.instance.collection('menu');
 
   @override
   Widget build(BuildContext context) {
@@ -31,69 +29,52 @@ class _AdminMenuPageState extends State<AdminMenuPage> {
       appBar: AppBar(
         title: const Text("MENU"),
       ),
-      body: const SafeArea(
+      body: SafeArea(
         child: SingleChildScrollView(
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.start,
-            children: [
-              CustomSearchBar(),
-              // Padding(
-              //   padding: const EdgeInsets.only(left: 16),
-              //   child: SizedBox(
-              //     height: 45,
-              //     child: ListView.builder(
-              //         itemCount: category.length, //from btnObject import
-              //         scrollDirection: Axis.horizontal,
-              //         itemBuilder: (context, index) {
-              //           final bool isActive = index == _activeButtonIndex;
+          child: Center(
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.start,
+              children: [
+                CustomSearchBar(),
+                FilterBtns(),
+                StreamBuilder<QuerySnapshot>(
+                  stream: itemsCollection.snapshots(),
+                  builder: (context, snapshot) {
+                    if (snapshot.hasError) {
+                      return Text('Error: ${snapshot.error}');
+                    }
 
-              //           return Padding(
-              //             padding: const EdgeInsets.only(right: 10),
-              //             child: StyledButton(
-              //               btnText: category[index].name,
-              //               onClick: () {
-              //                 setState(() {
-              //                   _activeButtonIndex = index;
-              //                 });
+                    if (!snapshot.hasData) {
+                      return CircularProgressIndicator();
+                    }
 
-              //                 category[index].onTap;
-              //               },
-              //               btnColor: isActive
-              //                   ? const Color(0xFFFE3034)
-              //                   : const Color(0xFFE2B563),
-              //             ),
-              //           );
-              //         }),
-              //   ),
-              // ),
-              FilterBtns(),
-              Padding(
-                padding: EdgeInsets.all(16),
-                child: SizedBox(
-                  width: double.infinity,
-                  child: Wrap(
-                    alignment: WrapAlignment.start,
-                    spacing: 10,
-                    runSpacing: 10,
-                    children: [
-                      // TODO WRAP ITEMCARD WITH LISTVIEW BUILDER AND CREATE A DYNAMIC ITEMCARD
-                      ItemCard(
-                        productName: "Turingan",
-                        productPrice: 69,
+                    final itemDocs = snapshot.data!.docs;
+
+                    return Padding(
+                      padding: EdgeInsets.all(16),
+                      child: Wrap(
+                        spacing: 10,
+                        runSpacing: 10,
+                        children: itemDocs.map((itemDoc) {
+                          final productName = itemDoc['itemName'] as String;
+                          final itemPrice = itemDoc['itemPrice'];
+                          final double productPrice = (itemPrice is double)
+                              ? itemPrice
+                              : (itemPrice is int)
+                                  ? itemPrice.toDouble()
+                                  : 0.0;
+
+                          return ItemCard(
+                            productName: productName,
+                            productPrice: productPrice,
+                          );
+                        }).toList(),
                       ),
-                      ItemCard(
-                        productName: "Sinapot",
-                        productPrice: 69,
-                      ),
-                      ItemCard(
-                        productName: "Turon",
-                        productPrice: 69,
-                      ),
-                    ],
-                  ),
+                    );
+                  },
                 ),
-              ),
-            ],
+              ],
+            ),
           ),
         ),
       ),
@@ -120,7 +101,7 @@ class _AdminMenuPageState extends State<AdminMenuPage> {
                 ),
               ),
               const SizedBox(
-                width: 10, //gap between the two btns
+                width: 10,
               ),
               Expanded(
                 flex: 1,

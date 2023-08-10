@@ -1,10 +1,14 @@
 import 'package:flutter/material.dart';
+import 'package:primos_app/pages/admin/table.dart';
 import 'package:primos_app/pages/cashier/orders.dart';
+import 'package:primos_app/pages/cashier/orders_view.dart';
 import 'package:primos_app/pages/test.dart';
 import 'package:primos_app/widgets/styledButton.dart';
 import 'package:primos_app/widgets/styledTextField.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'login_services.dart';
+import 'package:firebase_core/firebase_core.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 
 // admin pages
 import 'package:primos_app/pages/admin/salesReport.dart';
@@ -23,30 +27,48 @@ class LoginSreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     void handleSignin() {
-      final String email =
-          emailController.text.trim(); // Remove leading/trailing whitespace
+      final String email = emailController.text.trim();
       final String password = passwordController.text;
 
       if (email.isEmpty || password.isEmpty) {
-        // Show an error message to the user if email or password is empty
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(content: Text("Please enter both email and password")),
         );
-        return; // Don't proceed with sign-in if inputs are empty
+        return;
       }
-      FirebaseAuth.instance
-          .signInWithEmailAndPassword(
-              email: emailController.text, password: passwordController.text)
-          .then((value) {
-        Navigator.of(context).pushReplacement(
-          //pushReplacement prevents user to go back to login screen
 
-          MaterialPageRoute(
-            builder: (BuildContext context) {
-              return SalesReportPage(); //* Replace page depending on user type
-            },
-          ),
-        );
+      FirebaseAuth.instance
+          .signInWithEmailAndPassword(email: email, password: password)
+          .then((value) async {
+        final User? user = Auth().currentUser;
+
+        if (user != null) {
+          DocumentSnapshot userSnapshot = await FirebaseFirestore.instance
+              .collection('users')
+              .doc(user.uid)
+              .get();
+          String role =
+              userSnapshot['role']; // Assuming 'role' is a field in Firestore
+
+          Navigator.of(context).pushReplacement(
+            MaterialPageRoute(
+              builder: (BuildContext context) {
+                switch (role) {
+                  case 'Admin':
+                    return SalesReportPage();
+                  case 'Waiter':
+                    return TablePage(); // Replace with your waiter page
+                  case 'Cashier':
+                    return OrderViewPage();
+                  case 'Kitchen':
+                    return TestPage();
+                  default:
+                    return LoginSreen(); // Default page for unknown roles
+                }
+              },
+            ),
+          );
+        }
       });
     }
 
