@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:primos_app/pages/loginScreen.dart';
+import 'package:primos_app/pages/waiter/tables.dart';
 import '../pages/admin/salesReport.dart';
 import '../pages/admin/table.dart';
 import '../pages/cashier/orders.dart';
@@ -53,7 +54,7 @@ class MainPage extends StatelessWidget {
       case 'Admin':
         return SalesReportPage();
       case 'Waiter':
-        return TablePage();
+        return WaiterTablePage();
       case 'Cashier':
         return OrdersPage();
       case 'Kitchen':

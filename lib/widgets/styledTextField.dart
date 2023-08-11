@@ -4,12 +4,14 @@ class StyledTextField extends StatelessWidget {
   final controller; //for accessing the textField value
   final String hintText; //dynamic label or hint
   final bool obscureText; //true = for password
+  final dynamic keyboardType;
 
   const StyledTextField({
     super.key,
     required this.controller,
     required this.hintText,
     required this.obscureText,
+    this.keyboardType,
   });
 
   @override
@@ -18,6 +20,7 @@ class StyledTextField extends StatelessWidget {
       height: 45,
       width: 250,
       child: TextField(
+        keyboardType: keyboardType ?? TextInputType.text,
         style: const TextStyle(fontSize: 14.0),
         controller: controller, //controller
         obscureText: obscureText, //obscureText

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:primos_app/pages/waiter/tables.dart';
 
 // widgets
 import 'package:primos_app/widgets/styledButton.dart';
@@ -81,7 +82,7 @@ class LoginSreen extends ConsumerWidget {
                   case 'Admin':
                     return SalesReportPage();
                   case 'Waiter':
-                    return TablePage(); // Replace with your waiter page
+                    return WaiterTablePage(); // Replace with your waiter page
                   case 'Cashier':
                     return OrdersPage();
                   case 'Kitchen':
