@@ -8,12 +8,20 @@ class ItemCard extends StatelessWidget {
   final String productId;
   final String productName;
   final double productPrice;
+  final Widget? footerSection;
+
+  /*
+  to change the footer section below:
+  pass this parameter
+  Row(mainAxisAlignment: MainAxisAlignment.spaceBetween,children:[Text("replace this"), Text("Replace this")]),
+   */
 
   const ItemCard({
     Key? key,
     required this.productId,
     required this.productName,
     required this.productPrice,
+    this.footerSection,
   }) : super(key: key);
 
   Future<String> _getImageUrl(String productId) async {
@@ -126,38 +134,39 @@ class ItemCard extends StatelessWidget {
                       height: 8,
                     ),
                     // Footer section
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        StyledButton(
-                          noShadow: true,
-                          btnText: "Edit",
-                          onClick: () {
-                            Navigator.of(context).push(
-                              MaterialPageRoute(
-                                builder: (BuildContext context) {
-                                  return AdminMenuForm(
-                                    productId: productId,
-                                    productName: productName,
-                                    productPrice: productPrice,
-                                  );
-                                },
-                              ),
-                            );
-                          },
-                          btnHeight: 30,
+                    footerSection ??
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            StyledButton(
+                              noShadow: true,
+                              btnText: "Edit",
+                              onClick: () {
+                                Navigator.of(context).push(
+                                  MaterialPageRoute(
+                                    builder: (BuildContext context) {
+                                      return AdminMenuForm(
+                                        productId: productId,
+                                        productName: productName,
+                                        productPrice: productPrice,
+                                      );
+                                    },
+                                  ),
+                                );
+                              },
+                              btnHeight: 30,
+                            ),
+                            StyledButton(
+                              noShadow: true,
+                              btnText: "Delete",
+                              onClick: () {
+                                // Call the delete function when the "Delete" button is pressed
+                                _deleteMenuItem(context);
+                              },
+                              btnHeight: 30,
+                            ),
+                          ],
                         ),
-                        StyledButton(
-                          noShadow: true,
-                          btnText: "Delete",
-                          onClick: () {
-                            // Call the delete function when the "Delete" button is pressed
-                            _deleteMenuItem(context);
-                          },
-                          btnHeight: 30,
-                        ),
-                      ],
-                    ),
                   ],
                 ),
               ),

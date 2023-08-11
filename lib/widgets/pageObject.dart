@@ -7,6 +7,7 @@ import 'package:primos_app/pages/admin/salesReport.dart';
 import 'package:primos_app/pages/admin/table.dart';
 import 'package:primos_app/pages/cashier/orders.dart';
 import 'package:primos_app/pages/test.dart';
+import 'package:primos_app/pages/waiter/tables.dart';
 
 class SideMenuPage {
   final String name;
@@ -47,6 +48,15 @@ List<SideMenuPage> cashierPages = [
   SideMenuPage(
     name: "Orders",
     page: OrdersPage(),
+  ),
+];
+// END OF CASHIER PAGES
+
+// CASHIER PAGES
+List<SideMenuPage> waiterPages = [
+  SideMenuPage(
+    name: "Tables",
+    page: WaiterTablePage(),
   ),
 ];
 // END OF CASHIER PAGES
