@@ -3,6 +3,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:primos_app/widgets/pageObject.dart';
 import 'package:primos_app/pages/loginScreen.dart';
+import '../pages/login_services.dart';
 
 class SideMenu extends StatelessWidget {
   final List<SideMenuPage> pages;
@@ -41,13 +42,9 @@ class SideMenu extends StatelessWidget {
             return ListTile(
               title: Text(page.name),
               onTap: () async {
-                try {
-                  await FirebaseAuth.instance.signOut();
-                  Navigator.popUntil(context, (route) => route.isFirst);
-                } catch (error) {
-                  print('Error during logout: $error');
-                  // Handle error if needed
-                }
+                Navigator.of(context).push(MaterialPageRoute(
+                  builder: (context) => page.page,
+                ));
               },
               minLeadingWidth: 0,
             );
@@ -57,15 +54,19 @@ class SideMenu extends StatelessWidget {
           ListTile(
             leading: const Icon(Icons.exit_to_app),
             title: const Text('Logout'),
-            onTap: () => {
-              Navigator.of(context).pushAndRemoveUntil(
-                //clear the stack and push the login screen
-                MaterialPageRoute(
-                  builder: (context) => LoginSreen(),
-                ),
-                (_) => false,
-              ),
-            },
+            onTap: (() async {
+              try {
+                await Auth().signOut();
+
+                Navigator.of(context).pushReplacement(
+                  MaterialPageRoute(
+                    builder: (context) => LoginSreen(),
+                  ),
+                );
+              } catch (error) {
+                print('error');
+              }
+            }),
             minLeadingWidth: 0,
           ),
         ],
