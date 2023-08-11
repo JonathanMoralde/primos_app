@@ -10,8 +10,15 @@ import 'dart:io';
 import 'package:uuid/uuid.dart';
 
 class AdminMenuForm extends StatefulWidget {
+  final String? productId;
+  final String? productName;
+  final double? productPrice;
+
   const AdminMenuForm({
     Key? key,
+    this.productId,
+    this.productName,
+    this.productPrice,
   }) : super(key: key);
 
   @override
@@ -24,18 +31,29 @@ class _AdminMenuFormState extends State<AdminMenuForm> {
   String? category;
   String? selectedImagePath;
 
-  Future<void> addMenu(String imageUrl) async {
+  Future<void> updateMenu(String imageUrl) async {
     final String itemName = itemNameController.text;
     final double itemPrice = double.tryParse(itemPriceController.text) ?? 0.0;
     final String selectedCategory = category ?? '';
 
     try {
-      await FirebaseFirestore.instance.collection('menu').add({
-        'itemName': itemName,
-        'itemPrice': itemPrice,
-        'category': selectedCategory,
-        'imageURL': imageUrl,
-      });
+      // Ensure we have a valid productId to update an existing item
+      if (widget.productId != null) {
+        await FirebaseFirestore.instance
+            .collection('menu')
+            .doc(widget.productId)
+            .update({
+          'itemName': itemName,
+          'itemPrice': itemPrice,
+          'category': selectedCategory,
+          'imageURL': imageUrl,
+        });
+
+        // Successfully updated item, you can navigate back
+        Navigator.of(context).pop(true);
+      } else {
+        print("Invalid productId. Cannot update item.");
+      }
     } catch (error) {
       print('ERROR: $error');
     }
@@ -52,9 +70,51 @@ class _AdminMenuFormState extends State<AdminMenuForm> {
     }
   }
 
-  Future<void> _uploadImageAndAddMenu() async {
+  Future<void> _uploadImageAndUpdateMenu() async {
     if (selectedImagePath == null) {
-      return; // No image selected
+      // Show an error if no image is selected
+      showDialog(
+        context: context,
+        builder: (context) {
+          return AlertDialog(
+            title: Text("Error"),
+            content: Text("Please select an image."),
+            actions: [
+              TextButton(
+                onPressed: () {
+                  Navigator.pop(context);
+                },
+                child: Text("OK"),
+              ),
+            ],
+          );
+        },
+      );
+      return; // Do not proceed
+    }
+
+    if (itemNameController.text.isEmpty ||
+        itemPriceController.text.isEmpty ||
+        category == null) {
+      // Show an error if any required fields are missing
+      showDialog(
+        context: context,
+        builder: (context) {
+          return AlertDialog(
+            title: Text("Error"),
+            content: Text("Please fill in all required fields."),
+            actions: [
+              TextButton(
+                onPressed: () {
+                  Navigator.pop(context);
+                },
+                child: Text("OK"),
+              ),
+            ],
+          );
+        },
+      );
+      return; // Do not proceed
     }
 
     try {
@@ -67,22 +127,44 @@ class _AdminMenuFormState extends State<AdminMenuForm> {
           .ref()
           .child('menu_images')
           .child('$imageName.jpg'); // Use the unique image name
-      final uploadTask = storageRef.putFile(file);
+
+      final metadata = SettableMetadata(
+        contentType: 'image/jpeg', // Set the content type to image/jpeg
+        cacheControl: 'max-age=0', // Disable caching for the updated image
+      );
+
+      final uploadTask =
+          storageRef.putFile(file, metadata); // Include the metadata
 
       // Wait for the upload to complete and get the download URL
       final TaskSnapshot snapshot = await uploadTask;
       final imageUrl = await snapshot.ref.getDownloadURL();
 
-      // Call the addMenu function to store the data in Firestore
-      await addMenu(imageUrl);
+      // If productId is null, it's a new item, otherwise, it's an edit
+      if (widget.productId == null) {
+        // Add a new menu item
+        final String itemName = itemNameController.text;
+        final double itemPrice =
+            double.tryParse(itemPriceController.text) ?? 0.0;
+        final String selectedCategory = category ?? '';
 
-      // Reset form fields and selected image path after successful addition
-      itemNameController.clear();
-      itemPriceController.clear();
-      setState(() {
-        category = null;
-        selectedImagePath = null;
-      });
+        try {
+          await FirebaseFirestore.instance.collection('menu').add({
+            'itemName': itemName,
+            'itemPrice': itemPrice,
+            'category': selectedCategory,
+            'imageURL': imageUrl,
+          });
+
+          // Successfully added item, you can navigate back
+          Navigator.of(context).pop(true);
+        } catch (error) {
+          print('ERROR: $error');
+        }
+      } else {
+        // Update an existing menu item
+        await updateMenu(imageUrl);
+      }
     } catch (error) {
       print('ERROR: $error');
     }
@@ -91,66 +173,69 @@ class _AdminMenuFormState extends State<AdminMenuForm> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-        backgroundColor: const Color(0xFFf7f7f7),
-        appBar: AppBar(
-          leading: IconButton(
-            //manual handle back button
-            icon: const Icon(Icons.keyboard_arrow_left),
-            iconSize: 35,
-            onPressed: () => Navigator.of(context).pop(),
-          ),
-          title: Text("ADD ITEM"),
+      backgroundColor: const Color(0xFFf7f7f7),
+      appBar: AppBar(
+        leading: IconButton(
+          //manual handle back button
+          icon: const Icon(Icons.keyboard_arrow_left),
+          iconSize: 35,
+          onPressed: () => Navigator.of(context).pop(),
         ),
-        body: SafeArea(
-          child: SizedBox(
-            width: double.infinity,
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                StyledTextField(
-                    controller: itemNameController,
-                    hintText: "Item Name",
-                    obscureText: false),
-                const SizedBox(
-                  height: 10,
-                ),
-                StyledTextField(
-                    controller: itemPriceController,
-                    hintText: "Item Price",
-                    obscureText: false),
-                const SizedBox(
-                  height: 10,
-                ),
-                StyledDropdown(
-                  value: category,
-                  onChange: (String? newValue) {
-                    setState(() {
-                      category = newValue;
-                    });
-                  },
-                  hintText: "Category",
-                  items: const ['Beverages', 'Meat', 'Salads', 'Pastas'],
-                ),
-                const SizedBox(
-                  height: 10,
-                ),
-                UploadImage(
-                  onPressed: _pickImage,
-                  text: selectedImagePath,
-                ),
-                const SizedBox(
-                  height: 20,
-                ),
-                StyledButton(
-                  btnText: "ADD",
-                  onClick: () {
-                    _uploadImageAndAddMenu();
-                  },
-                  btnWidth: 250,
-                )
-              ],
-            ),
+        title: widget.productName != null && widget.productPrice != null
+            ? Text("EDIT ITEM")
+            : Text("ADD ITEM"),
+      ),
+      body: SafeArea(
+        child: SizedBox(
+          width: double.infinity,
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              StyledTextField(
+                controller: itemNameController,
+                hintText: "Item Name",
+                obscureText: false,
+              ),
+              const SizedBox(
+                height: 10,
+              ),
+              StyledTextField(
+                controller: itemPriceController,
+                hintText: "Item Price",
+                obscureText: false,
+              ),
+              const SizedBox(
+                height: 10,
+              ),
+              StyledDropdown(
+                value: category,
+                onChange: (String? newValue) {
+                  setState(() {
+                    category = newValue;
+                  });
+                },
+                hintText: "Category",
+                items: const ['Beverages', 'Meat', 'Salads', 'Pastas'],
+              ),
+              const SizedBox(
+                height: 10,
+              ),
+              UploadImage(
+                onPressed: _pickImage,
+                text: selectedImagePath,
+              ),
+              const SizedBox(
+                height: 20,
+              ),
+              StyledButton(
+                btnText: "ADD",
+                onClick: _uploadImageAndUpdateMenu,
+                btnWidth: 250,
+              ),
+            ],
           ),
-        ));
+        ),
+      ),
+    );
   }
 }

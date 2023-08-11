@@ -1,26 +1,58 @@
 import 'package:flutter/material.dart';
 import 'package:primos_app/pages/admin/adminMenu_Form.dart';
-import 'package:primos_app/pages/admin/adminMenu_Form_Edit.dart';
 import 'package:primos_app/widgets/styledButton.dart';
-
-// ! TO CHANGE THE FOOTER SECTION
-// PASS A WIDGET, EXAMPLE:
-/* 
-Row(
-mainAxisAlignment: MainAxisAlignment.spaceBetween,
-children:[Text("TEST"), Text("TEST")]), 
-*/
+import 'package:firebase_storage/firebase_storage.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 
 class ItemCard extends StatelessWidget {
+  final String productId;
   final String productName;
   final double productPrice;
-  final Widget? widget;
 
-  const ItemCard(
-      {super.key,
-      required this.productName,
-      required this.productPrice,
-      this.widget});
+  const ItemCard({
+    Key? key,
+    required this.productId,
+    required this.productName,
+    required this.productPrice,
+  }) : super(key: key);
+
+  Future<String> _getImageUrl(String productId) async {
+    try {
+      final DocumentSnapshot menuDoc = await FirebaseFirestore.instance
+          .collection('menu')
+          .doc(productId)
+          .get();
+
+      final imageUrl = menuDoc.get('imageURL') as String;
+      return imageUrl;
+    } catch (error) {
+      print('ERROR: $error');
+      // Handle errors
+      return ''; // Return an empty string or a default image URL
+    }
+  }
+
+  Future<void> _deleteMenuItem(BuildContext context) async {
+    try {
+      // Delete the menu item from Firestore
+      await FirebaseFirestore.instance
+          .collection('menu')
+          .doc(productId)
+          .delete();
+
+      // Delete the image from Firebase Storage
+      final storageRef =
+          FirebaseStorage.instance.ref().child('menu_images/$productId.jpg');
+      await storageRef.delete();
+
+      // You can also show a confirmation dialog or take other actions if needed
+
+      // Reload the UI to reflect the updated data (you can use a StreamBuilder for this)
+    } catch (error) {
+      print('ERROR: $error');
+      // Handle errors
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -48,10 +80,31 @@ class ItemCard extends StatelessWidget {
                 topLeft: Radius.circular(8),
                 topRight: Radius.circular(8),
               ),
-              child: Image.network(
-                "https://thestayathomechef.com/wp-content/uploads/2021/02/Korean-Beef-Bulgogi-4.jpg", //replace image
-                width: double.infinity,
-                fit: BoxFit.cover,
+              child: FutureBuilder<String>(
+                future: _getImageUrl(productId),
+                builder: (context, snapshot) {
+                  if (snapshot.connectionState == ConnectionState.waiting) {
+                    // Show a placeholder while loading the image
+                    return CircularProgressIndicator();
+                  } else if (snapshot.hasError ||
+                      !snapshot.hasData ||
+                      snapshot.data!.isEmpty) {
+                    // Handle errors or cases where the image URL is not available or empty
+                    // Show a placeholder or default image
+                    return Image.asset(
+                      'path_to_default_image.jpg', // Replace with the path to your default image
+                      width: double.infinity,
+                      fit: BoxFit.cover,
+                    );
+                  } else {
+                    // Successfully loaded the image URL, show the Image widget
+                    return Image.network(
+                      snapshot.data!, // Use the image URL from the snapshot
+                      width: double.infinity,
+                      fit: BoxFit.cover,
+                    );
+                  }
+                },
               ),
             ),
           ),
@@ -72,36 +125,39 @@ class ItemCard extends StatelessWidget {
                     const SizedBox(
                       height: 8,
                     ),
-                    // !FOOTER SECTION
-                    widget != null
-                        ? widget!
-                        : Row(
-                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                            children: [
-                              StyledButton(
-                                noShadow: true,
-                                btnText: "Edit",
-                                onClick: () {
-                                  Navigator.of(context).push(
-                                    MaterialPageRoute(
-                                        builder: (BuildContext context) {
-                                      return AdminMenuFormEdit(
-                                        productName: productName,
-                                        productPrice: productPrice,
-                                      );
-                                    }),
+                    // Footer section
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        StyledButton(
+                          noShadow: true,
+                          btnText: "Edit",
+                          onClick: () {
+                            Navigator.of(context).push(
+                              MaterialPageRoute(
+                                builder: (BuildContext context) {
+                                  return AdminMenuForm(
+                                    productId: productId,
+                                    productName: productName,
+                                    productPrice: productPrice,
                                   );
                                 },
-                                btnHeight: 30,
                               ),
-                              StyledButton(
-                                noShadow: true,
-                                btnText: "Delete",
-                                onClick: () {}, //TODO DELETE OR REMOVE FUNCTION
-                                btnHeight: 30,
-                              ),
-                            ],
-                          )
+                            );
+                          },
+                          btnHeight: 30,
+                        ),
+                        StyledButton(
+                          noShadow: true,
+                          btnText: "Delete",
+                          onClick: () {
+                            // Call the delete function when the "Delete" button is pressed
+                            _deleteMenuItem(context);
+                          },
+                          btnHeight: 30,
+                        ),
+                      ],
+                    ),
                   ],
                 ),
               ),

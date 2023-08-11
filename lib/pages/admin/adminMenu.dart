@@ -56,6 +56,8 @@ class _AdminMenuPageState extends State<AdminMenuPage> {
                         spacing: 10,
                         runSpacing: 10,
                         children: itemDocs.map((itemDoc) {
+                          final productId = itemDoc
+                              .id; // Get the document ID as the productId
                           final productName = itemDoc['itemName'] as String;
                           final itemPrice = itemDoc['itemPrice'];
                           final double productPrice = (itemPrice is double)
@@ -65,6 +67,7 @@ class _AdminMenuPageState extends State<AdminMenuPage> {
                                   : 0.0;
 
                           return ItemCard(
+                            productId: productId, // Pass the productId
                             productName: productName,
                             productPrice: productPrice,
                           );
