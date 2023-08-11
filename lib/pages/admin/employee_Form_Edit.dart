@@ -6,16 +6,52 @@ import 'package:primos_app/widgets/styledDropdown.dart';
 import 'package:primos_app/widgets/styledTextField.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 
-class EmployeeForm extends StatefulWidget {
-  EmployeeForm({
+// class StyledDropdown extends StatelessWidget {
+//   final String? value;
+//   final ValueChanged<String?>? onChange;
+//   final String hintText;
+//   final List<String> roleOptions; // Add this parameter
+
+//   StyledDropdown({
+//     required this.value,
+//     required this.onChange,
+//     required this.hintText,
+//     required this.roleOptions, // Initialize this parameter
+//   });
+
+//   @override
+//   Widget build(BuildContext context) {
+//     return Column(
+//       children: [
+//         DropdownButton<String>(
+//           value: value,
+//           items: roleOptions.map((role) {
+//             return DropdownMenuItem<String>(
+//               value: role,
+//               child: Text(role),
+//             );
+//           }).toList(),
+//           onChanged: onChange,
+//           hint: Text(hintText),
+//         ),
+//       ],
+//     );
+//   }
+// }
+
+class EmployeeFormEdit extends StatefulWidget {
+  final String? fullName;
+
+  EmployeeFormEdit({
     super.key,
+    this.fullName,
   });
 
   @override
-  State<EmployeeForm> createState() => _EmployeeFormState();
+  State<EmployeeFormEdit> createState() => _EmployeeFormState();
 }
 
-class _EmployeeFormState extends State<EmployeeForm> {
+class _EmployeeFormState extends State<EmployeeFormEdit> {
   final fullNameController = TextEditingController();
 
   final emailController = TextEditingController();
@@ -24,6 +60,14 @@ class _EmployeeFormState extends State<EmployeeForm> {
   CollectionReference users = FirebaseFirestore.instance.collection('users');
 
   String? role;
+
+  @override
+  void initState() {
+    super.initState();
+    // Set the initial values for the text fields
+    fullNameController.text =
+        widget.fullName ?? ''; // If fullName is null, set an empty string
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -36,7 +80,7 @@ class _EmployeeFormState extends State<EmployeeForm> {
           iconSize: 35,
           onPressed: () => Navigator.of(context).pop(),
         ),
-        title: const Text("NEW EMPLOYEE"),
+        title: const Text("EDIT EMPLOYEE"),
       ),
       body: SafeArea(
         child: SizedBox(
@@ -79,37 +123,15 @@ class _EmployeeFormState extends State<EmployeeForm> {
                 height: 20,
               ),
               StyledButton(
-                btnText: "ADD",
+                btnText: "SAVE",
                 onClick: () async {
-                  try {
-                    if (passwordController.text.length < 6) {
-                      ScaffoldMessenger.of(context).showSnackBar(
-                        const SnackBar(
-                          content:
-                              Text("Password should be at least 6 characters."),
-                        ),
-                      );
-                      return;
-                    }
-                    final authResult = await FirebaseAuth.instance
-                        .createUserWithEmailAndPassword(
-                      email: emailController.text,
-                      password: passwordController.text,
-                    );
-                    await users.doc(authResult.user!.uid).set({
-                      'fullName': fullNameController.text,
-                      'role': role,
-                    });
-                    Navigator.of(context).pushReplacement(
-                      MaterialPageRoute(
-                        builder: (BuildContext context) {
-                          return EmployeePage(); //* Replace page depending on user type
-                        },
-                      ),
-                    );
-                  } catch (error) {
-                    print('error detected: $error');
-                  }
+                  Navigator.of(context).pushReplacement(
+                    MaterialPageRoute(
+                      builder: (BuildContext context) {
+                        return EmployeePage();
+                      },
+                    ),
+                  );
                 },
                 btnWidth: 250,
               )

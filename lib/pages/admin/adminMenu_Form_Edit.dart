@@ -9,20 +9,32 @@ import 'package:firebase_storage/firebase_storage.dart';
 import 'dart:io';
 import 'package:uuid/uuid.dart';
 
-class AdminMenuForm extends StatefulWidget {
-  const AdminMenuForm({
-    Key? key,
-  }) : super(key: key);
+class AdminMenuFormEdit extends StatefulWidget {
+  final String? productName;
+  final double? productPrice;
+
+  const AdminMenuFormEdit({Key? key, this.productName, this.productPrice})
+      : super(key: key);
 
   @override
-  State<AdminMenuForm> createState() => _AdminMenuFormState();
+  State<AdminMenuFormEdit> createState() => _AdminMenuFormState();
 }
 
-class _AdminMenuFormState extends State<AdminMenuForm> {
+class _AdminMenuFormState extends State<AdminMenuFormEdit> {
   final itemNameController = TextEditingController();
   final itemPriceController = TextEditingController();
   String? category;
   String? selectedImagePath;
+
+  @override
+  void initState() {
+    super.initState();
+    // Set the initial values for the text fields
+    itemNameController.text =
+        widget.productName ?? ''; // If productName is null, set an empty string
+    itemPriceController.text = widget.productPrice?.toString() ??
+        ''; // If productPrice is null, set an empty string
+  }
 
   Future<void> addMenu(String imageUrl) async {
     final String itemName = itemNameController.text;
@@ -99,7 +111,7 @@ class _AdminMenuFormState extends State<AdminMenuForm> {
             iconSize: 35,
             onPressed: () => Navigator.of(context).pop(),
           ),
-          title: Text("ADD ITEM"),
+          title: Text("EDIT ITEM"),
         ),
         body: SafeArea(
           child: SizedBox(
@@ -142,7 +154,7 @@ class _AdminMenuFormState extends State<AdminMenuForm> {
                   height: 20,
                 ),
                 StyledButton(
-                  btnText: "ADD",
+                  btnText: "SAVE",
                   onClick: () {
                     _uploadImageAndAddMenu();
                   },

@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:primos_app/pages/admin/employee_Form.dart';
+import 'package:primos_app/pages/admin/employee_Form_Edit.dart';
 
 class EmployeeDisplay extends StatelessWidget {
   final String employeeName;
@@ -69,7 +70,7 @@ class EmployeeDisplay extends StatelessWidget {
                       Navigator.of(context).push(
                         MaterialPageRoute(
                           builder: (BuildContext context) {
-                            return EmployeeForm(
+                            return EmployeeFormEdit(
                               fullName: employeeName,
                             );
                           },

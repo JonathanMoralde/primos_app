@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:primos_app/pages/admin/adminMenu_Form.dart';
+import 'package:primos_app/pages/admin/adminMenu_Form_Edit.dart';
 import 'package:primos_app/widgets/styledButton.dart';
 
 // ! TO CHANGE THE FOOTER SECTION
@@ -84,7 +85,7 @@ class ItemCard extends StatelessWidget {
                                   Navigator.of(context).push(
                                     MaterialPageRoute(
                                         builder: (BuildContext context) {
-                                      return AdminMenuForm(
+                                      return AdminMenuFormEdit(
                                         productName: productName,
                                         productPrice: productPrice,
                                       );
