@@ -1,12 +1,10 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:primos_app/pages/admin/employee.dart';
-import 'package:primos_app/pages/admin/salesReport.dart';
 import 'package:primos_app/widgets/styledButton.dart';
 import 'package:primos_app/widgets/styledDropdown.dart';
 import 'package:primos_app/widgets/styledTextField.dart';
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:firebase_core/firebase_core.dart';
 
 // class StyledDropdown extends StatelessWidget {
 //   final String? value;

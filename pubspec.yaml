@@ -38,20 +38,15 @@ dependencies:
   image_picker: ^0.8.1
   flutter_riverpod: ^2.3.6
   cloud_firestore: ^4.8.4
-  firebase_core: ^2.15.0 
+  firebase_core: ^2.15.0
   firebase_auth: ^4.7.2
   firebase_storage: ^11.2.5
   uuid: ^3.0.7
-
-
+  shared_preferences: ^2.0.11
 
 dev_dependencies:
   flutter_test:
     sdk: flutter
-
-  
-  
-  
 
   # The "flutter_lints" package below contains a set of recommended lints to
   # encourage good coding practices. The lint set provided by the package is

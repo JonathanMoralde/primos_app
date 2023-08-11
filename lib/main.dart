@@ -4,6 +4,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:google_fonts/google_fonts.dart';
 
 import 'package:primos_app/pages/loginScreen.dart';
+import 'package:primos_app/widgets/main_page.dart';
 
 Future main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -47,7 +48,7 @@ class MyApp extends StatelessWidget {
           elevation: 0,
         ),
       ),
-      home: LoginSreen(),
+      home: MainPage(),
     );
   }
 }

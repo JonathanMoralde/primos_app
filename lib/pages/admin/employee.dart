@@ -6,7 +6,6 @@ import 'package:primos_app/widgets/sideMenu.dart';
 import 'package:primos_app/widgets/styledButton.dart';
 import 'package:primos_app/widgets/bottomBar.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:firebase_auth/firebase_auth.dart';
 
 class EmployeePage extends StatelessWidget {
   const EmployeePage({Key? key}) : super(key: key);
@@ -48,9 +47,16 @@ class EmployeePage extends StatelessWidget {
                           var employeeName = employeeData['fullName'] ?? 'N/A';
                           var employeeRole = employeeData['role'] ?? 'N/A';
 
-                          return EmployeeDisplay(
-                            employeeName: employeeName,
-                            employeeRole: employeeRole,
+                          return Column(
+                            children: [
+                              EmployeeDisplay(
+                                employeeName: employeeName,
+                                employeeRole: employeeRole,
+                              ),
+                              const SizedBox(
+                                height: 10,
+                              )
+                            ],
                           );
                         },
                       );

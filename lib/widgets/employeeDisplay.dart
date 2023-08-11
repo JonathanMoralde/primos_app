@@ -1,7 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:primos_app/pages/admin/employee_Form.dart';
-import 'package:firebase_auth/firebase_auth.dart';
-import 'package:cloud_firestore/cloud_firestore.dart';
 
 class EmployeeDisplay extends StatelessWidget {
   final String employeeName;

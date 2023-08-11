@@ -5,6 +5,8 @@ import 'package:primos_app/widgets/pageObject.dart';
 import 'package:primos_app/pages/loginScreen.dart';
 import '../pages/login_services.dart';
 
+import 'package:shared_preferences/shared_preferences.dart';
+
 class SideMenu extends StatelessWidget {
   final List<SideMenuPage> pages;
 
@@ -58,10 +60,15 @@ class SideMenu extends StatelessWidget {
               try {
                 await Auth().signOut();
 
-                Navigator.of(context).pushReplacement(
+                // store role in sharedPreferences
+                SharedPreferences prefs = await SharedPreferences.getInstance();
+                prefs.setString('lastVisitedPage', "LoginScreen");
+
+                Navigator.of(context).pushAndRemoveUntil(
                   MaterialPageRoute(
                     builder: (context) => LoginSreen(),
                   ),
+                  (Route<dynamic> route) => false,
                 );
               } catch (error) {
                 print('error');

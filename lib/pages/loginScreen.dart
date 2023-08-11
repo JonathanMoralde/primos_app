@@ -1,19 +1,31 @@
 import 'package:flutter/material.dart';
-import 'package:primos_app/pages/admin/table.dart';
-import 'package:primos_app/pages/cashier/orders.dart';
-import 'package:primos_app/pages/cashier/orders_view.dart';
-import 'package:primos_app/pages/test.dart';
+
+// widgets
 import 'package:primos_app/widgets/styledButton.dart';
 import 'package:primos_app/widgets/styledTextField.dart';
+
+// firebase
 import 'package:firebase_auth/firebase_auth.dart';
 import 'login_services.dart';
-import 'package:firebase_core/firebase_core.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 
+// test page
+import 'package:primos_app/pages/test.dart';
+// waiter page
+import 'package:primos_app/pages/admin/table.dart';
+// cashier page
+import 'package:primos_app/pages/cashier/orders.dart';
 // admin pages
 import 'package:primos_app/pages/admin/salesReport.dart';
 
-class LoginSreen extends StatelessWidget {
+// provider
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:primos_app/providers/session/user_provider.dart';
+
+// sharedpreference
+import 'package:shared_preferences/shared_preferences.dart';
+
+class LoginSreen extends ConsumerWidget {
   LoginSreen({super.key});
   final User? user = Auth().currentUser;
 
@@ -25,7 +37,7 @@ class LoginSreen extends StatelessWidget {
   final String btnText = "SIGN IN";
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
     void handleSignin() {
       final String email = emailController.text.trim();
       final String password = passwordController.text;
@@ -41,6 +53,11 @@ class LoginSreen extends StatelessWidget {
           .signInWithEmailAndPassword(email: email, password: password)
           .then((value) async {
         final User? user = Auth().currentUser;
+        ref.read(userProvider.notifier).state = user;
+
+        print("test");
+        print(user?.email);
+        print(user);
 
         if (user != null) {
           DocumentSnapshot userSnapshot = await FirebaseFirestore.instance
@@ -49,6 +66,13 @@ class LoginSreen extends StatelessWidget {
               .get();
           String role =
               userSnapshot['role']; // Assuming 'role' is a field in Firestore
+
+          print(userSnapshot);
+          print(userSnapshot['role']);
+
+          // store role in sharedPreferences
+          SharedPreferences prefs = await SharedPreferences.getInstance();
+          prefs.setString('lastVisitedPage', role);
 
           Navigator.of(context).pushReplacement(
             MaterialPageRoute(
@@ -59,7 +83,7 @@ class LoginSreen extends StatelessWidget {
                   case 'Waiter':
                     return TablePage(); // Replace with your waiter page
                   case 'Cashier':
-                    return OrderViewPage();
+                    return OrdersPage();
                   case 'Kitchen':
                     return TestPage();
                   default:
