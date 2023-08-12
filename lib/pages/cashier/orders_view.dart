@@ -221,7 +221,7 @@ class OrderViewPage extends StatelessWidget {
 
     return Scaffold(
       appBar: AppBar(
-        title: (Text("ORDER DETAILS")),
+        title: (Text("ORDER DETAILS TABLE 1")),
       ),
       body: SafeArea(
         child: SingleChildScrollView(

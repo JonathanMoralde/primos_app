@@ -56,10 +56,6 @@ class LoginSreen extends ConsumerWidget {
         final User? user = Auth().currentUser;
         ref.read(userProvider.notifier).state = user;
 
-        print("test");
-        print(user?.email);
-        print(user);
-
         if (user != null) {
           DocumentSnapshot userSnapshot = await FirebaseFirestore.instance
               .collection('users')
@@ -67,9 +63,6 @@ class LoginSreen extends ConsumerWidget {
               .get();
           String role =
               userSnapshot['role']; // Assuming 'role' is a field in Firestore
-
-          print(userSnapshot);
-          print(userSnapshot['role']);
 
           // store role in sharedPreferences
           SharedPreferences prefs = await SharedPreferences.getInstance();
@@ -94,6 +87,11 @@ class LoginSreen extends ConsumerWidget {
             ),
           );
         }
+      }).catchError((error) {
+        print(error);
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text("Incorrect Email or Password")),
+        );
       });
     }
 

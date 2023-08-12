@@ -1,8 +1,10 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
+import 'package:primos_app/pages/waiter/waiter_menu_cart.dart';
 import 'package:primos_app/widgets/bottomBar.dart';
 import 'package:primos_app/widgets/filterBtns.dart';
 import 'package:primos_app/widgets/searchBar.dart';
+import 'package:primos_app/widgets/styledButton.dart';
 
 import '../../widgets/itemCard.dart';
 
@@ -14,10 +16,14 @@ class WaiterMenu extends StatefulWidget {
 }
 
 class _WaiterMenuState extends State<WaiterMenu> {
+  // firebase
   final CollectionReference itemsCollection =
       FirebaseFirestore.instance.collection('menu');
+
   @override
   Widget build(BuildContext context) {
+    int subtotal = 0;
+
     return Scaffold(
       backgroundColor: Color(0xfff8f8f7),
       appBar: AppBar(
@@ -62,9 +68,29 @@ class _WaiterMenuState extends State<WaiterMenu> {
                           productId: productId, // Pass the productId
                           productName: productName,
                           productPrice: productPrice,
-                          footerSection: Row(
-                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                              children: [Text("Test"), Text("Test")]),
+                          cardHeight: 280,
+                          footerSection: Column(
+                            children: [
+                              const Row(
+                                  mainAxisAlignment:
+                                      MainAxisAlignment.spaceBetween,
+                                  children: [Text("Test"), Text("Test")]),
+                              const SizedBox(
+                                height: 5,
+                              ),
+                              StyledButton(
+                                  noShadow: true,
+                                  btnWidth: double.infinity,
+                                  btnHeight: 35,
+                                  btnText: "Add to order",
+                                  onClick: () {
+                                    // TODO ADD THE ITEM DETAILS TO AN ARRAY OR LIST THEN STORE IN PROVIDER(state management)
+                                    // TODO THEN NAVIGATE TO CART PAGE, GRAB THE ITEMS IN THE LIST/ARRAY AND DISPLAY + WAITER CAN DELETE/REMOVE, EDIT QTY OR VARIANT
+                                    // TODO WAITER CAN THEN CHECKOUT/CONFIRM ORDERS
+                                    print("Added to cart");
+                                  })
+                            ],
+                          ),
                         );
                       }).toList(),
                     ),
@@ -75,7 +101,33 @@ class _WaiterMenuState extends State<WaiterMenu> {
           ),
         ),
       ),
-      bottomNavigationBar: BottomBar(height: 100),
+      bottomNavigationBar: BottomBar(
+        height: 100,
+        child: Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 16.0),
+          child: Row(
+            children: [
+              Expanded(
+                flex: 1,
+                child: StyledButton(
+                  btnIcon: Icon(Icons.shopping_cart_checkout),
+                  noShadow: true,
+                  btnText: "View Orders",
+                  secondText: "PHP $subtotal",
+                  onClick: () {
+                    Navigator.of(context).push(
+                      MaterialPageRoute(builder: (BuildContext context) {
+                        return WaiterMenuCart();
+                      }),
+                    );
+                  },
+                  btnColor: const Color(0xfff8f8f7),
+                ),
+              ),
+            ],
+          ),
+        ),
+      ),
     );
   }
 }

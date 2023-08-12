@@ -9,6 +9,8 @@ class ItemCard extends StatelessWidget {
   final String productName;
   final double productPrice;
   final Widget? footerSection;
+  final double? cardHeight;
+  final bool? isRow;
 
   /*
   to change the footer section below:
@@ -22,6 +24,8 @@ class ItemCard extends StatelessWidget {
     required this.productName,
     required this.productPrice,
     this.footerSection,
+    this.cardHeight,
+    this.isRow,
   }) : super(key: key);
 
   Future<String> _getImageUrl(String productId) async {
@@ -65,8 +69,8 @@ class ItemCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      height: 220,
-      width: 174,
+      height: cardHeight ?? 220,
+      width: isRow == true ? double.infinity : 174,
       decoration: BoxDecoration(
         boxShadow: [
           BoxShadow(
@@ -79,101 +83,209 @@ class ItemCard extends StatelessWidget {
         borderRadius: BorderRadius.circular(8),
         color: Colors.grey.shade300,
       ),
-      child: Column(
-        children: [
-          Expanded(
-            flex: 1,
-            child: ClipRRect(
-              borderRadius: const BorderRadius.only(
-                topLeft: Radius.circular(8),
-                topRight: Radius.circular(8),
-              ),
-              child: FutureBuilder<String>(
-                future: _getImageUrl(productId),
-                builder: (context, snapshot) {
-                  if (snapshot.connectionState == ConnectionState.waiting) {
-                    // Show a placeholder while loading the image
-                    return CircularProgressIndicator();
-                  } else if (snapshot.hasError ||
-                      !snapshot.hasData ||
-                      snapshot.data!.isEmpty) {
-                    // Handle errors or cases where the image URL is not available or empty
-                    // Show a placeholder or default image
-                    return Image.asset(
-                      'path_to_default_image.jpg', // Replace with the path to your default image
-                      width: double.infinity,
-                      fit: BoxFit.cover,
-                    );
-                  } else {
-                    // Successfully loaded the image URL, show the Image widget
-                    return Image.network(
-                      snapshot.data!, // Use the image URL from the snapshot
-                      width: double.infinity,
-                      fit: BoxFit.cover,
-                    );
-                  }
-                },
-              ),
-            ),
-          ),
-          Expanded(
-            flex: 1,
-            child: SizedBox(
-              width: double.infinity,
-              child: Padding(
-                padding: const EdgeInsets.all(8.0),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(productName),
-                    const SizedBox(
-                      height: 8,
+      child: isRow == true
+          ? Row(
+              children: [
+                Expanded(
+                  flex: 1,
+                  child: ClipRRect(
+                    borderRadius: const BorderRadius.only(
+                      topLeft: Radius.circular(8),
+                      topRight: Radius.circular(8),
                     ),
-                    Text("$productPrice PHP"),
-                    const SizedBox(
-                      height: 8,
+                    child: FutureBuilder<String>(
+                      future: _getImageUrl(productId),
+                      builder: (context, snapshot) {
+                        if (snapshot.connectionState ==
+                            ConnectionState.waiting) {
+                          // Show a placeholder while loading the image
+                          return CircularProgressIndicator();
+                        } else if (snapshot.hasError ||
+                            !snapshot.hasData ||
+                            snapshot.data!.isEmpty) {
+                          // Handle errors or cases where the image URL is not available or empty
+                          // Show a placeholder or default image
+                          return Image.asset(
+                            'path_to_default_image.jpg', // Replace with the path to your default image
+                            width: double.infinity,
+                            fit: BoxFit.cover,
+                          );
+                        } else {
+                          // Successfully loaded the image URL, show the Image widget
+                          return Image.network(
+                            snapshot
+                                .data!, // Use the image URL from the snapshot
+                            width: double.infinity,
+                            fit: BoxFit.cover,
+                          );
+                        }
+                      },
                     ),
-                    // Footer section
-                    footerSection ??
-                        Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                          children: [
-                            StyledButton(
-                              noShadow: true,
-                              btnText: "Edit",
-                              onClick: () {
-                                Navigator.of(context).push(
-                                  MaterialPageRoute(
-                                    builder: (BuildContext context) {
-                                      return AdminMenuForm(
-                                        productId: productId,
-                                        productName: productName,
-                                        productPrice: productPrice,
+                  ),
+                ),
+                Expanded(
+                  flex: 1,
+                  child: SizedBox(
+                    width: double.infinity,
+                    child: Padding(
+                      padding: const EdgeInsets.only(
+                        left: 16,
+                        right: 16,
+                        top: 15,
+                        bottom: 8,
+                      ), //modified this for row
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(productName),
+                          const SizedBox(
+                            height: 8,
+                          ),
+                          Text("$productPrice PHP"),
+                          const SizedBox(
+                            height: 8,
+                          ),
+                          // Footer section
+                          footerSection ??
+                              Row(
+                                mainAxisAlignment:
+                                    MainAxisAlignment.spaceBetween,
+                                children: [
+                                  StyledButton(
+                                    noShadow: true,
+                                    btnText: "Edit",
+                                    onClick: () {
+                                      Navigator.of(context).push(
+                                        MaterialPageRoute(
+                                          builder: (BuildContext context) {
+                                            return AdminMenuForm(
+                                              productId: productId,
+                                              productName: productName,
+                                              productPrice: productPrice,
+                                            );
+                                          },
+                                        ),
                                       );
                                     },
+                                    btnHeight: 30,
                                   ),
-                                );
-                              },
-                              btnHeight: 30,
-                            ),
-                            StyledButton(
-                              noShadow: true,
-                              btnText: "Delete",
-                              onClick: () {
-                                // Call the delete function when the "Delete" button is pressed
-                                _deleteMenuItem(context);
-                              },
-                              btnHeight: 30,
-                            ),
-                          ],
-                        ),
-                  ],
+                                  StyledButton(
+                                    noShadow: true,
+                                    btnText: "Delete",
+                                    onClick: () {
+                                      // Call the delete function when the "Delete" button is pressed
+                                      _deleteMenuItem(context);
+                                    },
+                                    btnHeight: 30,
+                                  ),
+                                ],
+                              ),
+                        ],
+                      ),
+                    ),
+                  ),
                 ),
-              ),
+              ],
+            )
+          : Column(
+              //DEFAULT LAYOUT OF ITEM CARD
+              children: [
+                Expanded(
+                  flex: 1,
+                  child: ClipRRect(
+                    borderRadius: const BorderRadius.only(
+                      topLeft: Radius.circular(8),
+                      topRight: Radius.circular(8),
+                    ),
+                    child: FutureBuilder<String>(
+                      future: _getImageUrl(productId),
+                      builder: (context, snapshot) {
+                        if (snapshot.connectionState ==
+                            ConnectionState.waiting) {
+                          // Show a placeholder while loading the image
+                          return CircularProgressIndicator();
+                        } else if (snapshot.hasError ||
+                            !snapshot.hasData ||
+                            snapshot.data!.isEmpty) {
+                          // Handle errors or cases where the image URL is not available or empty
+                          // Show a placeholder or default image
+                          return Image.asset(
+                            'path_to_default_image.jpg', // Replace with the path to your default image
+                            width: double.infinity,
+                            fit: BoxFit.cover,
+                          );
+                        } else {
+                          // Successfully loaded the image URL, show the Image widget
+                          return Image.network(
+                            snapshot
+                                .data!, // Use the image URL from the snapshot
+                            width: double.infinity,
+                            fit: BoxFit.cover,
+                          );
+                        }
+                      },
+                    ),
+                  ),
+                ),
+                Expanded(
+                  flex: 1,
+                  child: SizedBox(
+                    width: double.infinity,
+                    child: Padding(
+                      padding: const EdgeInsets.all(8.0),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(productName),
+                          const SizedBox(
+                            height: 8,
+                          ),
+                          Text("$productPrice PHP"),
+                          const SizedBox(
+                            height: 8,
+                          ),
+                          // Footer section
+                          footerSection ??
+                              Row(
+                                mainAxisAlignment:
+                                    MainAxisAlignment.spaceBetween,
+                                children: [
+                                  StyledButton(
+                                    noShadow: true,
+                                    btnText: "Edit",
+                                    onClick: () {
+                                      Navigator.of(context).push(
+                                        MaterialPageRoute(
+                                          builder: (BuildContext context) {
+                                            return AdminMenuForm(
+                                              productId: productId,
+                                              productName: productName,
+                                              productPrice: productPrice,
+                                            );
+                                          },
+                                        ),
+                                      );
+                                    },
+                                    btnHeight: 30,
+                                  ),
+                                  StyledButton(
+                                    noShadow: true,
+                                    btnText: "Delete",
+                                    onClick: () {
+                                      // Call the delete function when the "Delete" button is pressed
+                                      _deleteMenuItem(context);
+                                    },
+                                    btnHeight: 30,
+                                  ),
+                                ],
+                              ),
+                        ],
+                      ),
+                    ),
+                  ),
+                ),
+              ],
             ),
-          ),
-        ],
-      ),
     );
   }
 }

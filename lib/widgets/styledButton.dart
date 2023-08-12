@@ -13,6 +13,7 @@ class StyledButton extends StatelessWidget {
   final double? btnHeight;
   final dynamic btnColor;
   final bool? noShadow;
+  final String? secondText;
 
   const StyledButton({
     super.key,
@@ -23,6 +24,7 @@ class StyledButton extends StatelessWidget {
     this.btnHeight,
     this.btnColor,
     this.noShadow,
+    this.secondText,
   });
 
   @override
@@ -45,7 +47,12 @@ class StyledButton extends StatelessWidget {
                 letterSpacing: 1, fontWeight: FontWeight.w500, fontSize: 16),
           ),
           icon: btnIcon,
-          label: Text(btnText),
+          label: secondText != null
+              ? Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [Text(btnText), Text(secondText!)],
+                )
+              : Text(btnText),
         ),
       );
     } else {
