@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:primos_app/pages/forgotPassForm.dart';
 import 'package:primos_app/pages/waiter/tables.dart';
 
 // widgets
@@ -172,6 +173,22 @@ class LoginSreen extends ConsumerWidget {
                   btnIcon: const Icon(Icons.login),
                   btnWidth: 250,
                 ),
+                const SizedBox(
+                  height: 20,
+                ),
+                GestureDetector(
+                  onTap: () {
+                    Navigator.of(context).push(
+                      MaterialPageRoute(builder: (BuildContext context) {
+                        return ForgotPassPage();
+                      }),
+                    );
+                  },
+                  child: const Text(
+                    "Forgot Password?",
+                    style: TextStyle(letterSpacing: 1),
+                  ),
+                )
               ],
             ),
           ),

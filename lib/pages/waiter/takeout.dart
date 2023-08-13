@@ -1,47 +1,49 @@
 import 'package:flutter/material.dart';
-import 'package:primos_app/pages/waiter/takeout.dart';
+import 'package:primos_app/pages/waiter/tables.dart';
+import 'package:primos_app/pages/waiter/waiter_menu.dart';
 import 'package:primos_app/widgets/bottomBar.dart';
 import 'package:primos_app/widgets/pageObject.dart';
 import 'package:primos_app/widgets/sideMenu.dart';
-import 'package:primos_app/widgets/tableBox.dart';
 
-class WaiterTablePage extends StatefulWidget {
-  const WaiterTablePage({super.key});
+class TakeoutPage extends StatefulWidget {
+  const TakeoutPage({super.key});
 
   @override
-  State<WaiterTablePage> createState() => _WaiterTablePageState();
+  State<TakeoutPage> createState() => _TakeoutPageState();
 }
 
-class _WaiterTablePageState extends State<WaiterTablePage> {
-  int currentIndex = 0;
+class _TakeoutPageState extends State<TakeoutPage> {
+  int currentIndex = 1;
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Color(0xfff8f8f7),
-      drawer: SideMenu(pages: waiterPages),
       appBar: AppBar(
-        title: Text("TABLES"),
+        title: Text("TAKE OUT ORDERS"),
       ),
+      drawer: SideMenu(pages: waiterPages),
       body: SafeArea(
         child: SingleChildScrollView(
           child: Padding(
             padding: const EdgeInsets.all(16.0),
-            child: Wrap(
-              spacing: 10,
-              runSpacing: 10,
-              children: List.generate(
-                10, // Replace this with the number of TableBox instances you want to generate
-                (index) => FractionallySizedBox(
-                  widthFactor: 0.31, // Take up 30% of available width
-                  child: TableBox(
-                      tableNum: index +
-                          1), // You can use 'index + 1' if you want table numbers to start from 1
-                ),
-              ),
+            child: Column(
+              children: [Container()],
             ),
           ),
         ),
+      ),
+      floatingActionButton: FloatingActionButton(
+        onPressed: () {
+          Navigator.of(context).push(
+            MaterialPageRoute(builder: (BuildContext context) {
+              return WaiterMenu();
+            }),
+          );
+        },
+        backgroundColor: Color(0xFFE2B563),
+        foregroundColor: Color(0xff252525),
+        child: Icon(Icons.add),
       ),
       bottomNavigationBar: Container(
         height: 80,
