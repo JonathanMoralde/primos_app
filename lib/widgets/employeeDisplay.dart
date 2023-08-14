@@ -1,15 +1,19 @@
 import 'package:flutter/material.dart';
-import 'package:primos_app/pages/admin/employee_Form.dart';
-import 'package:primos_app/pages/admin/employee_Form_Edit.dart';
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 
 class EmployeeDisplay extends StatelessWidget {
   final String employeeName;
+  final String employeeEmail;
   final String employeeRole;
+  final String userId;
 
   const EmployeeDisplay({
     Key? key,
     required this.employeeName,
+    required this.employeeEmail,
     required this.employeeRole,
+    required this.userId,
   }) : super(key: key);
 
   @override
@@ -29,120 +33,163 @@ class EmployeeDisplay extends StatelessWidget {
           Radius.circular(8),
         ),
       ),
-      height: 70,
-      width: double.infinity,
-      child: Padding(
-        padding: const EdgeInsets.all(10.0),
-        child: Row(
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-          children: [
-            Expanded(
-              flex: 2,
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    employeeName,
-                    style: const TextStyle(
-                      fontSize: 16,
-                      fontWeight: FontWeight.w600,
-                      letterSpacing: 1,
+      padding: const EdgeInsets.all(10.0),
+      margin: const EdgeInsets.symmetric(vertical: 10.0),
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.center,
+        children: [
+          Expanded(
+            flex: 3,
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  employeeName,
+                  style: const TextStyle(
+                    fontSize: 16,
+                    fontWeight: FontWeight.w600,
+                    letterSpacing: 1,
+                  ),
+                  overflow: TextOverflow.ellipsis,
+                ),
+                const SizedBox(
+                  height: 4,
+                ),
+                Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      'Email: $employeeEmail',
+                      style: const TextStyle(
+                        fontSize: 12,
+                        color: Color.fromARGB(255, 0, 0, 0),
+                      ),
                     ),
-                    overflow: TextOverflow.ellipsis,
-                  ),
-                  Text(
-                    employeeRole,
-                    style: const TextStyle(fontSize: 12),
-                  ),
-                ],
-              ),
+                    Text(
+                      'Role: $employeeRole',
+                      style: const TextStyle(
+                        fontSize: 12,
+                        color: Color.fromARGB(255, 0, 0, 0),
+                      ),
+                    ),
+                  ],
+                ),
+              ],
             ),
-            Expanded(
-              flex: 1,
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.end,
-                children: [
-                  IconButton(
-                    alignment: const AlignmentDirectional(7, 0),
-                    iconSize: 28,
-                    onPressed: () {
-                      Navigator.of(context).push(
-                        MaterialPageRoute(
-                          builder: (BuildContext context) {
-                            return EmployeeFormEdit(
-                              fullName: employeeName,
-                            );
-                          },
-                        ),
-                      );
-                    },
-                    icon: const Icon(Icons.create),
-                  ),
-                  IconButton(
-                    alignment: const AlignmentDirectional(7, 0),
-                    iconSize: 28,
-                    onPressed: () {
-                      _showDeleteConfirmationDialog(context);
-                    },
-                    icon: const Icon(Icons.delete),
-                  ),
-                ],
-              ),
+          ),
+          Expanded(
+            flex: 1,
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.end,
+              children: [
+                IconButton(
+                  alignment: AlignmentDirectional(7, 0),
+                  iconSize: 28,
+                  onPressed: () async {
+                    final isAuthorized =
+                        await _showPasswordAuthenticationDialog(context);
+                    if (isAuthorized) {
+                      await _deleteEmployee(context);
+                    } else {
+                      // Handle unauthorized deletion attempt (show a message, etc.)
+                    }
+                  },
+                  icon: const Icon(Icons.delete),
+                ),
+              ],
             ),
-          ],
-        ),
+          ),
+        ],
       ),
     );
   }
 
-  // Function to show a delete confirmation dialog
-  Future<void> _showDeleteConfirmationDialog(BuildContext context) async {
-    final confirmed = await showDialog<bool>(
+  Future<bool> _showPasswordAuthenticationDialog(BuildContext context) async {
+    final currentUser = FirebaseAuth.instance.currentUser;
+
+    if (currentUser == null) {
+      return false;
+    }
+
+    final email = currentUser.email;
+
+    final TextEditingController passwordController = TextEditingController();
+
+    final password = await showDialog<String?>(
       context: context,
       builder: (BuildContext context) {
         return AlertDialog(
-          title: const Text("Confirm Deletion"),
-          content: const Text("Are you sure you want to delete this employee?"),
+          title: const Text("Enter Your Password"),
+          content: TextField(
+            controller: passwordController,
+            obscureText: true,
+            decoration: const InputDecoration(labelText: "Password"),
+          ),
           actions: [
             TextButton(
               onPressed: () {
-                Navigator.of(context).pop(false); // User canceled deletion
+                Navigator.of(context).pop();
               },
               child: const Text("Cancel"),
             ),
             TextButton(
               onPressed: () {
-                Navigator.of(context).pop(true); // User confirmed deletion
+                Navigator.of(context).pop(passwordController.text);
               },
-              child: const Text("Delete"),
+              child: const Text("Confirm"),
             ),
           ],
         );
       },
     );
 
-    // If user confirmed deletion, proceed to delete
-    if (confirmed == true) {
-      // _deleteEmployee();
+    if (password == null || password.isEmpty) {
+      return false;
+    }
+
+    if (email == null) {
+      return false;
+    }
+
+    final credential =
+        EmailAuthProvider.credential(email: email, password: password);
+    try {
+      await currentUser.reauthenticateWithCredential(credential);
+      // Reauthentication successful
+      return true;
+    } catch (e) {
+      // Reauthentication failed
+      print("Reauthentication error: $e");
+      return false;
+    }
+  }
+
+  Future<void> _deleteEmployee(BuildContext context) async {
+    try {
+      final currentUser = FirebaseAuth.instance.currentUser;
+
+      if (currentUser == null) {
+        print('No user to be deleted');
+        return;
+      }
+
+      if (currentUser.uid == userId) {
+        print("Cannot delete the current user");
+        return;
+      }
+
+      // Delete the Firestore document associated with the user
+      final userDocRef =
+          FirebaseFirestore.instance.collection('users').doc(userId);
+      await userDocRef.delete();
+
+      ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+        content: Text("User deleted successfully."),
+        duration: Duration(seconds: 2),
+      ));
+    } catch (e) {
+      print("Error deleting user: $e");
+      // Handle deletion error
     }
   }
 }
-  // Function to delete the employee from Firebase Firestore and Authentication
-//   Future<void> _deleteEmployee() async {
-//     try {
-//       final user = FirebaseAuth.instance.currentUser;
-//       if (user != null) {
-//         // Delete user from Firestore
-//         await FirebaseFirestore.instance
-//             .collection('users')
-//             .doc(user.uid)
-//             .delete();
-//         // Delete user from authentication
-//         await user.delete();
-//       }
-//     } catch (error) {
-//       print('Error during deletion: $error');
-//     }
-//   }
-// }
