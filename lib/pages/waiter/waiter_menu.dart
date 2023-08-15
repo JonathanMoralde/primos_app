@@ -1,6 +1,7 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:primos_app/pages/waiter/waiter_menu_cart.dart';
+import 'package:primos_app/providers/categoryFilter/activeCategory_provider.dart';
 import 'package:primos_app/providers/waiter_menu/currentOrder_provider.dart';
 import 'package:primos_app/providers/waiter_menu/menuItems_provider.dart';
 import 'package:primos_app/providers/waiter_menu/quantity_provider.dart';
@@ -20,7 +21,6 @@ import 'package:primos_app/widgets/orderObject.dart';
 
 // STATE MANAGEMENT
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:primos_app/providers/itemCard/getImageUrl_provider.dart';
 
 import 'package:flutter_hooks/flutter_hooks.dart';
 
@@ -320,14 +320,22 @@ class WaiterMenu extends ConsumerWidget {
               CustomSearchBar(),
               FilterBtns(),
               Consumer(builder: ((context, ref, child) {
+                final activeCategory = ref.watch(activeCategoryProvider);
                 return menuItems.when(
                     data: (itemDocs) {
+                      // FILTER BASED ON ACTIVE CATEGORY
+                      final filteredItems = itemDocs.where((itemDoc) {
+                        final productCategory = itemDoc['category'] as String;
+                        return activeCategory == "All" ||
+                            productCategory == activeCategory;
+                      }).toList();
+
                       return Padding(
                         padding: EdgeInsets.all(16),
                         child: Wrap(
                           spacing: 10,
                           runSpacing: 10,
-                          children: itemDocs.map((itemDoc) {
+                          children: filteredItems.map((itemDoc) {
                             final productId = itemDoc
                                 .id; // Get the document ID as the productId
                             final productName = itemDoc['itemName'] as String;
@@ -341,6 +349,8 @@ class WaiterMenu extends ConsumerWidget {
 
                             final dynamic productVariation =
                                 null; //todo GRAB THE PRODUCT VARIATION FROM DB, ex. MEDIUM, LARGE, CHICKEN, BEEF
+
+                            final productCategory = itemDoc['category'];
 
                             return ItemCard(
                               key: ValueKey(productId),
@@ -461,10 +471,10 @@ class WaiterMenu extends ConsumerWidget {
                     Navigator.of(context).push(
                       MaterialPageRoute(builder: (BuildContext context) {
                         return WaiterMenuCart(
-                          orderData: currentOrders,
-                          // onDelete: removeOrder,
-                          onDelete: (int) {},
-                        );
+                            // orderData: currentOrders,
+                            // onDelete: removeOrder,
+                            // onDelete: (int) {},
+                            );
                       }),
                     );
                   },

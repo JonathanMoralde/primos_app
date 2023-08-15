@@ -134,7 +134,7 @@ class OrderDetailsPage extends StatelessWidget {
                       Expanded(
                         flex: 1,
                         child: Text(
-                          totalAmount.toString(),
+                          order.price.toString(),
                           textAlign: TextAlign.end,
                         ),
                       ),

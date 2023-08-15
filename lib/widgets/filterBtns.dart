@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:primos_app/providers/categoryFilter/fetchCategory_provider.dart';
 import 'package:primos_app/widgets/styledButton.dart';
 
 // class BtnObject {
@@ -9,77 +10,76 @@ import 'package:primos_app/widgets/styledButton.dart';
 
 //   BtnObject({required this.name, required this.onTap});
 // }
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:primos_app/providers/categoryFilter/activeCategory_provider.dart';
+import 'package:primos_app/providers/categoryFilter/fetchCategory_provider.dart';
 
-class FilterBtns extends StatefulWidget {
-  const FilterBtns({Key? key}) : super(key: key);
+class FilterBtns extends ConsumerWidget {
+  FilterBtns({Key? key}) : super(key: key);
 
-  @override
-  State<FilterBtns> createState() => _FilterBtnsState();
-}
+  // String _activeCategory = "All"; // Default active category
 
-class _FilterBtnsState extends State<FilterBtns> {
-  String _activeCategory = "All"; // Default active category
-  List<String> category = [];
+  // @override
+  // void initState() {
+  //   super.initState();
+  //   fetchCategories();
+  // }
 
-  @override
-  void initState() {
-    super.initState();
-    fetchCategories();
-  }
+  // void fetchCategories() async {
+  //   final categoriesCollection =
+  //       FirebaseFirestore.instance.collection('categories');
+  //   final QuerySnapshot<Map<String, dynamic>> categoriesSnapshot =
+  //       await categoriesCollection.get();
 
-  void fetchCategories() async {
-    final categoriesCollection =
-        FirebaseFirestore.instance.collection('categories');
-    final QuerySnapshot<Map<String, dynamic>> categoriesSnapshot =
-        await categoriesCollection.get();
+  //   final List<String> fetchedCategories = [
+  //     "All",
+  //     // (selectedCategory) {
+  //     // setState(() {
+  //     //   _activeCategory = selectedCategory;
+  //     // });
+  //     // print("Selected category: $_activeCategory");
+  //     // // You can perform other actions based on the selected category.
+  //     // },
+  //   ];
+  //   // fetchedCategories.add(
+  //   //   BtnObject(
+  //   //     name: "All",
+  //   //     onTap: (selectedCategory) {
+  //   //       setState(() {
+  //   //         _activeCategory = selectedCategory;
+  //   //       });
+  //   //       print("Selected category: $_activeCategory");
+  //   //       // You can perform other actions based on the selected category.
+  //   //     },
+  //   //   ),
+  //   // );
 
-    final List<String> fetchedCategories = [
-      "All",
-      // (selectedCategory) {
-      // setState(() {
-      //   _activeCategory = selectedCategory;
-      // });
-      // print("Selected category: $_activeCategory");
-      // // You can perform other actions based on the selected category.
-      // },
-    ];
-    // fetchedCategories.add(
-    //   BtnObject(
-    //     name: "All",
-    //     onTap: (selectedCategory) {
-    //       setState(() {
-    //         _activeCategory = selectedCategory;
-    //       });
-    //       print("Selected category: $_activeCategory");
-    //       // You can perform other actions based on the selected category.
-    //     },
-    //   ),
-    // );
+  //   // Iterate through fetched documents and add to the category list
+  //   categoriesSnapshot.docs.forEach((categoryDoc) {
+  //     final categoryName = categoryDoc.data()['categoryName'] as String;
+  //     fetchedCategories.add(categoryName
+  //         // BtnObject(
+  //         //   name: categoryName,
+  //         //   onTap: (selectedCategory) {
+  //         //     setState(() {
+  //         //       _activeCategory = selectedCategory;
+  //         //     });
+  //         //     print("Selected category: $_activeCategory");
+  //         //     // You can perform other actions based on the selected category.
+  //         //   },
+  //         // ),
+  //         );
+  //   });
 
-    // Iterate through fetched documents and add to the category list
-    categoriesSnapshot.docs.forEach((categoryDoc) {
-      final categoryName = categoryDoc.data()['categoryName'] as String;
-      fetchedCategories.add(categoryName
-          // BtnObject(
-          //   name: categoryName,
-          //   onTap: (selectedCategory) {
-          //     setState(() {
-          //       _activeCategory = selectedCategory;
-          //     });
-          //     print("Selected category: $_activeCategory");
-          //     // You can perform other actions based on the selected category.
-          //   },
-          // ),
-          );
-    });
-
-    setState(() {
-      category = fetchedCategories;
-    });
-  }
+  //   setState(() {
+  //     category = fetchedCategories;
+  //   });
+  // }
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
+    final _activeCategory = ref.watch(activeCategoryProvider);
+    final List<String> category = ref.watch(fetchCategoryProvider).value ?? [];
     return Padding(
       padding: const EdgeInsets.only(left: 16),
       child: SizedBox(
@@ -95,9 +95,11 @@ class _FilterBtnsState extends State<FilterBtns> {
               child: StyledButton(
                 btnText: category[index],
                 onClick: () {
-                  setState(() {
-                    _activeCategory = category[index];
-                  });
+                  // setState(() {
+                  //   _activeCategory = category[index];
+                  // });
+                  ref.read(activeCategoryProvider.notifier).state =
+                      category[index];
                 },
                 btnColor: isActive
                     ? const Color(0xFFFE3034)

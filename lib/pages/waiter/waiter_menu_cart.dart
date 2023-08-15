@@ -1,31 +1,43 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:primos_app/pages/waiter/orderDetails.dart';
+import 'package:primos_app/providers/waiter_menu/currentOrder_provider.dart';
 import 'package:primos_app/widgets/bottomBar.dart';
 import 'package:primos_app/widgets/itemCard.dart';
 import 'package:primos_app/widgets/orderObject.dart';
 import 'package:primos_app/widgets/styledButton.dart';
 
-class WaiterMenuCart extends StatefulWidget {
-  final List<OrderObject> orderData;
-  final Function(int) onDelete;
+import '../../providers/waiter_menu/subtotal_provider.dart';
+
+class WaiterMenuCart extends ConsumerWidget {
+  // final List<OrderObject> orderData;
 
   const WaiterMenuCart({
     Key? key,
-    required this.orderData,
-    required this.onDelete,
+    // required this.orderData,
   }) : super(key: key);
 
-  @override
-  State<WaiterMenuCart> createState() => _WaiterMenuCartState();
-}
-
-class _WaiterMenuCartState extends State<WaiterMenuCart> {
-  @override
-  Widget build(BuildContext context) {
-    double totalAmount =
-        widget.orderData.fold(0, (double sum, OrderObject order) {
+  double calculateSubtotal(List<OrderObject> orders) {
+    return orders.fold(0, (double sum, OrderObject order) {
       return sum + (order.price * order.quantity);
     });
+  }
+
+  void updateSubtotal(WidgetRef ref) {
+    final currentOrders = ref.watch(currentOrdersProvider);
+    // final subtotalState = ref.watch(subtotalProvider);
+    // subtotalState.state = calculateSubtotal(currentOrders);
+    ref.read(subtotalProvider.notifier).state =
+        calculateSubtotal(currentOrders);
+  }
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final orderData = ref.watch(currentOrdersProvider);
+    // double totalAmount = orderData.fold(0, (double sum, OrderObject order) {
+    //   return sum + (order.price * order.quantity);
+    // });
+    double totalAmount = calculateSubtotal(orderData);
 
     return Scaffold(
       backgroundColor: Color(0xfff8f8f7),
@@ -36,9 +48,9 @@ class _WaiterMenuCartState extends State<WaiterMenuCart> {
         child: Padding(
           padding: const EdgeInsets.all(16.0),
           child: ListView.builder(
-            itemCount: widget.orderData.length,
+            itemCount: orderData.length,
             itemBuilder: (BuildContext context, int index) {
-              OrderObject order = widget.orderData[index];
+              OrderObject order = orderData[index];
 
               print(order);
               return Column(
@@ -62,9 +74,16 @@ class _WaiterMenuCartState extends State<WaiterMenuCart> {
                               Text("Quantity: ${order.quantity.toString()}"),
                               IconButton(
                                 onPressed: () {
-                                  setState(() {
-                                    widget.onDelete(index);
-                                  });
+                                  orderData.removeAt(index);
+                                  ref
+                                      .read(currentOrdersProvider.notifier)
+                                      .state = orderData;
+                                  updateSubtotal(ref);
+
+                                  print(ref.watch(currentOrdersProvider));
+                                  // setState(() {
+                                  //   widget.onDelete(index);
+                                  // });
                                 },
                                 icon: Icon(Icons.delete),
                               ),
@@ -95,7 +114,7 @@ class _WaiterMenuCartState extends State<WaiterMenuCart> {
                     style: TextStyle(letterSpacing: 1),
                   ),
                   Text(
-                    "PHP $totalAmount",
+                    "PHP ${ref.watch(subtotalProvider)}",
                     style: TextStyle(
                         fontWeight: FontWeight.w700, letterSpacing: 1),
                   )
@@ -113,11 +132,11 @@ class _WaiterMenuCartState extends State<WaiterMenuCart> {
                       onClick: () {
                         // TODO SEND REAL TIME ORDER TO KITCHEN AND CASHIER
 
-                        if (widget.orderData.isNotEmpty) {
+                        if (orderData.isNotEmpty) {
                           Navigator.of(context).push(
                             MaterialPageRoute(builder: (BuildContext context) {
                               return OrderDetailsPage(
-                                orderData: widget.orderData,
+                                orderData: orderData,
                                 totalAmount: totalAmount,
                               );
                             }),
