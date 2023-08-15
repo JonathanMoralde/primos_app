@@ -72,7 +72,7 @@ class ForgotPassPage extends StatelessWidget {
                     ],
                   ),
                   Text(
-                    "and a password reset link will be sent to your email.",
+                    "then a password reset link will be sent to your email.",
                     style: TextStyle(
                       fontSize: 12,
                       letterSpacing: 1,

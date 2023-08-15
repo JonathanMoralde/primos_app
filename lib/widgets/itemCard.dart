@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:primos_app/pages/admin/adminMenu_Form.dart';
+import 'package:primos_app/widgets/imageLoader.dart';
 import 'package:primos_app/widgets/styledButton.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:cached_network_image/cached_network_image.dart';
 
 class ItemCard extends StatelessWidget {
   final String productId;
@@ -11,12 +13,15 @@ class ItemCard extends StatelessWidget {
   final Widget? footerSection;
   final double? cardHeight;
   final bool? isRow;
+  final String imageUrl;
 
   /*
   to change the footer section below:
   pass this parameter
   Row(mainAxisAlignment: MainAxisAlignment.spaceBetween,children:[Text("replace this"), Text("Replace this")]),
    */
+
+  // TODO DO NOT ALLOW THE IMAGE TO RERENDER ONCE LOADED FOR USER EXPERIENCE
 
   const ItemCard({
     Key? key,
@@ -26,23 +31,24 @@ class ItemCard extends StatelessWidget {
     this.footerSection,
     this.cardHeight,
     this.isRow,
+    required this.imageUrl,
   }) : super(key: key);
 
-  Future<String> _getImageUrl(String productId) async {
-    try {
-      final DocumentSnapshot menuDoc = await FirebaseFirestore.instance
-          .collection('menu')
-          .doc(productId)
-          .get();
+  // Future<String> _getImageUrl(String productId) async {
+  //   try {
+  //     final DocumentSnapshot menuDoc = await FirebaseFirestore.instance
+  //         .collection('menu')
+  //         .doc(productId)
+  //         .get();
 
-      final imageUrl = menuDoc.get('imageURL') as String;
-      return imageUrl;
-    } catch (error) {
-      print('ERROR: $error');
-      // Handle errors
-      return ''; // Return an empty string or a default image URL
-    }
-  }
+  //     final imageUrl = menuDoc.get('imageURL') as String;
+  //     return imageUrl;
+  //   } catch (error) {
+  //     print('ERROR: $error');
+  //     // Handle errors
+  //     return ''; // Return an empty string or a default image URL
+  //   }
+  // }
 
   Future<void> _deleteMenuItem(BuildContext context) async {
     try {
@@ -89,39 +95,20 @@ class ItemCard extends StatelessWidget {
                 Expanded(
                   flex: 1,
                   child: ClipRRect(
-                    borderRadius: const BorderRadius.only(
-                      topLeft: Radius.circular(8),
-                      topRight: Radius.circular(8),
-                    ),
-                    child: FutureBuilder<String>(
-                      future: _getImageUrl(productId),
-                      builder: (context, snapshot) {
-                        if (snapshot.connectionState ==
-                            ConnectionState.waiting) {
-                          // Show a placeholder while loading the image
-                          return CircularProgressIndicator();
-                        } else if (snapshot.hasError ||
-                            !snapshot.hasData ||
-                            snapshot.data!.isEmpty) {
-                          // Handle errors or cases where the image URL is not available or empty
-                          // Show a placeholder or default image
-                          return Image.asset(
-                            'path_to_default_image.jpg', // Replace with the path to your default image
-                            width: double.infinity,
-                            fit: BoxFit.cover,
-                          );
-                        } else {
-                          // Successfully loaded the image URL, show the Image widget
-                          return Image.network(
-                            snapshot
-                                .data!, // Use the image URL from the snapshot
-                            width: double.infinity,
-                            fit: BoxFit.cover,
-                          );
-                        }
-                      },
-                    ),
-                  ),
+                      borderRadius: isRow == true
+                          ? BorderRadius.only(
+                              topLeft: Radius.circular(8),
+                              bottomLeft: Radius.circular(8),
+                            )
+                          : BorderRadius.only(
+                              topLeft: Radius.circular(8),
+                              topRight: Radius.circular(8),
+                            ),
+                      child: CachedNetworkImage(
+                        imageUrl: imageUrl,
+                        width: double.infinity,
+                        fit: BoxFit.cover,
+                      )),
                 ),
                 Expanded(
                   flex: 1,
@@ -193,39 +180,15 @@ class ItemCard extends StatelessWidget {
                 Expanded(
                   flex: 1,
                   child: ClipRRect(
-                    borderRadius: const BorderRadius.only(
-                      topLeft: Radius.circular(8),
-                      topRight: Radius.circular(8),
-                    ),
-                    child: FutureBuilder<String>(
-                      future: _getImageUrl(productId),
-                      builder: (context, snapshot) {
-                        if (snapshot.connectionState ==
-                            ConnectionState.waiting) {
-                          // Show a placeholder while loading the image
-                          return CircularProgressIndicator();
-                        } else if (snapshot.hasError ||
-                            !snapshot.hasData ||
-                            snapshot.data!.isEmpty) {
-                          // Handle errors or cases where the image URL is not available or empty
-                          // Show a placeholder or default image
-                          return Image.asset(
-                            'path_to_default_image.jpg', // Replace with the path to your default image
-                            width: double.infinity,
-                            fit: BoxFit.cover,
-                          );
-                        } else {
-                          // Successfully loaded the image URL, show the Image widget
-                          return Image.network(
-                            snapshot
-                                .data!, // Use the image URL from the snapshot
-                            width: double.infinity,
-                            fit: BoxFit.cover,
-                          );
-                        }
-                      },
-                    ),
-                  ),
+                      borderRadius: const BorderRadius.only(
+                        topLeft: Radius.circular(8),
+                        topRight: Radius.circular(8),
+                      ),
+                      child: CachedNetworkImage(
+                        imageUrl: imageUrl,
+                        width: double.infinity,
+                        fit: BoxFit.cover,
+                      )),
                 ),
                 Expanded(
                   flex: 1,

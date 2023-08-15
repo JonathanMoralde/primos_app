@@ -88,7 +88,7 @@ class _TakeoutPageState extends State<TakeoutPage> {
             items: const [
               BottomNavigationBarItem(
                 icon: Icon(Icons.table_bar),
-                label: "Tables",
+                label: "Dine-In",
               ),
               BottomNavigationBarItem(
                 icon: Icon(Icons.takeout_dining),

@@ -5,6 +5,8 @@ class StyledDropdown extends StatelessWidget {
   final void Function(String?) onChange;
   final String hintText;
   final List<String> items;
+  final double? width;
+  final dynamic dropdownColor;
 
   const StyledDropdown({
     Key? key,
@@ -12,16 +14,18 @@ class StyledDropdown extends StatelessWidget {
     required this.onChange,
     required this.hintText,
     required this.items,
+    this.width,
+    this.dropdownColor,
   }) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
     return Container(
       height: 45,
-      width: 250,
+      width: width ?? 250,
       padding: EdgeInsets.only(left: 8, right: 8),
       decoration: BoxDecoration(
-        color: Colors.grey.shade300,
+        color: dropdownColor ?? Colors.grey.shade300,
         borderRadius: const BorderRadius.all(Radius.circular(8)),
       ),
       child: DropdownButton(

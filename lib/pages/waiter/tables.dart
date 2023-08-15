@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:primos_app/pages/waiter/takeout.dart';
+import 'package:primos_app/pages/waiter/waiter_menu.dart';
 import 'package:primos_app/widgets/bottomBar.dart';
 import 'package:primos_app/widgets/pageObject.dart';
 import 'package:primos_app/widgets/sideMenu.dart';
@@ -31,7 +32,7 @@ class _WaiterTablePageState extends State<WaiterTablePage> {
               spacing: 10,
               runSpacing: 10,
               children: List.generate(
-                10, // Replace this with the number of TableBox instances you want to generate
+                10, //! Replace this with the number of TableBox instances you want to generate
                 (index) => FractionallySizedBox(
                   widthFactor: 0.31, // Take up 30% of available width
                   child: TableBox(
@@ -86,7 +87,7 @@ class _WaiterTablePageState extends State<WaiterTablePage> {
             items: const [
               BottomNavigationBarItem(
                 icon: Icon(Icons.table_bar),
-                label: "Tables",
+                label: "Dine-In",
               ),
               BottomNavigationBarItem(
                 icon: Icon(Icons.takeout_dining),

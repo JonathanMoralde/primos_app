@@ -65,11 +65,13 @@ class _AdminMenuPageState extends State<AdminMenuPage> {
                               : (itemPrice is int)
                                   ? itemPrice.toDouble()
                                   : 0.0;
+                          final imageUrl = itemDoc['imageURL'] as String;
 
                           return ItemCard(
                             productId: productId, // Pass the productId
                             productName: productName,
                             productPrice: productPrice,
+                            imageUrl: imageUrl,
                           );
                         }).toList(),
                       ),

@@ -32,63 +32,37 @@ class EmployeeDisplay extends StatelessWidget {
       height: 70,
       width: double.infinity,
       child: Padding(
-        padding: const EdgeInsets.all(10.0),
+        padding:
+            const EdgeInsets.only(top: 10.0, bottom: 10.0, left: 16, right: 16),
         child: Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
-            Expanded(
-              flex: 2,
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    employeeName,
-                    style: const TextStyle(
-                      fontSize: 16,
-                      fontWeight: FontWeight.w600,
-                      letterSpacing: 1,
-                    ),
-                    overflow: TextOverflow.ellipsis,
+            Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  employeeName,
+                  style: const TextStyle(
+                    fontSize: 16,
+                    fontWeight: FontWeight.w600,
+                    letterSpacing: 1,
                   ),
-                  Text(
-                    employeeRole,
-                    style: const TextStyle(fontSize: 12),
-                  ),
-                ],
-              ),
+                  overflow: TextOverflow.ellipsis,
+                ),
+                Text(
+                  employeeRole,
+                  style: const TextStyle(fontSize: 12),
+                ),
+              ],
             ),
-            Expanded(
-              flex: 1,
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.end,
-                children: [
-                  IconButton(
-                    alignment: const AlignmentDirectional(7, 0),
-                    iconSize: 28,
-                    onPressed: () {
-                      Navigator.of(context).push(
-                        MaterialPageRoute(
-                          builder: (BuildContext context) {
-                            return EmployeeFormEdit(
-                              fullName: employeeName,
-                            );
-                          },
-                        ),
-                      );
-                    },
-                    icon: const Icon(Icons.create),
-                  ),
-                  IconButton(
-                    alignment: const AlignmentDirectional(7, 0),
-                    iconSize: 28,
-                    onPressed: () {
-                      _showDeleteConfirmationDialog(context);
-                    },
-                    icon: const Icon(Icons.delete),
-                  ),
-                ],
-              ),
+            IconButton(
+              alignment: const AlignmentDirectional(7, 0),
+              iconSize: 28,
+              onPressed: () {
+                _showDeleteConfirmationDialog(context);
+              },
+              icon: const Icon(Icons.delete),
             ),
           ],
         ),

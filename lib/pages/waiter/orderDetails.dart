@@ -3,8 +3,16 @@ import 'package:primos_app/pages/waiter/tables.dart';
 import 'package:primos_app/widgets/bottomBar.dart';
 import 'package:primos_app/widgets/styledButton.dart';
 
+import '../../widgets/orderObject.dart';
+
+// * issues encountered: using ListView.builder inside a column or singleChildScrollView() causes an error
+// * solution: used map instead
+
 class OrderDetailsPage extends StatelessWidget {
-  const OrderDetailsPage({super.key});
+  final List<OrderObject> orderData;
+  final double totalAmount;
+  const OrderDetailsPage(
+      {super.key, required this.orderData, required this.totalAmount});
 
   @override
   Widget build(BuildContext context) {
@@ -26,7 +34,7 @@ class OrderDetailsPage extends StatelessWidget {
                   decoration: BoxDecoration(
                       color: Colors.grey.shade300,
                       borderRadius: const BorderRadius.all(Radius.circular(8))),
-                  child: const Column(
+                  child: Column(
                     children: [
                       Row(
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -62,7 +70,7 @@ class OrderDetailsPage extends StatelessWidget {
                             style: TextStyle(fontWeight: FontWeight.w600),
                           ),
                           // TODO CHANGE TO ACTUAL
-                          Text("PHP 69")
+                          Text("PHP ${totalAmount.toString()}")
                         ],
                       ),
                     ],
@@ -105,31 +113,34 @@ class OrderDetailsPage extends StatelessWidget {
                   height: 10,
                 ),
 
-                // TODO CHANGE TO LISt OF ITEMS ORDERED
-                // INDIV ITEMS
-                const Row(
-                  children: [
-                    Expanded(flex: 2, child: Text("Beef Bulgogi")),
-                    Expanded(
+                ...orderData.map((OrderObject order) {
+                  return Row(
+                    children: [
+                      Expanded(flex: 2, child: Text(order.name)),
+                      Expanded(
                         flex: 1,
                         child: Text(
-                          "",
+                          order.variation ?? "",
                           textAlign: TextAlign.end,
-                        )),
-                    Expanded(
+                        ),
+                      ),
+                      Expanded(
                         flex: 1,
                         child: Text(
-                          "1",
+                          order.quantity.toString(),
                           textAlign: TextAlign.end,
-                        )),
-                    Expanded(
+                        ),
+                      ),
+                      Expanded(
                         flex: 1,
                         child: Text(
-                          "69",
+                          totalAmount.toString(),
                           textAlign: TextAlign.end,
-                        )),
-                  ],
-                ),
+                        ),
+                      ),
+                    ],
+                  );
+                }).toList(),
               ],
             ),
           ),
