@@ -20,6 +20,9 @@ class StyledDropdown extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    // Ensure unique values for items
+    final uniqueItems = items.toSet().toList();
+
     return Container(
       height: 45,
       width: width ?? 250,
@@ -37,7 +40,7 @@ class StyledDropdown extends StatelessWidget {
         ),
         value: value,
         isExpanded: true,
-        items: items.map((item) {
+        items: uniqueItems.map((item) {
           return DropdownMenuItem(
             value: item,
             child: Text(
