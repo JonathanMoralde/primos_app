@@ -1,20 +1,26 @@
 import 'package:flutter/material.dart';
 import 'package:primos_app/pages/waiter/waiter_menu.dart';
+import 'package:primos_app/providers/waiter_menu/orderName_provider.dart';
 import 'package:primos_app/widgets/styledButton.dart';
 
-class TableBox extends StatefulWidget {
+// STATE MANAGEMENT
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+
+// TODO UI FOR WHEN THE TABLE IS OCCUPPIED
+
+class TableBox extends ConsumerWidget {
   final int tableNum;
-  const TableBox({super.key, required this.tableNum});
+  TableBox({super.key, required this.tableNum});
 
-  @override
-  State<TableBox> createState() => _TableBoxState();
-}
+//   @override
+//   State<TableBox> createState() => _TableBoxState();
+// }
 
-class _TableBoxState extends State<TableBox> {
+// class _TableBoxState extends State<TableBox> {
   bool isOccupied = false;
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
     Future tableModal() => showDialog(
         context: context,
         builder: (context) => AlertDialog(
@@ -70,14 +76,16 @@ class _TableBoxState extends State<TableBox> {
           ),
         ),
         child: Center(
-          child: Text("Table ${widget.tableNum}"),
+          child: Text("Table ${tableNum}"),
         ),
       ),
       onTap: () {
-        print(widget.tableNum);
+        // print(tableNum);
         if (isOccupied) {
           tableModal();
         }
+        ref.read(orderNameProvider.notifier).state = "Table $tableNum";
+        print(ref.watch(orderNameProvider));
         Navigator.of(context).push(
           MaterialPageRoute(builder: (BuildContext context) {
             return WaiterMenu();

@@ -1,22 +1,26 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:primos_app/pages/waiter/tables.dart';
 import 'package:primos_app/pages/waiter/waiter_menu.dart';
+import 'package:primos_app/providers/bottomNavBar/currentIndex_provider.dart';
 import 'package:primos_app/widgets/bottomBar.dart';
 import 'package:primos_app/widgets/pageObject.dart';
 import 'package:primos_app/widgets/sideMenu.dart';
 
-class TakeoutPage extends StatefulWidget {
+import '../../providers/waiter_menu/orderName_provider.dart';
+
+class TakeoutPage extends ConsumerWidget {
   const TakeoutPage({super.key});
 
-  @override
-  State<TakeoutPage> createState() => _TakeoutPageState();
-}
+//   @override
+//   State<TakeoutPage> createState() => _TakeoutPageState();
+// }
 
-class _TakeoutPageState extends State<TakeoutPage> {
-  int currentIndex = 1;
+// class _TakeoutPageState extends State<TakeoutPage> {
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
+    int currentIndex = ref.watch(currentIndex_provider);
     return Scaffold(
       backgroundColor: Color(0xfff8f8f7),
       appBar: AppBar(
@@ -28,13 +32,30 @@ class _TakeoutPageState extends State<TakeoutPage> {
           child: Padding(
             padding: const EdgeInsets.all(16.0),
             child: Column(
-              children: [Container()],
+              children: [Container()], //TODO ADD LIST OF TAKEOUT ORDERS HERE
             ),
           ),
         ),
       ),
       floatingActionButton: FloatingActionButton(
         onPressed: () {
+          // When the floating action button is pressed, update the order name and last takeout number
+          final currentDate = DateTime.now();
+          final lastOrderDate = ref.watch(lastOrderDateProvider);
+
+          if (lastOrderDate == null || currentDate.day != lastOrderDate.day) {
+            ref.read(lastTakeoutNumberProvider.notifier).state = 1;
+            ref.read(lastOrderDateProvider.notifier).state = currentDate;
+          } else {
+            ref.read(lastTakeoutNumberProvider.notifier).state += 1;
+          }
+          final int takeoutNum = ref.watch(lastTakeoutNumberProvider);
+          final String orderName = "Takeout $takeoutNum";
+
+          ref.read(orderNameProvider.notifier).state = orderName;
+
+          print(ref.watch(orderNameProvider));
+
           Navigator.of(context).push(
             MaterialPageRoute(builder: (BuildContext context) {
               return WaiterMenu();
@@ -65,23 +86,21 @@ class _TakeoutPageState extends State<TakeoutPage> {
           child: BottomNavigationBar(
             currentIndex: currentIndex,
             onTap: (index) {
-              setState(() {
-                currentIndex = index;
+              ref.read(currentIndex_provider.notifier).state = index;
 
-                if (index == 0) {
-                  Navigator.of(context).pushReplacement(
-                    MaterialPageRoute(builder: (BuildContext context) {
-                      return WaiterTablePage();
-                    }),
-                  );
-                } else {
-                  Navigator.of(context).pushReplacement(
-                    MaterialPageRoute(builder: (BuildContext context) {
-                      return TakeoutPage();
-                    }),
-                  );
-                }
-              });
+              if (index == 0) {
+                Navigator.of(context).pushReplacement(
+                  MaterialPageRoute(builder: (BuildContext context) {
+                    return WaiterTablePage();
+                  }),
+                );
+              } else {
+                Navigator.of(context).pushReplacement(
+                  MaterialPageRoute(builder: (BuildContext context) {
+                    return TakeoutPage();
+                  }),
+                );
+              }
             },
             selectedItemColor: Color(0xFFFE3034),
             backgroundColor: Color(0xFFE2B563),

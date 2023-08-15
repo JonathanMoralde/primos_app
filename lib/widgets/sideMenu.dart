@@ -1,13 +1,15 @@
 //preconfigured with pageObject.dart
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:primos_app/providers/session/user_provider.dart';
 import 'package:primos_app/widgets/pageObject.dart';
 import 'package:primos_app/pages/loginScreen.dart';
 import '../pages/login_services.dart';
 
 import 'package:shared_preferences/shared_preferences.dart';
 
-class SideMenu extends StatelessWidget {
+class SideMenu extends ConsumerWidget {
   final List<SideMenuPage> pages;
 
   const SideMenu({
@@ -16,14 +18,15 @@ class SideMenu extends StatelessWidget {
   });
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
+    final String? userName = ref.watch(userNameProvider);
     return Drawer(
       child: ListView(
         shrinkWrap: true,
         padding: EdgeInsets.zero,
         children: <Widget>[
           // HEADER
-          const DrawerHeader(
+          DrawerHeader(
             decoration: BoxDecoration(
               color: Color(0xFFE2B563),
             ),
@@ -35,7 +38,7 @@ class SideMenu extends StatelessWidget {
                     Icons.account_circle,
                     size: 85,
                   ),
-                  Text("Jonathan Moralde"),
+                  Text(userName ?? "User"),
                 ]),
           ),
 

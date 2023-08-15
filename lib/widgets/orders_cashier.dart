@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:primos_app/pages/cashier/orders_view.dart';
 
 class OrdersCashier extends StatelessWidget {
-  final int orderNum;
+  final dynamic orderNum;
   final void Function()? onPressed;
 
   const OrdersCashier({super.key, required this.orderNum, this.onPressed});

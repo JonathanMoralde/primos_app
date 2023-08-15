@@ -10,6 +10,8 @@ import 'package:primos_app/widgets/searchBar.dart';
 import 'package:primos_app/widgets/styledButton.dart';
 import 'package:primos_app/widgets/pageObject.dart';
 
+// TODO REFACTOR THIS PAGE TO USE RIVERPOD STATE MANAGEMENT
+
 class AdminMenuPage extends StatefulWidget {
   const AdminMenuPage({Key? key});
 

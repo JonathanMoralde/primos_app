@@ -3,6 +3,9 @@ import 'package:primos_app/widgets/bottomBar.dart';
 import 'package:primos_app/widgets/styledButton.dart';
 import 'package:primos_app/widgets/styledTextField.dart';
 
+// TODO REFACTOR HARD CODED TO USE DATA FROM DB
+// TODO ADD BLUETOOTH FUNCTIONALITY IN PRINT BUTTON
+
 class OrderViewPage extends StatelessWidget {
   OrderViewPage({super.key});
 
@@ -221,6 +224,12 @@ class OrderViewPage extends StatelessWidget {
 
     return Scaffold(
       appBar: AppBar(
+        leading: IconButton(
+          //manual handle back button
+          icon: const Icon(Icons.keyboard_arrow_left),
+          iconSize: 35,
+          onPressed: () => Navigator.of(context).pop(),
+        ),
         title: (Text("ORDER DETAILS TABLE 1")),
       ),
       body: SafeArea(

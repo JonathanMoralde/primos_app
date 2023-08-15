@@ -19,6 +19,8 @@ class OrderDetailsPage extends StatelessWidget {
     return Scaffold(
       backgroundColor: Color(0xfff8f8f7),
       appBar: AppBar(
+        automaticallyImplyLeading: false,
+        // TODO REMOVE BACK BUTTON TO PREVENT GOING BACK TO CART
         title: Text("ORDER DETAILS TABLE 1"),
       ),
       body: SafeArea(

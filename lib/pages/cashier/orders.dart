@@ -3,6 +3,11 @@ import 'package:primos_app/widgets/orders_cashier.dart';
 import 'package:primos_app/widgets/pageObject.dart';
 import 'package:primos_app/widgets/sideMenu.dart';
 
+//* WAYS:
+//  FETCH ORDERS DATA HERE IN PARENT WIDGET AND STORE IN RIVERPOD FOR STATE MANAGEMENT
+//  OR FETCH DATA USING RIVERPOD TO BE CALLED HERE AND STORE STATES IN RIVERPOD
+// FETCH ORDERS DATA AND PASS IT AS PARAMETER IN OrdersCashier Widget (ALSO EDIT OrdersCashier CONSTRUCTOR)
+
 class OrdersPage extends StatelessWidget {
   const OrdersPage({super.key});
 
@@ -18,7 +23,7 @@ class OrdersPage extends StatelessWidget {
           children: [
             SizedBox(
               height: 16,
-            ),
+            ), //TODO CREATE DYNAMIC LIST
             OrdersCashier(orderNum: 1),
             OrdersCashier(orderNum: 1),
             OrdersCashier(orderNum: 1),

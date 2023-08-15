@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:primos_app/pages/waiter/orderDetails.dart';
+import 'package:primos_app/providers/session/user_provider.dart';
 import 'package:primos_app/providers/waiter_menu/currentOrder_provider.dart';
+import 'package:primos_app/providers/waiter_menu/orderName_provider.dart';
 import 'package:primos_app/widgets/bottomBar.dart';
 import 'package:primos_app/widgets/itemCard.dart';
 import 'package:primos_app/widgets/orderObject.dart';
@@ -31,6 +33,46 @@ class WaiterMenuCart extends ConsumerWidget {
         calculateSubtotal(currentOrders);
   }
 
+//! FUNCTION FOR INSERTING DATA TO REALTIME DATABASE
+  void insertData(List<OrderObject> orderData, WidgetRef ref) {
+    // final databaseReference = FirebaseDatabase.instance.reference();
+
+    // Get the current date in the desired format
+    final String currentDate = DateTime.now().toString();
+    final String tableName = ref.watch(orderNameProvider).toString();
+    final double totalAmount = ref.watch(subtotalProvider);
+    final waiterName = ref.watch(userNameProvider);
+
+    // Generate a new unique key for the order
+    // final newOrderRef = databaseReference.child('orders').push();
+
+    // Prepare order details in the required format
+    List<Map<String, dynamic>> orderDetails = orderData
+        .map((order) => {
+              'productId': order.id,
+              'productName': order.name,
+              'productPrice': order.price,
+              'quantity': order.quantity,
+              'variation': order.variation,
+            })
+        .toList();
+
+    // Prepare the order object
+    Map<String, dynamic> order = {
+      'order_name': tableName,
+      'order_date': currentDate,
+      'total_amount': totalAmount,
+      'order_details': orderDetails,
+      'served_by': waiterName,
+    };
+
+    // Insert the order data using the generated key
+    // await newOrderRef.set(order);
+
+    // Clear the current orders after successful insertion
+    ref.read(currentOrdersProvider.notifier).state = [];
+  }
+
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final orderData = ref.watch(currentOrdersProvider);
@@ -42,6 +84,12 @@ class WaiterMenuCart extends ConsumerWidget {
     return Scaffold(
       backgroundColor: Color(0xfff8f8f7),
       appBar: AppBar(
+        leading: IconButton(
+          //manual handle back button
+          icon: const Icon(Icons.keyboard_arrow_left),
+          iconSize: 35,
+          onPressed: () => Navigator.of(context).pop(),
+        ),
         title: Text("CURRENT ORDERS"),
       ),
       body: SafeArea(
@@ -130,9 +178,9 @@ class WaiterMenuCart extends ConsumerWidget {
                       btnColor: Color(0xfff8f8f7),
                       btnText: "CONFIRM ORDER",
                       onClick: () {
-                        // TODO SEND REAL TIME ORDER TO KITCHEN AND CASHIER
-
                         if (orderData.isNotEmpty) {
+                          insertData(orderData, ref);
+                          // TODO SEND REAL TIME ORDER TO KITCHEN AND CASHIER BEFORE EXECUTION NAVIGATOR
                           Navigator.of(context).push(
                             MaterialPageRoute(builder: (BuildContext context) {
                               return OrderDetailsPage(

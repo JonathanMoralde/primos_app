@@ -55,7 +55,6 @@ class LoginSreen extends ConsumerWidget {
           .signInWithEmailAndPassword(email: email, password: password)
           .then((value) async {
         final User? user = Auth().currentUser;
-        ref.read(userProvider.notifier).state = user;
 
         if (user != null) {
           DocumentSnapshot userSnapshot = await FirebaseFirestore.instance
@@ -64,6 +63,8 @@ class LoginSreen extends ConsumerWidget {
               .get();
           String role =
               userSnapshot['role']; // Assuming 'role' is a field in Firestore
+          String fullName = userSnapshot['fullName'];
+          ref.read(userNameProvider.notifier).state = fullName;
 
           // store role in sharedPreferences
           SharedPreferences prefs = await SharedPreferences.getInstance();

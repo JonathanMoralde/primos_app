@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:primos_app/widgets/orderCard.dart';
 
+// TODO GRAB ORDERS FROM DB AND DISPLAY DYNAMICALLY
+
 class KitchenPage extends StatelessWidget {
   const KitchenPage({super.key});
 
@@ -16,7 +18,10 @@ class KitchenPage extends StatelessWidget {
           child: Padding(
             padding: const EdgeInsets.all(16.0),
             child: Wrap(
-              children: [OrderCard()],
+              //TODO ADD WIDGET THAT DISPLAYS DATA FROM DB ex. LISTVIEW.BUILDER, MAP
+              children: [
+                OrderCard()
+              ], //TODO EDIT THE ORDERCARD() TO TAKE PARAMETERS FROM THE DATA FROM DB
             ),
           ),
         ),

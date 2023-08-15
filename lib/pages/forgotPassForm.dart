@@ -11,7 +11,14 @@ class ForgotPassPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(),
+      appBar: AppBar(
+        leading: IconButton(
+          //manual handle back button
+          icon: const Icon(Icons.keyboard_arrow_left),
+          iconSize: 35,
+          onPressed: () => Navigator.of(context).pop(),
+        ),
+      ),
       backgroundColor: Color(0xfff8f8f7),
       body: SizedBox(
         width: double.infinity,
