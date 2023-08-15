@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:primos_app/widgets/styledButton.dart';
 import 'package:primos_app/widgets/styledTextField.dart';
+import 'passwordResetFunction.dart';
 
 class ForgotPassPage extends StatelessWidget {
   ForgotPassPage({super.key});
@@ -40,7 +41,17 @@ class ForgotPassPage extends StatelessWidget {
             ),
             StyledButton(
               btnText: "CONFIRM",
-              onClick: () {},
+              onClick: () async {
+                final email = emailController.text;
+                try {
+                  await sendPasswordResetLink(email);
+                  ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+                      content: Text('Password Reset Link has been sent.')));
+                } catch (error) {
+                  ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+                      content: Text('Error sending Password Reset Link.')));
+                }
+              },
               btnWidth: 250,
             ),
             const SizedBox(

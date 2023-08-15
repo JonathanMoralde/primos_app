@@ -99,6 +99,7 @@ class _EmployeeFormState extends State<EmployeeForm> {
                     await users.doc(authResult.user!.uid).set({
                       'fullName': fullNameController.text,
                       'role': role,
+                      'email': emailController.text
                     });
                     Navigator.of(context).pushReplacement(
                       MaterialPageRoute(
