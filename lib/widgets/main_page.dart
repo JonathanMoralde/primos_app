@@ -1,11 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:primos_app/pages/kitchen/kitchen.dart';
 import 'package:primos_app/pages/loginScreen.dart';
 import 'package:primos_app/pages/waiter/tables.dart';
 import '../pages/admin/salesReport.dart';
 import '../pages/admin/table.dart';
 import '../pages/cashier/orders.dart';
-import '../pages/test.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class MainPage extends StatelessWidget {
@@ -58,7 +58,7 @@ class MainPage extends StatelessWidget {
       case 'Cashier':
         return OrdersPage();
       case 'Kitchen':
-        return TestPage();
+        return KitchenPage();
       default:
         return LoginSreen(); // Default page for unknown roles
     }

@@ -7,7 +7,7 @@ import 'package:primos_app/pages/admin/salesReport.dart';
 import 'package:primos_app/pages/admin/table.dart';
 import 'package:primos_app/pages/cashier/orders.dart';
 import 'package:primos_app/pages/kitchen/kitchen.dart';
-import 'package:primos_app/pages/test.dart';
+
 import 'package:primos_app/pages/waiter/tables.dart';
 import 'package:primos_app/pages/waiter/takeout.dart';
 

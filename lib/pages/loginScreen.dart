@@ -70,8 +70,10 @@ class LoginSreen extends ConsumerWidget {
           ref.read(userNameProvider.notifier).state = fullName;
 
           // store role in sharedPreferences
+          // Store role in SharedPreferences with a user-specific key
           SharedPreferences prefs = await SharedPreferences.getInstance();
-          prefs.setString('lastVisitedPage', role);
+          String userSpecificKey = 'lastVisitedPage_${user.uid}';
+          prefs.setString(userSpecificKey, role);
 
           Navigator.of(context).pushReplacement(
             MaterialPageRoute(

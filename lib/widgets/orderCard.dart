@@ -22,13 +22,14 @@ class OrderCardDropdown extends ConsumerWidget {
     return Container(
       decoration: BoxDecoration(
         border: Border.all(
-          color: const Color(0xFFE2B563), // Border color
+          color: Color.fromARGB(255, 0, 0, 0), // Border color
           width: 1.0, // Border width
         ),
         borderRadius: BorderRadius.circular(8.0), // Border radius
       ),
       width: 200,
       child: ExpansionTile(
+        backgroundColor: Colors.grey,
         title: Text(
           'TABLE 1',
           style: TextStyle(letterSpacing: 1, fontSize: 20),
