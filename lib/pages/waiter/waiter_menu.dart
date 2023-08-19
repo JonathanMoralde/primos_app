@@ -7,10 +7,11 @@ import 'package:primos_app/widgets/bottomBar.dart';
 import 'package:primos_app/widgets/filterBtns.dart';
 import 'package:primos_app/widgets/searchBar.dart';
 import 'package:primos_app/widgets/styledButton.dart';
-
+import 'package:cloud_firestore/cloud_firestore.dart';
 import '../../providers/waiter_menu/subtotal_provider.dart';
 import '../../widgets/itemCard.dart';
 import '../../widgets/styledDropdown.dart';
+import '../../providers/kitchen/variation_provider.dart';
 
 import 'package:primos_app/widgets/orderObject.dart';
 
@@ -90,7 +91,7 @@ class WaiterMenu extends ConsumerWidget {
                                       },
                                       hintText: "Select Variation",
                                       items: const [
-                                        //TODO CHANGE DYNAMICALLY
+                                        'Small',
                                         'Medium',
                                         'Large',
                                       ],
@@ -222,7 +223,7 @@ class WaiterMenu extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final subtotal = ref.watch(subtotalProvider);
-    final menuItems = ref.watch(menuItemsProvider);
+    final menuItems = ref.watch(menuItemsStreamProvider);
 
     return WillPopScope(
       onWillPop: () async {

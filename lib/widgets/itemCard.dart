@@ -6,7 +6,7 @@ import 'package:firebase_storage/firebase_storage.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 
-class ItemCard extends StatelessWidget {
+class ItemCard extends StatefulWidget {
   final String productId;
   final String productName;
   final double productPrice;
@@ -34,33 +34,24 @@ class ItemCard extends StatelessWidget {
     required this.imageUrl,
   }) : super(key: key);
 
+  @override
+  State<ItemCard> createState() => _ItemCardState();
+}
+
+class _ItemCardState extends State<ItemCard> {
   // Future<String> _getImageUrl(String productId) async {
-  //   try {
-  //     final DocumentSnapshot menuDoc = await FirebaseFirestore.instance
-  //         .collection('menu')
-  //         .doc(productId)
-  //         .get();
-
-  //     final imageUrl = menuDoc.get('imageURL') as String;
-  //     return imageUrl;
-  //   } catch (error) {
-  //     print('ERROR: $error');
-  //     // Handle errors
-  //     return ''; // Return an empty string or a default image URL
-  //   }
-  // }
-
   Future<void> _deleteMenuItem(BuildContext context) async {
     try {
       // Delete the menu item from Firestore
       await FirebaseFirestore.instance
           .collection('menu')
-          .doc(productId)
+          .doc(widget.productId)
           .delete();
 
       // Delete the image from Firebase Storage
-      final storageRef =
-          FirebaseStorage.instance.ref().child('menu_images/$productId.jpg');
+      final storageRef = FirebaseStorage.instance
+          .ref()
+          .child('menu_images/${widget.productId}.jpg');
       await storageRef.delete();
 
       // You can also show a confirmation dialog or take other actions if needed
@@ -75,8 +66,8 @@ class ItemCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      height: cardHeight ?? 220,
-      width: isRow == true ? double.infinity : 174,
+      height: widget.cardHeight ?? 220,
+      width: widget.isRow == true ? double.infinity : 174,
       decoration: BoxDecoration(
         boxShadow: [
           BoxShadow(
@@ -89,13 +80,13 @@ class ItemCard extends StatelessWidget {
         borderRadius: BorderRadius.circular(8),
         color: Colors.grey.shade300,
       ),
-      child: isRow == true
+      child: widget.isRow == true
           ? Row(
               children: [
                 Expanded(
                   flex: 1,
                   child: ClipRRect(
-                      borderRadius: isRow == true
+                      borderRadius: widget.isRow == true
                           ? BorderRadius.only(
                               topLeft: Radius.circular(8),
                               bottomLeft: Radius.circular(8),
@@ -105,7 +96,7 @@ class ItemCard extends StatelessWidget {
                               topRight: Radius.circular(8),
                             ),
                       child: CachedNetworkImage(
-                        imageUrl: imageUrl,
+                        imageUrl: widget.imageUrl,
                         width: double.infinity,
                         fit: BoxFit.cover,
                       )),
@@ -124,16 +115,16 @@ class ItemCard extends StatelessWidget {
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          Text(productName),
+                          Text(widget.productName),
                           const SizedBox(
                             height: 8,
                           ),
-                          Text("$productPrice PHP"),
+                          Text("${widget.productPrice} PHP"),
                           const SizedBox(
                             height: 8,
                           ),
                           // Footer section
-                          footerSection ??
+                          widget.footerSection ??
                               Row(
                                 mainAxisAlignment:
                                     MainAxisAlignment.spaceBetween,
@@ -146,9 +137,9 @@ class ItemCard extends StatelessWidget {
                                         MaterialPageRoute(
                                           builder: (BuildContext context) {
                                             return AdminMenuForm(
-                                              productId: productId,
-                                              productName: productName,
-                                              productPrice: productPrice,
+                                              productId: widget.productId,
+                                              productName: widget.productName,
+                                              productPrice: widget.productPrice,
                                             );
                                           },
                                         ),
@@ -185,7 +176,7 @@ class ItemCard extends StatelessWidget {
                         topRight: Radius.circular(8),
                       ),
                       child: CachedNetworkImage(
-                        imageUrl: imageUrl,
+                        imageUrl: widget.imageUrl,
                         width: double.infinity,
                         fit: BoxFit.cover,
                       )),
@@ -199,16 +190,16 @@ class ItemCard extends StatelessWidget {
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          Text(productName),
+                          Text(widget.productName),
                           const SizedBox(
                             height: 8,
                           ),
-                          Text("$productPrice PHP"),
+                          Text("${widget.productPrice} PHP"),
                           const SizedBox(
                             height: 8,
                           ),
                           // Footer section
-                          footerSection ??
+                          widget.footerSection ??
                               Row(
                                 mainAxisAlignment:
                                     MainAxisAlignment.spaceBetween,
@@ -221,9 +212,9 @@ class ItemCard extends StatelessWidget {
                                         MaterialPageRoute(
                                           builder: (BuildContext context) {
                                             return AdminMenuForm(
-                                              productId: productId,
-                                              productName: productName,
-                                              productPrice: productPrice,
+                                              productId: widget.productId,
+                                              productName: widget.productName,
+                                              productPrice: widget.productPrice,
                                             );
                                           },
                                         ),

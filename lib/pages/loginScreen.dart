@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:primos_app/pages/forgotPassForm.dart';
+import 'package:primos_app/pages/kitchen/kitchen.dart';
 import 'package:primos_app/pages/waiter/tables.dart';
 
 // widgets
@@ -11,8 +12,8 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'login_services.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 
-// test page
-import 'package:primos_app/pages/test.dart';
+// // test page
+// import 'package:primos_app/pages/test.dart';
 // waiter page
 import 'package:primos_app/pages/admin/table.dart';
 // cashier page
@@ -20,6 +21,8 @@ import 'package:primos_app/pages/cashier/orders.dart';
 // admin pages
 import 'package:primos_app/pages/admin/salesReport.dart';
 
+// kitchen page
+import 'package:primos_app/pages/kitchen/kitchen.dart';
 // provider
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:primos_app/providers/session/user_provider.dart';
@@ -81,7 +84,7 @@ class LoginSreen extends ConsumerWidget {
                   case 'Cashier':
                     return OrdersPage();
                   case 'Kitchen':
-                    return TestPage();
+                    return KitchenPage();
                   default:
                     return LoginSreen(); // Default page for unknown roles
                 }

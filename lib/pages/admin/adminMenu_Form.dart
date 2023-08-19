@@ -215,7 +215,7 @@ class _AdminMenuFormState extends State<AdminMenuForm> {
                   });
                 },
                 hintText: "Category",
-                items: const ['Beverages', 'Meat', 'Salads', 'Pastas'],
+                items: [],
               ),
               const SizedBox(
                 height: 10,

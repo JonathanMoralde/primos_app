@@ -10,6 +10,7 @@ import 'package:primos_app/widgets/orderObject.dart';
 import 'package:primos_app/widgets/styledButton.dart';
 
 import '../../providers/waiter_menu/subtotal_provider.dart';
+import 'package:firebase_database/firebase_database.dart';
 
 class WaiterMenuCart extends ConsumerWidget {
   // final List<OrderObject> orderData;
@@ -33,9 +34,8 @@ class WaiterMenuCart extends ConsumerWidget {
         calculateSubtotal(currentOrders);
   }
 
-//! FUNCTION FOR INSERTING DATA TO REALTIME DATABASE
-  void insertData(List<OrderObject> orderData, WidgetRef ref) {
-    // final databaseReference = FirebaseDatabase.instance.reference();
+  void insertData(List<OrderObject> orderData, WidgetRef ref) async {
+    final databaseReference = FirebaseDatabase.instance;
 
     // Get the current date in the desired format
     final String currentDate = DateTime.now().toString();
@@ -44,7 +44,7 @@ class WaiterMenuCart extends ConsumerWidget {
     final waiterName = ref.watch(userNameProvider);
 
     // Generate a new unique key for the order
-    // final newOrderRef = databaseReference.child('orders').push();
+    final newOrderRef = databaseReference.ref().child('orders').push();
 
     // Prepare order details in the required format
     List<Map<String, dynamic>> orderDetails = orderData
@@ -64,10 +64,12 @@ class WaiterMenuCart extends ConsumerWidget {
       'total_amount': totalAmount,
       'order_details': orderDetails,
       'served_by': waiterName,
+      'order_status': 'Pending',
+      'payment_status': 'Unpaid',
     };
 
     // Insert the order data using the generated key
-    // await newOrderRef.set(order);
+    await newOrderRef.set(order);
 
     // Clear the current orders after successful insertion
     ref.read(currentOrdersProvider.notifier).state = [];
