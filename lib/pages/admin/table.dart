@@ -7,7 +7,7 @@ import 'package:primos_app/widgets/styledButton.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 
 class TablePage extends StatefulWidget {
-  const TablePage({super.key});
+  const TablePage({Key? key}) : super(key: key);
 
   @override
   State<TablePage> createState() => _TablePageState();
@@ -16,6 +16,7 @@ class TablePage extends StatefulWidget {
 class _TablePageState extends State<TablePage> {
   int quantity = 1;
   late List<Map<String, dynamic>> tablesData = [];
+
   Future<int> getLastTableNumber() async {
     final tablesCollection = FirebaseFirestore.instance.collection('tables');
     final querySnapshot = await tablesCollection
@@ -47,10 +48,19 @@ class _TablePageState extends State<TablePage> {
     final tablesCollection = FirebaseFirestore.instance.collection('tables');
     final querySnapshot = await tablesCollection.get();
 
+    final fetchedData = querySnapshot.docs.map((doc) {
+      final data = doc.data() as Map<String, dynamic>;
+      return {
+        'tableName': data['tableName'] as String,
+        'tableNumber': data['tableNumber'] as int,
+      };
+    }).toList();
+
+    print("Fetched tables: $fetchedData");
+
     setState(() {
-      tablesData = querySnapshot.docs.map((doc) => doc.data()).toList();
+      tablesData = fetchedData;
     });
-    print("Fetched tables: $tablesData");
   }
 
   @override
@@ -63,19 +73,29 @@ class _TablePageState extends State<TablePage> {
       ),
       body: SafeArea(
         child: Padding(
-          padding: EdgeInsets.all(16.0),
-          child: Wrap(
-            spacing: 10,
-            runSpacing: 10,
-            children: tablesData.map((tableData) {
-              final tableNum = tableData['tableNumber'] as int;
-              final tableName = tableData['tableName'] as String;
-              print("Creating TableDisplay for Table $tableNum: $tableName");
-              return TableDisplay(
-                tableNum: tableNum,
-                tableName: tableName,
-              );
-            }).toList(),
+          padding: const EdgeInsets.all(16.0),
+          child: FutureBuilder<void>(
+            future: fetchTables(),
+            builder: (context, snapshot) {
+              if (snapshot.connectionState == ConnectionState.waiting) {
+                return CircularProgressIndicator();
+              } else if (snapshot.hasError) {
+                return Text('Error: ${snapshot.error}');
+              } else {
+                return ListView.builder(
+                  itemCount: tablesData.length,
+                  itemBuilder: (context, index) {
+                    final tableNum = tablesData[index]['tableNumber'] as int;
+                    final tableName = tablesData[index]['tableName'] as String;
+                    return TableDisplay(
+                      key: ValueKey<int>(tableNum),
+                      tableNum: tableNum,
+                      tableName: tableName,
+                    );
+                  },
+                );
+              }
+            },
           ),
         ),
       ),

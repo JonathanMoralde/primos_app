@@ -19,17 +19,20 @@ class OrderCardDropdown extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    Color backgroundColor = Color(0xFFD9D9D9); // Equivalent to #D9D9D9
     return Container(
       decoration: BoxDecoration(
+        color: Color(0xFFD9D9D9), // Set the background color for the container
         border: Border.all(
-          color: Color.fromARGB(255, 0, 0, 0), // Border color
-          width: 1.0, // Border width
+          color: Color.fromARGB(255, 209, 209, 209),
+          width: 1.0,
         ),
-        borderRadius: BorderRadius.circular(8.0), // Border radius
+        borderRadius: BorderRadius.circular(8.0),
       ),
       width: 200,
       child: ExpansionTile(
-        backgroundColor: Colors.grey,
+        backgroundColor:
+            Color(0xFFD9D9D9), // Set the background color for the ExpansionTile
         title: Text(
           'TABLE 1',
           style: TextStyle(letterSpacing: 1, fontSize: 20),
@@ -46,7 +49,7 @@ class OrderCardDropdown extends ConsumerWidget {
           Container(
             width: 350,
             decoration: BoxDecoration(
-              color: Color.fromARGB(255, 255, 255, 255),
+              color: backgroundColor,
               borderRadius: BorderRadius.all(
                 Radius.circular(8),
               ),

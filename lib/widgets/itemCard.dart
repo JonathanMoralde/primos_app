@@ -5,6 +5,7 @@ import 'package:primos_app/widgets/styledButton.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:cached_network_image/cached_network_image.dart';
+import 'package:primos_app/pages/admin/addVariation_Form.dart';
 
 class ItemCard extends StatefulWidget {
   final String productId;
@@ -66,7 +67,7 @@ class _ItemCardState extends State<ItemCard> {
   @override
   Widget build(BuildContext context) {
     return Container(
-      height: widget.cardHeight ?? 220,
+      height: widget.cardHeight ?? 300,
       width: widget.isRow == true ? double.infinity : 174,
       decoration: BoxDecoration(
         boxShadow: [
@@ -199,40 +200,70 @@ class _ItemCardState extends State<ItemCard> {
                             height: 8,
                           ),
                           // Footer section
-                          widget.footerSection ??
-                              Row(
-                                mainAxisAlignment:
-                                    MainAxisAlignment.spaceBetween,
-                                children: [
-                                  StyledButton(
-                                    noShadow: true,
-                                    btnText: "Edit",
-                                    onClick: () {
-                                      Navigator.of(context).push(
-                                        MaterialPageRoute(
-                                          builder: (BuildContext context) {
-                                            return AdminMenuForm(
-                                              productId: widget.productId,
-                                              productName: widget.productName,
-                                              productPrice: widget.productPrice,
-                                            );
-                                          },
-                                        ),
-                                      );
-                                    },
-                                    btnHeight: 30,
+                          Column(
+                            children: [
+                              widget.footerSection ??
+                                  Column(
+                                    children: [
+                                      Row(
+                                        mainAxisAlignment:
+                                            MainAxisAlignment.spaceBetween,
+                                        children: [
+                                          StyledButton(
+                                            noShadow: true,
+                                            btnText: "Edit",
+                                            onClick: () {
+                                              Navigator.of(context).push(
+                                                MaterialPageRoute(
+                                                  builder:
+                                                      (BuildContext context) {
+                                                    return AdminMenuForm(
+                                                      productId:
+                                                          widget.productId,
+                                                      productName:
+                                                          widget.productName,
+                                                      productPrice:
+                                                          widget.productPrice,
+                                                    );
+                                                  },
+                                                ),
+                                              );
+                                            },
+                                            btnHeight: 30,
+                                          ),
+                                          StyledButton(
+                                            noShadow: true,
+                                            btnText: "Delete",
+                                            onClick: () {
+                                              // Call the delete function when the "Delete" button is pressed
+                                              _deleteMenuItem(context);
+                                            },
+                                            btnHeight: 30,
+                                          ),
+                                        ],
+                                      ),
+                                      SizedBox(
+                                          height:
+                                              12), // Adjust the spacing as needed
+                                      StyledButton(
+                                        btnHeight: 30,
+                                        btnText: 'Add Variation',
+                                        onClick: () {
+                                          Navigator.of(context).push(
+                                            MaterialPageRoute(
+                                              builder: (BuildContext context) {
+                                                return AddVariationForm(
+                                                  productId: widget.productId,
+                                                );
+                                              },
+                                            ),
+                                          );
+                                        },
+                                      )
+                                    ],
                                   ),
-                                  StyledButton(
-                                    noShadow: true,
-                                    btnText: "Delete",
-                                    onClick: () {
-                                      // Call the delete function when the "Delete" button is pressed
-                                      _deleteMenuItem(context);
-                                    },
-                                    btnHeight: 30,
-                                  ),
-                                ],
-                              ),
+                            ],
+                          ),
                         ],
                       ),
                     ),

@@ -3,7 +3,6 @@ import 'package:flutter/material.dart';
 class TableDisplay extends StatefulWidget {
   final int tableNum;
   final String tableName;
-
   const TableDisplay({
     Key? key,
     required this.tableNum,
@@ -32,9 +31,9 @@ class _TableDisplayState extends State<TableDisplay> {
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           crossAxisAlignment: CrossAxisAlignment.center,
           children: [
-            Text("Table ${widget.tableNum}: ${widget.tableName}"),
+            Text("Table: ${widget.tableNum}"),
             IconButton(
-              icon: const Icon(Icons.delete),
+              icon: Icon(Icons.delete),
               onPressed: () {
                 // TODO: Implement the logic to delete the table
                 print("Delete table ${widget.tableNum}");
