@@ -4,6 +4,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:primos_app/pages/admin/adminMenu_CatForm.dart';
 import 'package:primos_app/pages/admin/adminMenu_Form.dart';
 import 'package:primos_app/providers/categoryFilter/activeCategory_provider.dart';
+import 'package:primos_app/providers/searchBar/searchQuery_provider.dart';
 import 'package:primos_app/widgets/bottomBar.dart';
 import 'package:primos_app/widgets/filterBtns.dart';
 import 'package:primos_app/widgets/itemCard.dart';
@@ -41,13 +42,22 @@ class AdminMenuPage extends ConsumerWidget {
                 FilterBtns(),
                 Consumer(builder: ((context, ref, child) {
                   final activeCategory = ref.watch(activeCategoryProvider);
+                  final searchQuery =
+                      ref.watch(searchQueryProvider).toLowerCase();
+
                   return menuItems.when(
                       data: (itemDocs) {
                         // FILTER BASED ON ACTIVE CATEGORY
                         final filteredItems = itemDocs.where((itemDoc) {
                           final productCategory = itemDoc['category'] as String;
-                          return activeCategory == "All" ||
-                              productCategory == activeCategory;
+                          final productName =
+                              itemDoc['itemName'].toString().toLowerCase();
+                          // return activeCategory == "All" ||
+                          //     productCategory == activeCategory;
+                          return (activeCategory == "All" ||
+                                  productCategory == activeCategory) &&
+                              (searchQuery.isEmpty ||
+                                  productName.contains(searchQuery));
                         }).toList();
 
                         return Padding(

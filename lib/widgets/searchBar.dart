@@ -1,29 +1,19 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-class CustomSearchBar extends StatefulWidget {
-  const CustomSearchBar({Key? key}) : super(key: key);
+import '../providers/searchBar/searchQuery_provider.dart';
 
-  @override
-  _CustomSearchBarState createState() => _CustomSearchBarState();
-}
+class CustomSearchBar extends ConsumerWidget {
+  CustomSearchBar({Key? key}) : super(key: key);
 
-class _CustomSearchBarState extends State<CustomSearchBar> {
   // This controller will store the value of the search bar
-  final TextEditingController _searchController = TextEditingController();
+  // final TextEditingController _searchController = TextEditingController();
+  final searchController = TextEditingController();
 
+  // @override
   @override
-  void initState() {
-    super.initState();
-    _searchController.addListener(_onSearchTextChanged);
-  }
-
-  void _onSearchTextChanged() {
-    setState(() {}); // To update the widget when the text changes
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    bool isTextEmpty = _searchController.text.isEmpty;
+  Widget build(BuildContext context, WidgetRef ref) {
+    final searchQuery = ref.watch(searchQueryProvider);
 
     return Container(
       // height: 55,
@@ -32,27 +22,34 @@ class _CustomSearchBarState extends State<CustomSearchBar> {
       padding: const EdgeInsets.fromLTRB(16, 32, 16, 16),
       // Use a Material design search bar
       child: TextField(
-        controller: _searchController,
+        controller: searchController,
+        onChanged: (value) {
+          ref.read(searchQueryProvider.notifier).state = value;
+        },
+        // controller: searchController,
         cursorColor: const Color(0xFF252525),
         decoration: InputDecoration(
           contentPadding: const EdgeInsets.only(
               bottom: 16, left: 10, right: 10), //* This centers the input
           hintText: 'Search',
           // Show the clear icon only when there is text in the search bar
-          suffixIcon: isTextEmpty
-              ? null
-              : IconButton(
+          suffixIcon: searchQuery.isNotEmpty
+              ? IconButton(
                   color: const Color(0xFF252525),
                   icon: const Icon(Icons.clear),
-                  onPressed: () => _searchController.clear(),
-                ),
+                  onPressed: () {
+                    ref.read(searchQueryProvider.notifier).state = '';
+                    searchController.clear();
+                  },
+                )
+              : null,
           // Add a search icon or button to the search bar
           prefixIcon: IconButton(
-            color: const Color(0xFF252525),
-            icon: const Icon(Icons.search),
-            onPressed: () {
-              // TODO PERFORM SEARCH HERE
-            },
+            onPressed: () {},
+            icon: Icon(
+              Icons.search,
+              color: Color(0xFF252525),
+            ),
           ),
           filled: true,
           fillColor: Colors.grey.shade300,

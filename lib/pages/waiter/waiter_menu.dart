@@ -8,6 +8,7 @@ import 'package:primos_app/widgets/filterBtns.dart';
 import 'package:primos_app/widgets/searchBar.dart';
 import 'package:primos_app/widgets/styledButton.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import '../../providers/searchBar/searchQuery_provider.dart';
 import '../../providers/waiter_menu/subtotal_provider.dart';
 import '../../widgets/itemCard.dart';
 import '../../widgets/styledDropdown.dart';
@@ -272,13 +273,22 @@ class WaiterMenu extends ConsumerWidget {
                 FilterBtns(),
                 Consumer(builder: ((context, ref, child) {
                   final activeCategory = ref.watch(activeCategoryProvider);
+                  final searchQuery =
+                      ref.watch(searchQueryProvider).toLowerCase();
+
                   return menuItems.when(
                     data: (itemDocs) {
                       // FILTER BASED ON ACTIVE CATEGORY
                       final filteredItems = itemDocs.where((itemDoc) {
                         final productCategory = itemDoc['category'] as String;
-                        return activeCategory == "All" ||
-                            productCategory == activeCategory;
+                        final productName =
+                            itemDoc['itemName'].toString().toLowerCase();
+                        // return activeCategory == "All" ||
+                        //     productCategory == activeCategory;
+                        return (activeCategory == "All" ||
+                                productCategory == activeCategory) &&
+                            (searchQuery.isEmpty ||
+                                productName.contains(searchQuery));
                       }).toList();
 
                       return Padding(
