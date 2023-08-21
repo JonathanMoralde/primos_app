@@ -24,18 +24,30 @@ class KitchenPage extends ConsumerWidget {
               data: (ordersMap) {
                 final orderEntries = ordersMap.entries.toList();
 
+                // print(orderEntries);
+                // print(ordersMap['order_name']);
+                print(ordersStream);
+
+                // Sort the orderEntries based on the order_date
+                orderEntries.sort((a, b) {
+                  final aDate = DateTime.parse(a.value['order_date']);
+                  final bDate = DateTime.parse(b.value['order_date']);
+                  return aDate.compareTo(bDate);
+                });
+
                 return SingleChildScrollView(
-                  scrollDirection: Axis.horizontal,
-                  child: Row(
+                  // scrollDirection: Axis.horizontal,
+                  child: Wrap(
+                    spacing: 10,
+                    runSpacing: 10,
                     children: [
                       for (final entry in orderEntries)
-                        Padding(
-                          padding: const EdgeInsets.only(right: 10.0),
-                          child: OrderCardDropdown(
-                            orderID: entry.key,
-                            orders: entry.value,
+                        if (entry.value['order_status'] ==
+                            'Pending') // Filter by order_status
+                          OrderCardDropdown(
+                            // orderName: entry.key, // Pass the order name
+                            orderEntry: entry,
                           ),
-                        ),
                     ],
                   ),
                 );

@@ -8,18 +8,47 @@ import 'package:primos_app/providers/kitchen/models.dart';
 import 'package:flutter/material.dart';
 
 class OrderCardDropdown extends ConsumerWidget {
-  final String orderID;
-  final List<Order> orders;
+  // final String orderID;
+  // final String orderName;
+  // final List<Order> orders;
+  final MapEntry<dynamic, dynamic> orderEntry;
 
   OrderCardDropdown({
-    required this.orderID,
-    required this.orders,
+    // required this.orderID,
+    // required this.orderName,
+    // required this.orders,
+    required this.orderEntry,
     Key? key,
   }) : super(key: key);
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     Color backgroundColor = Color(0xFFD9D9D9); // Equivalent to #D9D9D9
+
+    // Extract the order details from orderEntry.value
+    final orderDetails = orderEntry.value['order_details'] as List<dynamic>?;
+    final orderName = orderEntry.value['order_name'] as String?;
+
+    if (orderDetails == null || orderName == null) {
+      return SizedBox.shrink(); // Handle if the data is missing
+    }
+
+    final List<Order> ordersList = orderDetails.map<Order>((orderDetail) {
+      final name = orderDetail['productName'] ?? 'No Name';
+      final quantity = orderDetail['quantity'] ?? 0;
+      final variation = orderDetail['variation'] ?? 'No Variation';
+
+      return Order(
+        name: name,
+        quantity: quantity,
+        variation: variation,
+        // orderName: orderName,
+      );
+    }).toList();
+
+    // print(orders[0].variation);
+    // print(orderID);
+    print(orderName);
     return Container(
       decoration: BoxDecoration(
         color: Color(0xFFD9D9D9), // Set the background color for the container
@@ -29,12 +58,12 @@ class OrderCardDropdown extends ConsumerWidget {
         ),
         borderRadius: BorderRadius.circular(8.0),
       ),
-      width: 200,
+      width: 380,
       child: ExpansionTile(
         backgroundColor:
             Color(0xFFD9D9D9), // Set the background color for the ExpansionTile
         title: Text(
-          'TABLE 1',
+          orderName,
           style: TextStyle(letterSpacing: 1, fontSize: 20),
         ),
         subtitle: Text(
@@ -67,8 +96,8 @@ class OrderCardDropdown extends ConsumerWidget {
                 const Divider(
                   height: 0,
                 ),
-                Padding(
-                  padding: const EdgeInsets.only(left: 16, right: 16, top: 5),
+                const Padding(
+                  padding: EdgeInsets.only(left: 16, right: 16, top: 5),
                   child: Row(
                     children: [
                       Expanded(
@@ -82,7 +111,7 @@ class OrderCardDropdown extends ConsumerWidget {
                         flex: 1,
                         child: Text(
                           "Qty.",
-                          textAlign: TextAlign.end,
+                          // textAlign: TextAlign.end,
                           style: TextStyle(fontSize: 12),
                         ),
                       ),
@@ -90,24 +119,25 @@ class OrderCardDropdown extends ConsumerWidget {
                         flex: 1,
                         child: Text(
                           "Var.",
-                          textAlign: TextAlign.end,
+                          // textAlign: TextAlign.end,
                           style: TextStyle(fontSize: 12),
                         ),
                       ),
                     ],
                   ),
                 ),
-                for (final order in orders)
+                for (final order in ordersList)
                   Padding(
                     padding:
                         const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
                     child: Row(
                       children: [
-                        Expanded(child: Text(order.name)),
+                        Expanded(flex: 2, child: Text(order.name)),
                         Expanded(
+                          flex: 1,
                           child: Text(order.quantity.toString()),
                         ),
-                        Expanded(child: Text(order.variation)),
+                        Expanded(flex: 1, child: Text(order.variation)),
                       ],
                     ),
                   ),
@@ -115,7 +145,14 @@ class OrderCardDropdown extends ConsumerWidget {
                   padding: const EdgeInsets.symmetric(horizontal: 16),
                   child: StyledButton(
                     btnText: "DONE",
-                    onClick: () {},
+                    onClick: () {
+                      DatabaseReference orderRef = FirebaseDatabase.instance
+                          .ref()
+                          .child('orders')
+                          .child(orderEntry.key);
+
+                      orderRef.update({'order_status': 'DONE'});
+                    },
                     btnWidth: double.infinity,
                     noShadow: true,
                   ),
