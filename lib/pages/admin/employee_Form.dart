@@ -65,7 +65,7 @@ class _EmployeeFormState extends State<EmployeeForm> {
               const SizedBox(
                 height: 10,
               ),
-              StyledDropdown(
+              StyledDropdown<String>(
                 value: role,
                 onChange: (String? newValue) {
                   setState(() {
@@ -74,6 +74,7 @@ class _EmployeeFormState extends State<EmployeeForm> {
                 },
                 hintText: "Role",
                 items: const ['Admin', 'Waiter', 'Cashier', 'Kitchen'],
+                showFetchedCategories: false,
               ),
               const SizedBox(
                 height: 20,

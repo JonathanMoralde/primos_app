@@ -1,18 +1,28 @@
 import 'package:flutter/material.dart';
 
-class TableDisplay extends StatelessWidget {
+class TableDisplay extends StatefulWidget {
   final int tableNum;
+  final String tableName;
+  const TableDisplay({
+    Key? key,
+    required this.tableNum,
+    required this.tableName,
+  }) : super(key: key);
 
-  const TableDisplay({super.key, required this.tableNum});
+  @override
+  State<TableDisplay> createState() => _TableDisplayState();
+}
 
+class _TableDisplayState extends State<TableDisplay> {
   @override
   Widget build(BuildContext context) {
     return Container(
-      decoration: const BoxDecoration(
-          borderRadius: BorderRadius.all(
-            Radius.circular(8),
-          ),
-          color: Color(0xFFE2B563)),
+      decoration: BoxDecoration(
+        borderRadius: BorderRadius.all(
+          Radius.circular(8),
+        ),
+        color: const Color(0xFFE2B563),
+      ),
       height: 45,
       width: 175,
       child: Padding(
@@ -21,12 +31,12 @@ class TableDisplay extends StatelessWidget {
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           crossAxisAlignment: CrossAxisAlignment.center,
           children: [
-            Text("Table $tableNum"),
+            Text("Table: ${widget.tableNum}"),
             IconButton(
-              icon: const Icon(Icons.delete),
+              icon: Icon(Icons.delete),
               onPressed: () {
-                // TODO ADD API
-                print(tableNum);
+                // TODO: Implement the logic to delete the table
+                print("Delete table ${widget.tableNum}");
               },
             ),
           ],
