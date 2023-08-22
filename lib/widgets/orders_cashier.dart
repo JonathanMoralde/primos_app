@@ -2,13 +2,15 @@ import 'package:flutter/material.dart';
 import 'package:primos_app/pages/cashier/orders_view.dart';
 
 class OrdersCashier extends StatelessWidget {
-  final dynamic orderNum;
-  final void Function()? onPressed;
+  // final dynamic? orderNum;
+  // final void Function()? onPressed;
+  final MapEntry<dynamic, dynamic> orderEntry;
 
-  const OrdersCashier({super.key, required this.orderNum, this.onPressed});
+  const OrdersCashier({super.key, required this.orderEntry});
 
   @override
   Widget build(BuildContext context) {
+    final orderName = orderEntry.value['order_name'] as String?;
     return Padding(
       padding: const EdgeInsets.only(
         left: 16,
@@ -29,13 +31,13 @@ class OrdersCashier extends StatelessWidget {
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             crossAxisAlignment: CrossAxisAlignment.center,
             children: [
-              Text("Table $orderNum"),
+              Text(orderName!),
             ],
           ),
           onPressed: () {
             Navigator.of(context).push(
               MaterialPageRoute(
-                builder: (context) => OrderViewPage(),
+                builder: (context) => OrderViewPage(orderEntry: orderEntry),
               ),
             );
           },

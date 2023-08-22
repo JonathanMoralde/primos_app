@@ -1,19 +1,52 @@
+// import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:primos_app/widgets/bottomBar.dart';
 import 'package:primos_app/widgets/styledButton.dart';
 import 'package:primos_app/widgets/styledTextField.dart';
+import 'package:primos_app/providers/kitchen/models.dart';
 
 // TODO REFACTOR HARD CODED TO USE DATA FROM DB
 // TODO ADD BLUETOOTH FUNCTIONALITY IN PRINT BUTTON
 
 class OrderViewPage extends StatelessWidget {
-  OrderViewPage({super.key});
+  final MapEntry<dynamic, dynamic> orderEntry;
+  OrderViewPage({super.key, required this.orderEntry});
 
   final cashController = TextEditingController();
   final discountController = TextEditingController();
 
   @override
   Widget build(BuildContext context) {
+    // Extract the order details from orderEntry.value
+    final orderDetails = orderEntry.value['order_details'] as List<dynamic>?;
+    final orderName = orderEntry.value['order_name'] as String?;
+    final totalAmount = orderEntry.value['total_amount'] as int?;
+    final orderDate = orderEntry.value['order_date'];
+    final waiterName = orderEntry.value['served_by'] as String?;
+
+    if (orderDetails == null || orderName == null) {
+      return SizedBox.shrink(); // Handle if the data is missing
+    }
+
+    if (orderDetails == null || orderName == null) {
+      return SizedBox.shrink(); // Handle if the data is missing
+    }
+
+    final List<Order> ordersList = orderDetails.map<Order>((orderDetail) {
+      final name = orderDetail['productName'] ?? 'No Name';
+      final quantity = orderDetail['quantity'] ?? 0;
+      final variation = orderDetail['variation'] ?? 'No Variation';
+      final price = orderDetail['productPrice'] ?? 0;
+
+      return Order(
+        name: name,
+        quantity: quantity,
+        variation: variation,
+        price: price,
+        // orderName: orderName,
+      );
+    }).toList();
+
     Future nextModal() => showDialog(
           barrierDismissible: false, // Prevent dismissal by tapping outside
           barrierColor: Colors.black54.withOpacity(
@@ -230,7 +263,7 @@ class OrderViewPage extends StatelessWidget {
           iconSize: 35,
           onPressed: () => Navigator.of(context).pop(),
         ),
-        title: (Text("ORDER DETAILS TABLE 1")),
+        title: (Text("ORDER DETAILS $orderName")),
       ),
       body: SafeArea(
         child: SingleChildScrollView(
@@ -245,7 +278,7 @@ class OrderViewPage extends StatelessWidget {
                   decoration: BoxDecoration(
                       color: Colors.grey.shade300,
                       borderRadius: const BorderRadius.all(Radius.circular(8))),
-                  child: const Column(
+                  child: Column(
                     children: [
                       Row(
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -254,7 +287,7 @@ class OrderViewPage extends StatelessWidget {
                             "WAITER",
                             style: TextStyle(fontWeight: FontWeight.w600),
                           ),
-                          Text("Jonnel Angel Red")
+                          Text(waiterName ?? "Waiter")
                         ],
                       ),
                       SizedBox(
@@ -267,7 +300,8 @@ class OrderViewPage extends StatelessWidget {
                             "ORDER DATE & TIME",
                             style: TextStyle(fontWeight: FontWeight.w600),
                           ),
-                          Text("20 March 2023 03:43 PM")
+                          // Text("20 March 2023 03:43 PM")
+                          Text(orderDate)
                         ],
                       ),
                       SizedBox(
@@ -281,7 +315,7 @@ class OrderViewPage extends StatelessWidget {
                             style: TextStyle(fontWeight: FontWeight.w600),
                           ),
                           // TODO CHANGE TO ACTUAL
-                          Text("PHP 69")
+                          Text("PHP $totalAmount")
                         ],
                       ),
                     ],
@@ -326,29 +360,33 @@ class OrderViewPage extends StatelessWidget {
 
                 // TODO CHANGE TO LISt OF ITEMS ORDERED
                 // INDIV ITEMS
-                const Row(
-                  children: [
-                    Expanded(flex: 2, child: Text("Beef Bulgogi")),
-                    Expanded(
-                        flex: 1,
-                        child: Text(
-                          "",
-                          textAlign: TextAlign.end,
-                        )),
-                    Expanded(
-                        flex: 1,
-                        child: Text(
-                          "1",
-                          textAlign: TextAlign.end,
-                        )),
-                    Expanded(
-                        flex: 1,
-                        child: Text(
-                          "69",
-                          textAlign: TextAlign.end,
-                        )),
-                  ],
-                ),
+
+                for (final order in ordersList)
+                  Row(
+                    children: [
+                      Expanded(flex: 2, child: Text(order.name)),
+                      Expanded(
+                          flex: 1,
+                          child: Text(
+                            order.variation == "No Variation"
+                                ? "N/A"
+                                : order.variation,
+                            textAlign: TextAlign.end,
+                          )),
+                      Expanded(
+                          flex: 1,
+                          child: Text(
+                            order.quantity.toString(),
+                            textAlign: TextAlign.end,
+                          )),
+                      Expanded(
+                          flex: 1,
+                          child: Text(
+                            order.price.toString(),
+                            textAlign: TextAlign.end,
+                          )),
+                    ],
+                  ),
               ],
             ),
           ),
