@@ -37,11 +37,13 @@ class OrderCardDropdown extends ConsumerWidget {
       final name = orderDetail['productName'] ?? 'No Name';
       final quantity = orderDetail['quantity'] ?? 0;
       final variation = orderDetail['variation'] ?? 'No Variation';
+      final serveStatus = orderDetail['serve_status'] ?? 'Pending';
 
       return Order(
         name: name,
         quantity: quantity,
         variation: variation,
+        serveStatus: serveStatus,
         // orderName: orderName,
       );
     }).toList();
@@ -127,31 +129,50 @@ class OrderCardDropdown extends ConsumerWidget {
                   ),
                 ),
                 for (final order in ordersList)
-                  Padding(
-                    padding:
-                        const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-                    child: Row(
-                      children: [
-                        Expanded(flex: 2, child: Text(order.name)),
-                        Expanded(
-                          flex: 1,
-                          child: Text(order.quantity.toString()),
-                        ),
-                        Expanded(flex: 1, child: Text(order.variation)),
-                      ],
+                  if (order.serveStatus != 'Served')
+                    Padding(
+                      padding: const EdgeInsets.symmetric(
+                          horizontal: 16, vertical: 8),
+                      child: Row(
+                        children: [
+                          Expanded(flex: 2, child: Text(order.name)),
+                          Expanded(
+                            flex: 1,
+                            child: Text(order.quantity.toString()),
+                          ),
+                          Expanded(flex: 1, child: Text(order.variation)),
+                        ],
+                      ),
                     ),
-                  ),
                 Padding(
                   padding: const EdgeInsets.symmetric(horizontal: 16),
                   child: StyledButton(
                     btnText: "DONE",
                     onClick: () {
+                      final List<Object?> orderDetails =
+                          orderEntry.value['order_details'];
                       DatabaseReference orderRef = FirebaseDatabase.instance
                           .ref()
                           .child('orders')
                           .child(orderEntry.key);
 
+                      // Inside the onClick function
+                      for (int i = 0; i < orderDetails.length; i++) {
+                        DatabaseReference productRef = FirebaseDatabase.instance
+                            .ref()
+                            .child('orders')
+                            .child(orderEntry.key)
+                            .child('order_details')
+                            .child('$i');
+
+                        // Update the serve_status for the specific order item
+                        productRef.update({
+                          'serve_status': 'Served'
+                        }); // Change 'Served' to the desired status
+                      }
                       orderRef.update({'order_status': 'DONE'});
+                      // print(orderDetails);
+                      // print(orderEntry.value['order_date']);
                     },
                     btnWidth: double.infinity,
                     noShadow: true,

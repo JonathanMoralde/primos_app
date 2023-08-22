@@ -63,6 +63,8 @@ class _TablePageState extends State<TablePage> {
     });
   }
 
+  late Future<void> fetchTablesFuture = fetchTables();
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -75,7 +77,7 @@ class _TablePageState extends State<TablePage> {
         child: Padding(
           padding: const EdgeInsets.all(16.0),
           child: FutureBuilder<void>(
-            future: fetchTables(),
+            future: fetchTablesFuture,
             builder: (context, snapshot) {
               if (snapshot.connectionState == ConnectionState.waiting) {
                 return CircularProgressIndicator();
@@ -87,10 +89,20 @@ class _TablePageState extends State<TablePage> {
                   itemBuilder: (context, index) {
                     final tableNum = tablesData[index]['tableNumber'] as int;
                     final tableName = tablesData[index]['tableName'] as String;
-                    return TableDisplay(
-                      key: ValueKey<int>(tableNum),
-                      tableNum: tableNum,
-                      tableName: tableName,
+                    return Column(
+                      children: [
+                        SizedBox(
+                          width: double.infinity,
+                          child: TableDisplay(
+                            key: ValueKey<int>(tableNum),
+                            tableNum: tableNum,
+                            tableName: tableName,
+                          ),
+                        ),
+                        const SizedBox(
+                          height: 10,
+                        )
+                      ],
                     );
                   },
                 );

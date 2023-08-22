@@ -4,6 +4,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:primos_app/pages/waiter/takeout.dart';
 import 'package:primos_app/pages/waiter/waiter_menu.dart';
 import 'package:primos_app/providers/bottomNavBar/currentIndex_provider.dart';
+import 'package:primos_app/providers/table/table_provider.dart';
 import 'package:primos_app/widgets/bottomBar.dart';
 import 'package:primos_app/widgets/pageObject.dart';
 import 'package:primos_app/widgets/sideMenu.dart';
@@ -38,6 +39,10 @@ class WaiterTablePage extends ConsumerWidget {
     //   });
     // });
 
+    final tableItems = ref.watch(tableItemsProvider);
+
+    // print(tableItems);
+
     int currentIndex = ref.watch(currentIndex_provider);
     return Scaffold(
       backgroundColor: Color(0xfff8f8f7),
@@ -47,23 +52,37 @@ class WaiterTablePage extends ConsumerWidget {
       ),
       body: SafeArea(
         child: SingleChildScrollView(
-          child: Padding(
-            padding: const EdgeInsets.all(16.0),
-            child: Wrap(
-              spacing: 10,
-              runSpacing: 10,
-              children: List.generate(
-                10, //! Replace this with the number of TableBox instances you want to generate
-                (index) => FractionallySizedBox(
-                  widthFactor: 0.31, // Take up 30% of available width
-                  child: TableBox(
-                      tableNum: index +
-                          1), // You can use 'index + 1' if you want table numbers to start from 1
-                ),
-              ),
-            ),
-          ),
-        ),
+            child: Consumer(builder: ((context, ref, child) {
+          return tableItems.when(
+              data: (itemDocs) {
+                itemDocs.sort((a, b) {
+                  // Extract the numeric part of the table names
+                  int tableNumberA =
+                      int.parse(RegExp(r'[0-9]+').firstMatch(a)!.group(0)!);
+                  int tableNumberB =
+                      int.parse(RegExp(r'[0-9]+').firstMatch(b)!.group(0)!);
+                  return tableNumberA.compareTo(tableNumberB);
+                });
+                return Padding(
+                  padding: const EdgeInsets.all(16.0),
+                  child: Wrap(
+                    spacing: 10,
+                    runSpacing: 10,
+                    children: List.generate(
+                      itemDocs.length,
+                      (index) => FractionallySizedBox(
+                        widthFactor: 0.31, // Take up 30% of available width
+                        child: TableBox(
+                          tableName: itemDocs[index],
+                        ), // You can use 'index + 1' if you want table numbers to start from 1
+                      ),
+                    ),
+                  ),
+                );
+              },
+              error: (error, stackTrace) => Text("Error: $error"),
+              loading: () => CircularProgressIndicator());
+        }))),
       ),
       bottomNavigationBar: Container(
         height: 80,
@@ -101,6 +120,7 @@ class WaiterTablePage extends ConsumerWidget {
                 );
               }
             },
+            unselectedItemColor: Color(0xFF252525),
             selectedItemColor: Color(0xFFFE3034),
             backgroundColor: Color(0xFFE2B563),
             items: const [

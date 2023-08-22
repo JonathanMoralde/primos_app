@@ -47,6 +47,7 @@ dependencies:
   flutter_hooks: ^0.18.5+1
   cloud_functions: ^4.3.4
   firebase_database: ^10.2.5
+  intl: ^0.17.0
 
 dev_dependencies:
   flutter_test:

@@ -1,6 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:primos_app/pages/waiter/orderDetails.dart';
+import 'package:primos_app/providers/isAdditionalOrder/existingOrderId_provider.dart';
+import 'package:primos_app/providers/isAdditionalOrder/existingOrder_provider.dart';
+import 'package:primos_app/providers/isAdditionalOrder/isAdditionalOrder_provider.dart';
 import 'package:primos_app/providers/session/user_provider.dart';
 import 'package:primos_app/providers/waiter_menu/currentOrder_provider.dart';
 import 'package:primos_app/providers/waiter_menu/orderName_provider.dart';
@@ -34,7 +37,8 @@ class WaiterMenuCart extends ConsumerWidget {
         calculateSubtotal(currentOrders);
   }
 
-  void insertData(List<OrderObject> orderData, WidgetRef ref) async {
+  void insertData(
+      List<OrderObject> orderData, WidgetRef ref, BuildContext context) async {
     final databaseReference = FirebaseDatabase.instance;
 
     // Get the current date in the desired format
@@ -54,6 +58,7 @@ class WaiterMenuCart extends ConsumerWidget {
               'productPrice': order.price,
               'quantity': order.quantity,
               'variation': order.variation,
+              'serve_status': "Pending",
             })
         .toList();
 
@@ -71,12 +76,26 @@ class WaiterMenuCart extends ConsumerWidget {
     // Insert the order data using the generated key
     await newOrderRef.set(order);
 
+    // Retrieve the generated key
+    final String generatedKey = newOrderRef.key!;
+
     // Clear the current orders after successful insertion
     ref.read(currentOrdersProvider.notifier).state = [];
+
+    Navigator.of(context).push(
+      MaterialPageRoute(builder: (BuildContext context) {
+        return OrderDetailsPage(
+          // orderData: orderData,
+          // totalAmount: totalAmount,
+          orderKey: generatedKey,
+        );
+      }),
+    );
   }
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    final isAdditionalOrder = ref.watch(isAdditionalOrderProvider);
     final orderData = ref.watch(currentOrdersProvider);
     // double totalAmount = orderData.fold(0, (double sum, OrderObject order) {
     //   return sum + (order.price * order.quantity);
@@ -181,16 +200,50 @@ class WaiterMenuCart extends ConsumerWidget {
                       btnText: "CONFIRM ORDER",
                       onClick: () {
                         if (orderData.isNotEmpty) {
-                          insertData(orderData, ref);
-                          // TODO SEND REAL TIME ORDER TO KITCHEN AND CASHIER BEFORE EXECUTION NAVIGATOR
-                          Navigator.of(context).push(
-                            MaterialPageRoute(builder: (BuildContext context) {
-                              return OrderDetailsPage(
-                                orderData: orderData,
-                                totalAmount: totalAmount,
-                              );
-                            }),
-                          );
+                          if (isAdditionalOrder) {
+                            final existingOrder =
+                                ref.watch(existingOrderProvider);
+                            final existingOrderId =
+                                ref.watch(existingOrderIdProvider);
+                            final String currentDate =
+                                DateTime.now().toString();
+
+                            List<dynamic>? orderDetails =
+                                existingOrder!['order_details'];
+
+                            List<Map<String, dynamic>> newOrder = orderData
+                                .map((order) => {
+                                      'productId': order.id,
+                                      'productName': order.name,
+                                      'productPrice': order.price,
+                                      'quantity': order.quantity,
+                                      'variation': order.variation,
+                                      'serve_status': "Pending",
+                                    })
+                                .toList();
+
+                            // Convert the existing fixed-length list to a mutable list
+                            if (orderDetails != null) {
+                              orderDetails = List.from(orderDetails);
+                              // Merge the two lists
+                              orderDetails.addAll(newOrder);
+
+                              // Now 'orderDetails' contains both the existing order details and the new order details
+                              print(orderDetails);
+
+                              DatabaseReference orderRef = FirebaseDatabase
+                                  .instance
+                                  .ref()
+                                  .child('orders')
+                                  .child(existingOrderId!);
+
+                              orderRef.update({'order_date': currentDate});
+                              orderRef.update({'order_details': orderDetails});
+                              orderRef.update({'order_status': 'Pending'});
+                            }
+                          } else {
+                            insertData(orderData, ref, context);
+                          }
                         } else {
                           ScaffoldMessenger.of(context).showSnackBar(
                             SnackBar(
