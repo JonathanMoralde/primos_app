@@ -34,7 +34,6 @@ class EmployeeDisplay extends StatelessWidget {
         ),
       ),
       padding: const EdgeInsets.all(10.0),
-      margin: const EdgeInsets.symmetric(vertical: 10.0),
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.center,
         children: [

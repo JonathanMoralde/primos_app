@@ -58,6 +58,11 @@ class _TablePageState extends State<TablePage> {
 
     print("Fetched tables: $fetchedData");
 
+    // Sort the fetchedData in ascending order by tableNumber
+    fetchedData.sort((a, b) {
+      return (a['tableNumber'] as int).compareTo(b['tableNumber'] as int);
+    });
+
     setState(() {
       tablesData = fetchedData;
     });

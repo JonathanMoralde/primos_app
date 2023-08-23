@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:primos_app/pages/waiter/waiter_menu_cart.dart';
 import 'package:primos_app/providers/categoryFilter/activeCategory_provider.dart';
+import 'package:primos_app/providers/isAdditionalOrder/isAdditionalOrder_provider.dart';
 import 'package:primos_app/providers/waiter_menu/currentOrder_provider.dart';
 import 'package:primos_app/providers/waiter_menu/menuItems_provider.dart';
+import 'package:primos_app/providers/waiter_menu/orderName_provider.dart';
 import 'package:primos_app/widgets/bottomBar.dart';
 import 'package:primos_app/widgets/filterBtns.dart';
 import 'package:primos_app/widgets/searchBar.dart';
@@ -246,6 +248,8 @@ class WaiterMenu extends ConsumerWidget {
       onWillPop: () async {
         // Reset the currentOrdersProvider state when navigating back
         ref.read(currentOrdersProvider.notifier).state = [];
+        ref.read(isAdditionalOrderProvider.notifier).state = false;
+        ref.read(orderNameProvider.notifier).state = null;
         updateSubtotal(ref);
         return true; // Allow navigation
       },
@@ -259,6 +263,8 @@ class WaiterMenu extends ConsumerWidget {
             onPressed: () {
               // RESET CURRENT ORDERS
               ref.read(currentOrdersProvider.notifier).state = [];
+              ref.read(isAdditionalOrderProvider.notifier).state = false;
+              ref.read(orderNameProvider.notifier).state = null;
               updateSubtotal(ref);
               Navigator.of(context).pop();
             },

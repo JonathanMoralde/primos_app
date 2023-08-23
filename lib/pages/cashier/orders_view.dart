@@ -1,5 +1,8 @@
 // import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_database/firebase_database.dart';
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
+import 'package:primos_app/pages/cashier/orders.dart';
 import 'package:primos_app/widgets/bottomBar.dart';
 import 'package:primos_app/widgets/styledButton.dart';
 import 'package:primos_app/widgets/styledTextField.dart';
@@ -20,9 +23,11 @@ class OrderViewPage extends StatelessWidget {
     // Extract the order details from orderEntry.value
     final orderDetails = orderEntry.value['order_details'] as List<dynamic>?;
     final orderName = orderEntry.value['order_name'] as String?;
-    final totalAmount = orderEntry.value['total_amount'] as int?;
-    final orderDate = orderEntry.value['order_date'];
+    // final totalAmount = orderEntry.value['total_amount'] as int?;
+    final orderDate = DateTime.parse(orderEntry.value['order_date']);
     final waiterName = orderEntry.value['served_by'] as String?;
+    String formattedDate =
+        DateFormat('dd-MM-yyyy hh:mm a').format(orderDate.toLocal());
 
     if (orderDetails == null || orderName == null) {
       return SizedBox.shrink(); // Handle if the data is missing
@@ -47,7 +52,16 @@ class OrderViewPage extends StatelessWidget {
       );
     }).toList();
 
-    Future nextModal() => showDialog(
+    int totalAmount = ordersList.fold(0, (int sum, Order order) {
+      return sum + (order.quantity * order.price!.toInt());
+    });
+
+    double calculateDiscountedPrice(
+        double originalPrice, double discountPercentage) {
+      return originalPrice - (originalPrice * (discountPercentage / 100));
+    }
+
+    Future nextModal(double discountedTotal) => showDialog(
           barrierDismissible: false, // Prevent dismissal by tapping outside
           barrierColor: Colors.black54.withOpacity(
               0), //prevent the background from becoming more darker
@@ -71,7 +85,10 @@ class OrderViewPage extends StatelessWidget {
                     children: [
                       Row(
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        children: [Text("Bill Amount: "), Text("PHP 69")],
+                        children: [
+                          Text("Amount Received: "),
+                          Text("PHP ${cashController.text}"),
+                        ],
                       ),
                       const SizedBox(
                         height: 5,
@@ -79,8 +96,24 @@ class OrderViewPage extends StatelessWidget {
                       Row(
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
-                          Text("Amount Paid: "),
-                          Text("PHP ${cashController.text}"),
+                          Text("Bill Amount: "),
+                          Text("PHP $totalAmount")
+                        ],
+                      ),
+                      const SizedBox(
+                        height: 5,
+                      ),
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          Text(
+                            "VAT 12% ",
+                            style: TextStyle(fontSize: 13),
+                          ),
+                          Text(
+                            (totalAmount! * 0.12).toStringAsFixed(2),
+                            style: TextStyle(fontSize: 13),
+                          )
                         ],
                       ),
                       const SizedBox(
@@ -101,8 +134,19 @@ class OrderViewPage extends StatelessWidget {
                       Row(
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
+                          Text("Total Amount: "),
+                          Text(discountedTotal.toStringAsFixed(2)),
+                        ],
+                      ),
+                      const SizedBox(
+                        height: 5,
+                      ),
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
                           Text("Change: "),
-                          Text("PHP 999"),
+                          Text(
+                              "PHP ${(int.parse(cashController.text) - discountedTotal).toStringAsFixed(2)}"),
                         ],
                       ),
                       const SizedBox(
@@ -117,7 +161,33 @@ class OrderViewPage extends StatelessWidget {
                                 Navigator.of(context).pop();
                               }),
                           StyledButton(
-                              btnText: "Confirm & Print", onClick: () {}),
+                              btnText: "Confirm & Print",
+                              onClick: () {
+                                DatabaseReference orderRef = FirebaseDatabase
+                                    .instance
+                                    .ref()
+                                    .child('orders')
+                                    .child(orderEntry.key);
+
+                                orderRef.update({'bill_amount': totalAmount});
+                                orderRef
+                                    .update({'total_amount': discountedTotal});
+                                orderRef.update({
+                                  'discount': (totalAmount *
+                                      (double.parse(discountController.text) /
+                                          100))
+                                });
+                                orderRef.update({
+                                  'vat': (totalAmount * 0.12).toStringAsFixed(2)
+                                });
+                                orderRef.update({'payment_status': 'Paid'});
+
+                                Navigator.of(context).pushAndRemoveUntil(
+                                    MaterialPageRoute(
+                                        builder: (BuildContext context) {
+                                  return OrdersPage();
+                                }), (route) => false);
+                              }),
                         ],
                       )
                     ],
@@ -161,7 +231,7 @@ class OrderViewPage extends StatelessWidget {
                       StyledTextField(
                           keyboardType: TextInputType.number,
                           controller: cashController,
-                          hintText: "Enter Amount",
+                          hintText: "Enter Amount Received",
                           obscureText: false),
                       const SizedBox(
                         height: 10,
@@ -169,7 +239,7 @@ class OrderViewPage extends StatelessWidget {
                       StyledTextField(
                           keyboardType: TextInputType.number,
                           controller: discountController,
-                          hintText: "Enter Discount",
+                          hintText: "Enter Discount %",
                           obscureText: false),
                       const SizedBox(
                         height: 15,
@@ -192,7 +262,15 @@ class OrderViewPage extends StatelessWidget {
                             child: StyledButton(
                                 btnText: "Next",
                                 onClick: () {
-                                  nextModal();
+                                  double discountedTotal =
+                                      calculateDiscountedPrice(
+                                          totalAmount.toDouble(),
+                                          discountController.text.isEmpty
+                                              ? 0
+                                              : double.parse(
+                                                  discountController.text));
+                                  // print(discountedTotal);
+                                  nextModal(discountedTotal);
                                 }),
                           ),
                         ],
@@ -226,7 +304,30 @@ class OrderViewPage extends StatelessWidget {
                       children: [
                         Text("Are you sure you want to void this order?"),
                         const SizedBox(
-                          height: 15,
+                          height: 5,
+                        ),
+                        const Row(
+                          children: [
+                            Icon(
+                              Icons.info_outline,
+                              size: 20,
+                            ),
+                            SizedBox(
+                                width:
+                                    4), // Adding a small gap between the icon and text
+                            Flexible(
+                              child: Text(
+                                "Confirming this action can not be undone",
+                                style: TextStyle(
+                                  fontSize: 12,
+                                  letterSpacing: 1,
+                                ),
+                              ),
+                            ),
+                          ],
+                        ),
+                        const SizedBox(
+                          height: 5,
                         ),
                         Row(
                           children: [
@@ -244,7 +345,25 @@ class OrderViewPage extends StatelessWidget {
                             Expanded(
                               flex: 1,
                               child: StyledButton(
-                                  btnText: "Confirm", onClick: () {}),
+                                  btnText: "Confirm",
+                                  onClick: () {
+                                    DatabaseReference orderRef =
+                                        FirebaseDatabase.instance
+                                            .ref()
+                                            .child('orders')
+                                            .child(orderEntry.key);
+
+                                    orderRef.remove().then((_) {
+                                      print('Entry deleted successfully');
+                                      Navigator.of(context).pushAndRemoveUntil(
+                                          MaterialPageRoute(
+                                              builder: (BuildContext context) =>
+                                                  OrdersPage()),
+                                          (route) => false);
+                                    }).catchError((error) {
+                                      print('Error deleting entry: $error');
+                                    });
+                                  }),
                             ),
                           ],
                         )
@@ -301,7 +420,7 @@ class OrderViewPage extends StatelessWidget {
                             style: TextStyle(fontWeight: FontWeight.w600),
                           ),
                           // Text("20 March 2023 03:43 PM")
-                          Text(orderDate)
+                          Text(formattedDate)
                         ],
                       ),
                       SizedBox(
@@ -311,10 +430,9 @@ class OrderViewPage extends StatelessWidget {
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
                           Text(
-                            "BILL AMOUNT",
+                            "SUBTOTAL",
                             style: TextStyle(fontWeight: FontWeight.w600),
                           ),
-                          // TODO CHANGE TO ACTUAL
                           Text("PHP $totalAmount")
                         ],
                       ),
@@ -325,13 +443,7 @@ class OrderViewPage extends StatelessWidget {
                 // ORDER ITEMS
                 const Row(
                   children: [
-                    Expanded(flex: 2, child: Text("ITEM")),
-                    Expanded(
-                        flex: 1,
-                        child: Text(
-                          "VARIANT",
-                          textAlign: TextAlign.end,
-                        )),
+                    Expanded(flex: 1, child: Text("ITEM")),
                     Expanded(
                         flex: 1,
                         child: Text(
@@ -341,7 +453,19 @@ class OrderViewPage extends StatelessWidget {
                     Expanded(
                         flex: 1,
                         child: Text(
-                          "PRICE",
+                          "VARIANT",
+                          textAlign: TextAlign.end,
+                        )),
+                    Expanded(
+                        flex: 1,
+                        child: Text(
+                          "UNIT PRICE",
+                          textAlign: TextAlign.end,
+                        )),
+                    Expanded(
+                        flex: 1,
+                        child: Text(
+                          "TOTAL PRICE",
                           textAlign: TextAlign.end,
                         )),
                   ],
@@ -364,7 +488,13 @@ class OrderViewPage extends StatelessWidget {
                 for (final order in ordersList)
                   Row(
                     children: [
-                      Expanded(flex: 2, child: Text(order.name)),
+                      Expanded(flex: 1, child: Text(order.name)),
+                      Expanded(
+                          flex: 1,
+                          child: Text(
+                            order.quantity.toString(),
+                            textAlign: TextAlign.end,
+                          )),
                       Expanded(
                           flex: 1,
                           child: Text(
@@ -376,13 +506,13 @@ class OrderViewPage extends StatelessWidget {
                       Expanded(
                           flex: 1,
                           child: Text(
-                            order.quantity.toString(),
+                            order.price.toString(),
                             textAlign: TextAlign.end,
                           )),
                       Expanded(
                           flex: 1,
                           child: Text(
-                            order.price.toString(),
+                            (order.price! * order.quantity).toString(),
                             textAlign: TextAlign.end,
                           )),
                     ],

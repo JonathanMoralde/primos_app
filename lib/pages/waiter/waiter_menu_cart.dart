@@ -66,11 +66,14 @@ class WaiterMenuCart extends ConsumerWidget {
     Map<String, dynamic> order = {
       'order_name': tableName,
       'order_date': currentDate,
-      'total_amount': totalAmount,
+      'total_amount': 0,
       'order_details': orderDetails,
       'served_by': waiterName,
       'order_status': 'Pending',
       'payment_status': 'Unpaid',
+      'bill_amount': 0,
+      'discount': "0%",
+      'vat': 0
     };
 
     // Insert the order data using the generated key
@@ -240,6 +243,13 @@ class WaiterMenuCart extends ConsumerWidget {
                               orderRef.update({'order_date': currentDate});
                               orderRef.update({'order_details': orderDetails});
                               orderRef.update({'order_status': 'Pending'});
+                              Navigator.of(context).push(
+                                MaterialPageRoute(
+                                  builder: (BuildContext context) =>
+                                      OrderDetailsPage(
+                                          orderKey: existingOrderId),
+                                ),
+                              );
                             }
                           } else {
                             insertData(orderData, ref, context);

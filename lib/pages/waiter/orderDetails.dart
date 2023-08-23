@@ -3,19 +3,18 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:intl/intl.dart';
 import 'package:primos_app/pages/waiter/tables.dart';
+import 'package:primos_app/providers/isAdditionalOrder/isAdditionalOrder_provider.dart';
+import 'package:primos_app/providers/kitchen/models.dart';
+import 'package:primos_app/providers/waiter_menu/currentOrder_provider.dart';
 import 'package:primos_app/providers/waiter_menu/orderName_provider.dart';
+import 'package:primos_app/providers/waiter_menu/subtotal_provider.dart';
 import 'package:primos_app/widgets/bottomBar.dart';
 import 'package:primos_app/widgets/styledButton.dart';
 
 import '../../providers/kitchen/orderDetails_Provider.dart';
 import '../../widgets/orderObject.dart';
 
-// * issues encountered: using ListView.builder inside a column or singleChildScrollView() causes an error
-// * solution: used map instead
-
 class OrderDetailsPage extends ConsumerWidget {
-  // final List<OrderObject> orderData;
-  // final double totalAmount;
   final String orderKey;
   const OrderDetailsPage({super.key, required this.orderKey});
 
@@ -28,7 +27,6 @@ class OrderDetailsPage extends ConsumerWidget {
       backgroundColor: Color(0xfff8f8f7),
       appBar: AppBar(
         automaticallyImplyLeading: false,
-        // TODO REMOVE BACK BUTTON TO PREVENT GOING BACK TO CART
         title: Text("ORDER DETAILS $orderName"),
       ),
       body: SafeArea(
@@ -41,7 +39,6 @@ class OrderDetailsPage extends ConsumerWidget {
                     data: (ordersMap) {
                       final orderEntries = ordersMap.entries.toList();
 
-                      // Assuming orderEntries is a list of MapEntry<dynamic, dynamic>
                       final singleOrderEntry = orderEntries.firstWhere(
                         (entry) => entry.key == orderKey,
                       );
@@ -49,12 +46,37 @@ class OrderDetailsPage extends ConsumerWidget {
                       final waiterName = singleOrderEntry.value['served_by'];
                       final orderDate =
                           DateTime.parse(singleOrderEntry.value['order_date']);
+                      final orderData = singleOrderEntry.value['order_details']
+                          as List<dynamic>?;
 
                       String formattedDate = DateFormat('dd-MM-yyyy hh:mm a')
                           .format(orderDate.toLocal());
 
                       // TODO EXTRACT THE ORDER DETAILS AND CALCULATE THE TOTAL AMOUNT
                       // TODO RESET THE STATES WHEN BACK TO TABLES IS CLICKED
+                      final List<Order> ordersList =
+                          orderData!.map<Order>((orderDetail) {
+                        final name = orderDetail['productName'] ?? 'No Name';
+                        final quantity = orderDetail['quantity'] ?? 0;
+                        final variation =
+                            orderDetail['variation'] ?? 'No Variation';
+                        final serveStatus =
+                            orderDetail['serve_status'] ?? 'Pending';
+                        final price = orderDetail['productPrice'] as int;
+
+                        return Order(
+                          name: name,
+                          quantity: quantity,
+                          variation: variation,
+                          serveStatus: serveStatus,
+                          price: price,
+                        );
+                      }).toList();
+
+                      int totalAmount =
+                          ordersList.fold(0, (int sum, Order order) {
+                        return sum + (order.quantity * order.price!.toInt());
+                      });
 
                       return Column(
                         children: [
@@ -107,7 +129,7 @@ class OrderDetailsPage extends ConsumerWidget {
                                           fontWeight: FontWeight.w600),
                                     ),
                                     // TODO CHANGE TO ACTUAL
-                                    Text("PHP total amount")
+                                    Text("PHP $totalAmount")
                                   ],
                                 ),
                               ],
@@ -150,6 +172,36 @@ class OrderDetailsPage extends ConsumerWidget {
                           const SizedBox(
                             height: 10,
                           ),
+
+                          for (final order in ordersList)
+                            Row(
+                              children: [
+                                Expanded(flex: 2, child: Text(order.name)),
+                                Expanded(
+                                  flex: 1,
+                                  child: Text(
+                                    order.variation == "No Variation"
+                                        ? "N/A"
+                                        : order.variation,
+                                    textAlign: TextAlign.end,
+                                  ),
+                                ),
+                                Expanded(
+                                  flex: 1,
+                                  child: Text(
+                                    order.quantity.toString(),
+                                    textAlign: TextAlign.end,
+                                  ),
+                                ),
+                                Expanded(
+                                  flex: 1,
+                                  child: Text(
+                                    order.price.toString(),
+                                    textAlign: TextAlign.end,
+                                  ),
+                                ),
+                              ],
+                            )
                         ],
                       );
                     },
@@ -200,6 +252,12 @@ class OrderDetailsPage extends ConsumerWidget {
                 child: StyledButton(
                   btnText: "BACK TO TABLES",
                   onClick: () {
+                    // reset states
+                    ref.read(currentOrdersProvider.notifier).state = [];
+                    ref.read(isAdditionalOrderProvider.notifier).state = false;
+                    ref.read(orderNameProvider.notifier).state = null;
+                    ref.read(subtotalProvider.notifier).state = 0.0;
+
                     Navigator.of(context).pushAndRemoveUntil(
                       MaterialPageRoute(
                         builder: (context) => WaiterTablePage(),

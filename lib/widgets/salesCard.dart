@@ -1,16 +1,46 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:intl/intl.dart';
+import 'package:primos_app/pages/admin/salesReport_details.dart';
 import 'package:primos_app/widgets/progressBar.dart';
 import 'package:primos_app/widgets/styledButton.dart';
 
+import '../providers/kitchen/models.dart';
+
 class SalesCard extends StatelessWidget {
-  final dynamic date;
-  const SalesCard({super.key, this.date});
+  final String date;
+  final int totalBillAmount;
+  final double totalDiscount;
+  final double totalAmount;
+  final double totalVat;
+  final List<String> orderKey;
+  final AsyncValue<Map<dynamic, dynamic>> allOrders;
+
+  SalesCard({
+    super.key,
+    required this.date,
+    required this.totalBillAmount,
+    required this.totalDiscount,
+    required this.totalAmount,
+    required this.totalVat,
+    required this.orderKey,
+    required this.allOrders,
+  });
 
   @override
   Widget build(BuildContext context) {
+    DateTime originalDate = DateTime.parse(date);
+
+    String formattedDate = DateFormat('MMMM dd, yyyy').format(originalDate);
+    // print(date);
+    // print(totalBillAmount);
+    // print(totalDiscount);
+    // print(totalAmount);
+    // print(totalVat);
+    // print(orderKey.length);
     return Container(
       width: 360,
-      height: 183,
+      // height: 183,
       decoration: BoxDecoration(
         color: const Color(0xffffffff),
         borderRadius: const BorderRadius.all(
@@ -30,60 +60,120 @@ class SalesCard extends StatelessWidget {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text(
-              "$date",
-              style: const TextStyle(
-                fontWeight: FontWeight.w600,
-                letterSpacing: 1,
+            Align(
+              alignment: Alignment.center,
+              child: Text(
+                formattedDate,
+                style: const TextStyle(
+                  fontWeight: FontWeight.w600,
+                  letterSpacing: 1,
+                  fontSize: 16,
+                ),
               ),
             ),
             const SizedBox(
               height: 10,
             ),
             Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                const Expanded(
-                  flex: 1,
-                  child: Text("Total Order % based on target: (10)"),
-                ),
+                const Text("Total Order: "),
                 const SizedBox(
                   width: 30,
                 ),
-                Expanded(
-                  flex: 1,
-                  child: ProgressBar(
-                    value: 0.35,
-                  ),
-                )
+                Text(orderKey.length.toString())
               ],
             ),
-            Container(
-              decoration: const BoxDecoration(
-                border: Border.fromBorderSide(
-                  BorderSide(style: BorderStyle.solid, width: 0.5),
-                ),
-              ),
+            const Divider(
+              height: 0,
+              color: Color(0xff252525),
             ),
             const SizedBox(
               height: 5,
             ),
-            const Row(
+            Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [Text("Total Sales:"), Text("6969 PHP")],
+              children: [
+                const Text("Gross Sales:"),
+                Text('PHP ${totalBillAmount.toString()}'),
+              ],
             ),
-            Container(
-              decoration: const BoxDecoration(
-                border: Border.fromBorderSide(
-                  BorderSide(style: BorderStyle.solid, width: 0.5),
-                ),
-              ),
+            const Divider(
+              height: 0,
+              color: Color(0xff252525),
+            ),
+            const SizedBox(
+              height: 5,
+            ),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                const Text("Total discounts given:"),
+                Text(totalDiscount.toString()),
+              ],
+            ),
+            const Divider(
+              height: 0,
+              color: Color(0xff252525),
+            ),
+            const SizedBox(
+              height: 5,
+            ),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                const Text("Grand Total:"),
+                Text('PHP ${totalAmount.toString()}'),
+              ],
+            ),
+            const Divider(
+              height: 0,
+              color: Color(0xff252525),
+            ),
+            const SizedBox(
+              height: 5,
+            ),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                const Text("Total VAT amount:"),
+                Text(totalVat.toString()),
+              ],
+            ),
+            const Divider(
+              height: 0,
+              color: Color(0xff252525),
+            ),
+            const SizedBox(
+              height: 5,
+            ),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                const Text("Net Income:"),
+                Text('PHP ${(totalAmount - totalVat).toStringAsFixed(2)}'),
+              ],
+            ),
+            const Divider(
+              height: 0,
+              color: Color(0xff252525),
             ),
             const SizedBox(
               height: 10,
             ),
             StyledButton(
               btnText: "Details",
-              onClick: () {},
+              onClick: () {
+                Navigator.of(context).push(
+                  MaterialPageRoute(
+                    builder: (BuildContext context) => SalesReportDetails(
+                      date: date,
+                      orderKey: orderKey,
+                      ordersStream: allOrders,
+                    ),
+                  ),
+                );
+              },
               btnWidth: double.infinity,
               btnColor: const Color(0xFFE2B563),
               noShadow: true,

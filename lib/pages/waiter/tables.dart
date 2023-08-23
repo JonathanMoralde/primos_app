@@ -15,33 +15,9 @@ import '../../providers/waiter_menu/currentOrder_provider.dart';
 class WaiterTablePage extends ConsumerWidget {
   WaiterTablePage({super.key});
 
-//   @override
-//   State<WaiterTablePage> createState() => _WaiterTablePageState();
-// }
-
-// class _WaiterTablePageState extends State<WaiterTablePage> {
-
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    // Reset the currentOrdersProvider when navigating back to WaiterTablePage
-    // useEffect(() {
-    //   return () {
-    //     ref.read(currentOrdersProvider.notifier).state = [];
-    //   };
-    // }, []);
-    // Reset the currentOrdersProvider when navigating back to WaiterTablePage
-    // ref.read(currentOrdersProvider.notifier).state = [];
-    // Listen for route changes and reset currentOrdersProvider if returning to WaiterTablePage
-    // Future.microtask(() {
-    //   ModalRoute.of(context)?.addScopedWillPopCallback(() {
-    //     ref.read(currentOrdersProvider.notifier).state = [];
-    //     return Future.value(true);
-    //   });
-    // });
-
     final tableItems = ref.watch(tableItemsProvider);
-
-    // print(tableItems);
 
     int currentIndex = ref.watch(currentIndex_provider);
     return Scaffold(

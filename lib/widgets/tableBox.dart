@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:primos_app/pages/waiter/orderDetails.dart';
 import 'package:primos_app/pages/waiter/waiter_menu.dart';
 import 'package:primos_app/providers/isAdditionalOrder/existingOrderId_provider.dart';
 import 'package:primos_app/providers/isAdditionalOrder/existingOrder_provider.dart';
@@ -84,7 +85,16 @@ class TableBox extends ConsumerWidget {
                         ),
                         StyledButton(
                           btnText: "View Order",
-                          onClick: () {},
+                          onClick: () {
+                            ref.read(orderNameProvider.notifier).state =
+                                tableName;
+                            Navigator.of(context).push(
+                              MaterialPageRoute(
+                                builder: (BuildContext context) =>
+                                    OrderDetailsPage(orderKey: tableEntryId!),
+                              ),
+                            );
+                          },
                           btnWidth: double.infinity,
                         ),
                         const SizedBox(
