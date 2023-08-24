@@ -1,11 +1,16 @@
+import 'dart:math';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:primos_app/pages/waiter/tables.dart';
 import 'package:primos_app/pages/waiter/waiter_menu.dart';
 import 'package:primos_app/providers/bottomNavBar/currentIndex_provider.dart';
+import 'package:primos_app/providers/kitchen/orderDetails_Provider.dart';
+import 'package:primos_app/providers/waiter_menu/isTakeout_provider.dart';
 import 'package:primos_app/widgets/bottomBar.dart';
 import 'package:primos_app/widgets/pageObject.dart';
 import 'package:primos_app/widgets/sideMenu.dart';
+import 'package:primos_app/widgets/takeout_orders.dart';
 
 import '../../providers/waiter_menu/orderName_provider.dart';
 
@@ -21,6 +26,7 @@ class TakeoutPage extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     int currentIndex = ref.watch(currentIndex_provider);
+    final ordersStream = ref.watch(ordersProvider);
     return Scaffold(
       backgroundColor: Color(0xfff8f8f7),
       appBar: AppBar(
@@ -30,31 +36,51 @@ class TakeoutPage extends ConsumerWidget {
       body: SafeArea(
         child: SingleChildScrollView(
           child: Padding(
-            padding: const EdgeInsets.all(16.0),
-            child: Column(
-              children: [Container()], //TODO ADD LIST OF TAKEOUT ORDERS HERE
-            ),
+            padding: const EdgeInsets.symmetric(vertical: 16),
+            child: ordersStream.when(
+                data: (ordersMap) {
+                  final orderEntries = ordersMap.entries.toList();
+
+                  // Sort the orderEntries based on the order_date
+                  orderEntries.sort((a, b) {
+                    final aDate = DateTime.parse(a.value['order_date']);
+                    final bDate = DateTime.parse(b.value['order_date']);
+                    return aDate.compareTo(bDate);
+                  });
+
+                  return Column(
+                    children: [
+                      for (final entry in orderEntries)
+                        if (entry.value['payment_status'] == 'Unpaid')
+                          TakeoutOrdersWaiter(
+                            orderEntry: entry,
+                          ),
+                    ],
+                  );
+                },
+                error: (error, stackTrace) => Text('Error: $error'),
+                loading: () => CircularProgressIndicator()),
           ),
         ),
       ),
       floatingActionButton: FloatingActionButton(
         onPressed: () {
           // When the floating action button is pressed, update the order name and last takeout number
-          final currentDate = DateTime.now();
-          final lastOrderDate = ref.watch(lastOrderDateProvider);
+          // final currentDate = DateTime.now();
+          // final lastOrderDate = ref.watch(lastOrderDateProvider);
 
-          if (lastOrderDate == null || currentDate.day != lastOrderDate.day) {
-            ref.read(lastTakeoutNumberProvider.notifier).state = 1;
-            ref.read(lastOrderDateProvider.notifier).state = currentDate;
-          } else {
-            ref.read(lastTakeoutNumberProvider.notifier).state += 1;
-          }
-          final int takeoutNum = ref.watch(lastTakeoutNumberProvider);
-          final String orderName = "Takeout $takeoutNum";
+          // if (lastOrderDate == null || currentDate.day != lastOrderDate.day) {
+          //   ref.read(lastTakeoutNumberProvider.notifier).state = 1;
+          //   ref.read(lastOrderDateProvider.notifier).state = currentDate;
+          // } else {
+          //   ref.read(lastTakeoutNumberProvider.notifier).state += 1;
+          // }
+          // final int takeoutNum = ref.watch(lastTakeoutNumberProvider);
+          final String orderName = "Takeout ${Random().nextInt(200)}";
 
           ref.read(orderNameProvider.notifier).state = orderName;
 
-          print(ref.watch(orderNameProvider));
+          ref.read(isTakeoutProvider.notifier).state = true;
 
           Navigator.of(context).push(
             MaterialPageRoute(builder: (BuildContext context) {

@@ -3,9 +3,11 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:intl/intl.dart';
 import 'package:primos_app/pages/waiter/tables.dart';
+import 'package:primos_app/pages/waiter/takeout.dart';
 import 'package:primos_app/providers/isAdditionalOrder/isAdditionalOrder_provider.dart';
 import 'package:primos_app/providers/kitchen/models.dart';
 import 'package:primos_app/providers/waiter_menu/currentOrder_provider.dart';
+import 'package:primos_app/providers/waiter_menu/isTakeout_provider.dart';
 import 'package:primos_app/providers/waiter_menu/orderName_provider.dart';
 import 'package:primos_app/providers/waiter_menu/subtotal_provider.dart';
 import 'package:primos_app/widgets/bottomBar.dart';
@@ -23,6 +25,7 @@ class OrderDetailsPage extends ConsumerWidget {
     final ordersStream = ref.watch(ordersProvider);
 
     final orderName = ref.watch(orderNameProvider);
+    final isTakeout = ref.watch(isTakeoutProvider);
     return Scaffold(
       backgroundColor: Color(0xfff8f8f7),
       appBar: AppBar(
@@ -52,8 +55,6 @@ class OrderDetailsPage extends ConsumerWidget {
                       String formattedDate = DateFormat('dd-MM-yyyy hh:mm a')
                           .format(orderDate.toLocal());
 
-                      // TODO EXTRACT THE ORDER DETAILS AND CALCULATE THE TOTAL AMOUNT
-                      // TODO RESET THE STATES WHEN BACK TO TABLES IS CLICKED
                       final List<Order> ordersList =
                           orderData!.map<Order>((orderDetail) {
                         final name = orderDetail['productName'] ?? 'No Name';
@@ -128,7 +129,6 @@ class OrderDetailsPage extends ConsumerWidget {
                                       style: TextStyle(
                                           fontWeight: FontWeight.w600),
                                     ),
-                                    // TODO CHANGE TO ACTUAL
                                     Text("PHP $totalAmount")
                                   ],
                                 ),
@@ -208,35 +208,6 @@ class OrderDetailsPage extends ConsumerWidget {
                     error: (error, stackTrace) => Text('Error: $error'),
                     loading: () => CircularProgressIndicator()),
                 //     // ORDER DETAILS
-
-                // ...orderData.map((OrderObject order) {
-                //   return Row(
-                //     children: [
-                //       Expanded(flex: 2, child: Text(order.name)),
-                //       Expanded(
-                //         flex: 1,
-                //         child: Text(
-                //           order.variation ?? "",
-                //           textAlign: TextAlign.end,
-                //         ),
-                //       ),
-                //       Expanded(
-                //         flex: 1,
-                //         child: Text(
-                //           order.quantity.toString(),
-                //           textAlign: TextAlign.end,
-                //         ),
-                //       ),
-                //       Expanded(
-                //         flex: 1,
-                //         child: Text(
-                //           order.price.toString(),
-                //           textAlign: TextAlign.end,
-                //         ),
-                //       ),
-                //     ],
-                //   );
-                // }).toList(),
               ],
             ),
           ),
@@ -250,7 +221,7 @@ class OrderDetailsPage extends ConsumerWidget {
             children: [
               Expanded(
                 child: StyledButton(
-                  btnText: "BACK TO TABLES",
+                  btnText: isTakeout ? "BACK TO TAKEOUTS" : "BACK TO TABLES",
                   onClick: () {
                     // reset states
                     ref.read(currentOrdersProvider.notifier).state = [];
@@ -259,9 +230,13 @@ class OrderDetailsPage extends ConsumerWidget {
                     ref.read(subtotalProvider.notifier).state = 0.0;
 
                     Navigator.of(context).pushAndRemoveUntil(
-                      MaterialPageRoute(
-                        builder: (context) => WaiterTablePage(),
-                      ),
+                      MaterialPageRoute(builder: (context) {
+                        if (isTakeout) {
+                          return TakeoutPage();
+                        } else {
+                          return WaiterTablePage();
+                        }
+                      }),
                       (Route<dynamic> route) => false,
                     );
                   },
