@@ -174,7 +174,10 @@ class OrderViewPage extends StatelessWidget {
                                     .update({'total_amount': discountedTotal});
                                 orderRef.update({
                                   'discount': (totalAmount *
-                                      (double.parse(discountController.text) /
+                                      (double.parse(
+                                              discountController.text.isNotEmpty
+                                                  ? discountController.text
+                                                  : "0") /
                                           100))
                                 });
                                 orderRef.update({

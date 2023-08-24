@@ -6,11 +6,6 @@ import 'package:primos_app/widgets/sideMenu.dart';
 
 import '../../providers/kitchen/orderDetails_Provider.dart';
 
-//* WAYS:
-//  FETCH ORDERS DATA HERE IN PARENT WIDGET AND STORE IN RIVERPOD FOR STATE MANAGEMENT
-//  OR FETCH DATA USING RIVERPOD TO BE CALLED HERE AND STORE STATES IN RIVERPOD
-// FETCH ORDERS DATA AND PASS IT AS PARAMETER IN OrdersCashier Widget (ALSO EDIT OrdersCashier CONSTRUCTOR)
-
 class OrdersPage extends ConsumerWidget {
   const OrdersPage({super.key});
 
