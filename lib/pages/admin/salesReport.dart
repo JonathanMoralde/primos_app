@@ -2,6 +2,9 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:intl/intl.dart';
 import 'package:primos_app/pages/admin/salesObject.dart';
+import 'package:primos_app/providers/filter/isDateRange_provider.dart';
+import 'package:primos_app/providers/filter/isSingleDate_provider.dart';
+import 'package:primos_app/providers/filter/selectedDate_provider.dart';
 import 'package:primos_app/providers/kitchen/orderDetails_Provider.dart';
 import 'package:primos_app/providers/sales/allSales_provider.dart';
 import 'package:primos_app/widgets/filterExpansion.dart';
@@ -16,6 +19,14 @@ class SalesReportPage extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final ordersStream = ref.watch(ordersProvider);
+
+// FILTERING
+    final isSingleDate = ref.watch(isSingleDateProvider);
+    final isDateRange = ref.watch(isDateRangeProvider);
+
+    final singleDate = ref.watch(selectedDate3Provider);
+    final dateRange1 = ref.watch(selectedDate1Provider);
+    final dateRange2 = ref.watch(selectedDate2Provider);
     return Scaffold(
       backgroundColor: const Color(0xFFF8F8F7),
       drawer: SideMenu(
@@ -72,10 +83,11 @@ class SalesReportPage extends ConsumerWidget {
                       double grandTotal = 0.0;
 
                       for (final order in orders) {
+                        final orderDiscount = order['discount'];
                         totalBillAmount += order['bill_amount'] as int;
-                        totalDiscount += order['discount'] as double;
-                        totalVat += order['vat'] as double;
-                        grandTotal += order['total_amount'] as double;
+                        totalDiscount += (order['discount'] as num).toDouble();
+                        totalVat += (order['vat'] as num).toDouble();
+                        grandTotal += (order['total_amount'] as num).toDouble();
                       }
                       // print(date);
                       // print(totalBillAmount);
@@ -96,10 +108,40 @@ class SalesReportPage extends ConsumerWidget {
                       ));
                     });
 
+                    // Inside the ordersStream.when data callback
+                    List<SalesObject> filteredSalesObjects = [];
+
+                    if (isSingleDate) {
+                      // Display only selected single date
+
+                      filteredSalesObjects = salesObjects.where((object) {
+                        final toDate = DateTime.parse(object.date);
+                        print(toDate);
+                        print(singleDate);
+                        print(toDate.isAtSameMomentAs(singleDate!));
+                        return toDate.isAtSameMomentAs(singleDate!);
+                      }).toList();
+                    } else if (isDateRange) {
+                      // Display sales objects falling within the selected date range
+                      filteredSalesObjects = salesObjects.where((object) {
+                        final dateParsed = DateTime.parse(object.date);
+
+                        return (dateParsed.isAfter(dateRange1!) ||
+                                dateParsed.isAtSameMomentAs(dateRange1!)) &&
+                            (dateParsed.isBefore(dateRange2!) ||
+                                dateParsed.isAtSameMomentAs(dateRange2!));
+                      }).toList();
+                    } else {
+                      // Display all sales objects
+                      filteredSalesObjects = salesObjects;
+                    }
+
                     // print(salesObjects[0].date);
-                    return Column(
+                    return Wrap(
+                      runSpacing: 10,
+                      spacing: 10,
                       children: [
-                        for (final object in salesObjects)
+                        for (final object in filteredSalesObjects)
                           SalesCard(
                               date: object.date,
                               totalBillAmount: object.totalBillAmount,

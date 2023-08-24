@@ -2,12 +2,13 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:intl/intl.dart';
 import 'package:primos_app/pages/admin/salesReport_details.dart';
+import 'package:primos_app/providers/filter/isExpanded_provider.dart';
 import 'package:primos_app/widgets/progressBar.dart';
 import 'package:primos_app/widgets/styledButton.dart';
 
 import '../providers/kitchen/models.dart';
 
-class SalesCard extends StatelessWidget {
+class SalesCard extends StatefulWidget {
   final String date;
   final int totalBillAmount;
   final double totalDiscount;
@@ -28,8 +29,14 @@ class SalesCard extends StatelessWidget {
   });
 
   @override
+  State<SalesCard> createState() => _SalesCardState();
+}
+
+class _SalesCardState extends State<SalesCard> {
+  bool isExpanded = false;
+  @override
   Widget build(BuildContext context) {
-    DateTime originalDate = DateTime.parse(date);
+    DateTime originalDate = DateTime.parse(widget.date);
 
     String formattedDate = DateFormat('MMMM dd, yyyy').format(originalDate);
     // print(date);
@@ -43,141 +50,169 @@ class SalesCard extends StatelessWidget {
       // height: 183,
       decoration: BoxDecoration(
         color: const Color(0xffffffff),
-        borderRadius: const BorderRadius.all(
-          Radius.circular(8),
-        ),
+        borderRadius: BorderRadius.circular(8),
         boxShadow: [
           BoxShadow(
-            color: Colors.grey.withOpacity(0.5),
-            spreadRadius: 2,
-            blurRadius: 10,
-            offset: const Offset(0, 3), // Changes the position of the shadow
+            color: Colors.black.withOpacity(0.25),
+            spreadRadius: 0,
+            blurRadius: 5,
+            offset: const Offset(0, 2), // Changes the position of the shadow
           ),
         ],
       ),
-      child: Padding(
-        padding: const EdgeInsets.all(10.0),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
+      child: ClipRRect(
+        borderRadius: BorderRadius.circular(8),
+        child: ExpansionPanelList(
+          expandedHeaderPadding: EdgeInsets.all(0),
+          expansionCallback: (int index, bool currentlyExpanded) {
+            setState(() {
+              isExpanded = !currentlyExpanded;
+            });
+          },
           children: [
-            Align(
-              alignment: Alignment.center,
-              child: Text(
-                formattedDate,
-                style: const TextStyle(
-                  fontWeight: FontWeight.w600,
-                  letterSpacing: 1,
-                  fontSize: 16,
-                ),
-              ),
-            ),
-            const SizedBox(
-              height: 10,
-            ),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                const Text("Total Order: "),
-                const SizedBox(
-                  width: 30,
-                ),
-                Text(orderKey.length.toString())
-              ],
-            ),
-            const Divider(
-              height: 0,
-              color: Color(0xff252525),
-            ),
-            const SizedBox(
-              height: 5,
-            ),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                const Text("Gross Sales:"),
-                Text('PHP ${totalBillAmount.toString()}'),
-              ],
-            ),
-            const Divider(
-              height: 0,
-              color: Color(0xff252525),
-            ),
-            const SizedBox(
-              height: 5,
-            ),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                const Text("Total discounts given:"),
-                Text(totalDiscount.toString()),
-              ],
-            ),
-            const Divider(
-              height: 0,
-              color: Color(0xff252525),
-            ),
-            const SizedBox(
-              height: 5,
-            ),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                const Text("Grand Total:"),
-                Text('PHP ${totalAmount.toString()}'),
-              ],
-            ),
-            const Divider(
-              height: 0,
-              color: Color(0xff252525),
-            ),
-            const SizedBox(
-              height: 5,
-            ),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                const Text("Total VAT amount:"),
-                Text(totalVat.toString()),
-              ],
-            ),
-            const Divider(
-              height: 0,
-              color: Color(0xff252525),
-            ),
-            const SizedBox(
-              height: 5,
-            ),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                const Text("Net Income:"),
-                Text('PHP ${(totalAmount - totalVat).toStringAsFixed(2)}'),
-              ],
-            ),
-            const Divider(
-              height: 0,
-              color: Color(0xff252525),
-            ),
-            const SizedBox(
-              height: 10,
-            ),
-            StyledButton(
-              btnText: "Details",
-              onClick: () {
-                Navigator.of(context).push(
-                  MaterialPageRoute(
-                    builder: (BuildContext context) => SalesReportDetails(
-                      date: date,
-                      orderKey: orderKey,
-                      ordersStream: allOrders,
+            ExpansionPanel(
+              headerBuilder: (BuildContext context, bool isExpanded) {
+                return ListTile(
+                  title: Text(
+                    formattedDate,
+                    style: const TextStyle(
+                      fontWeight: FontWeight.w600,
+                      letterSpacing: 1,
+                      fontSize: 16,
                     ),
                   ),
                 );
               },
-              btnWidth: double.infinity,
-              btnColor: const Color(0xFFE2B563),
-              noShadow: true,
-            )
+              body: Padding(
+                padding: const EdgeInsets.only(left: 16, right: 16, bottom: 16),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    // Align(
+                    //   alignment: Alignment.center,
+                    //   child: Text(
+                    //     formattedDate,
+                    //     style: const TextStyle(
+                    //       fontWeight: FontWeight.w600,
+                    //       letterSpacing: 1,
+                    //       fontSize: 16,
+                    //     ),
+                    //   ),
+                    // ),
+                    const SizedBox(
+                      height: 10,
+                    ),
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        const Text("Total Orders: "),
+                        const SizedBox(
+                          width: 30,
+                        ),
+                        Text(widget.orderKey.length.toString())
+                      ],
+                    ),
+                    const Divider(
+                      height: 0,
+                      color: Color(0xff252525),
+                    ),
+                    const SizedBox(
+                      height: 5,
+                    ),
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        const Text("Gross Sales:"),
+                        Text('PHP ${widget.totalBillAmount.toString()}'),
+                      ],
+                    ),
+                    const Divider(
+                      height: 0,
+                      color: Color(0xff252525),
+                    ),
+                    const SizedBox(
+                      height: 5,
+                    ),
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        const Text("Total discounts given:"),
+                        Text('PHP ${widget.totalDiscount.toString()}'),
+                      ],
+                    ),
+                    const Divider(
+                      height: 0,
+                      color: Color(0xff252525),
+                    ),
+                    const SizedBox(
+                      height: 5,
+                    ),
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        const Text("Grand Total:"),
+                        Text('PHP ${widget.totalAmount.toString()}'),
+                      ],
+                    ),
+                    const Divider(
+                      height: 0,
+                      color: Color(0xff252525),
+                    ),
+                    const SizedBox(
+                      height: 5,
+                    ),
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        const Text("Total VAT amount:"),
+                        Text('PHP ${widget.totalVat.toString()}'),
+                      ],
+                    ),
+                    const Divider(
+                      height: 0,
+                      color: Color(0xff252525),
+                    ),
+                    const SizedBox(
+                      height: 5,
+                    ),
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        const Text("Net Income:"),
+                        Text(
+                            'PHP ${(widget.totalAmount - widget.totalVat).toStringAsFixed(2)}'),
+                      ],
+                    ),
+                    const Divider(
+                      height: 0,
+                      color: Color(0xff252525),
+                    ),
+                    const SizedBox(
+                      height: 20,
+                    ),
+                    StyledButton(
+                      btnText: "View Sold Dishes",
+                      onClick: () {
+                        Navigator.of(context).push(
+                          MaterialPageRoute(
+                            builder: (BuildContext context) =>
+                                SalesReportDetails(
+                              date: widget.date,
+                              orderKey: widget.orderKey,
+                              ordersStream: widget.allOrders,
+                            ),
+                          ),
+                        );
+                      },
+                      btnWidth: double.infinity,
+                      btnColor: const Color(0xFFE2B563),
+                      noShadow: true,
+                    )
+                  ],
+                ),
+              ),
+              isExpanded: isExpanded,
+            ),
           ],
         ),
       ),

@@ -66,14 +66,14 @@ class WaiterMenuCart extends ConsumerWidget {
     Map<String, dynamic> order = {
       'order_name': tableName,
       'order_date': currentDate,
-      'total_amount': 0,
+      'total_amount': 0.0,
       'order_details': orderDetails,
       'served_by': waiterName,
       'order_status': 'Pending',
       'payment_status': 'Unpaid',
       'bill_amount': 0,
-      'discount': "0%",
-      'vat': 0
+      'discount': 0.0,
+      'vat': 0.0
     };
 
     // Insert the order data using the generated key

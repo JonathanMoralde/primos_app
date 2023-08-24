@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:primos_app/providers/filter/isDateRange_provider.dart';
+import 'package:primos_app/providers/filter/isSingleDate_provider.dart';
 import 'package:primos_app/widgets/styledButton.dart';
 import 'package:primos_app/widgets/styledDatepicker.dart';
 
@@ -114,6 +116,10 @@ class FilterExpansion extends ConsumerWidget {
                             noShadow: true,
                             btnText: "FILTER",
                             onClick: () {
+                              ref.read(isSingleDateProvider.notifier).state =
+                                  false;
+                              ref.read(isDateRangeProvider.notifier).state =
+                                  true;
                               // TODO FILTER BY DATE RANGE API
                             }),
                       ),
@@ -145,6 +151,10 @@ class FilterExpansion extends ConsumerWidget {
                               noShadow: true,
                               btnText: "FILTER",
                               onClick: () {
+                                ref.read(isDateRangeProvider.notifier).state =
+                                    false;
+                                ref.read(isSingleDateProvider.notifier).state =
+                                    true;
                                 //TODO FILTER BY SINGLE DATE API
                               },
                             ),
@@ -160,6 +170,11 @@ class FilterExpansion extends ConsumerWidget {
                             noShadow: true,
                             btnText: "RESET DATE",
                             onClick: () {
+                              ref.read(isSingleDateProvider.notifier).state =
+                                  false;
+                              ref.read(isDateRangeProvider.notifier).state =
+                                  false;
+
                               ref.read(selectedDate1Provider.notifier).state =
                                   null;
                               ref.read(selectedDate2Provider.notifier).state =

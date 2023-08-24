@@ -44,12 +44,76 @@ class SalesReportDetails extends ConsumerWidget {
 
                 return Column(
                   children: [
+                    const Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        Expanded(
+                            flex: 1,
+                            child: Text(
+                              "NAME",
+                              style: TextStyle(
+                                  letterSpacing: 1,
+                                  fontWeight: FontWeight.w600),
+                            )),
+                        Expanded(
+                            flex: 1,
+                            child: Text(
+                              "QUANTITY",
+                              style: TextStyle(
+                                  letterSpacing: 1,
+                                  fontWeight: FontWeight.w600),
+                              textAlign: TextAlign.center,
+                            )),
+                        Expanded(
+                            flex: 1,
+                            child: Text(
+                              "VARIATION",
+                              style: TextStyle(
+                                  letterSpacing: 1,
+                                  fontWeight: FontWeight.w600),
+                              textAlign: TextAlign.center,
+                            ))
+                      ],
+                    ),
+                    const SizedBox(
+                      height: 5,
+                    ),
+                    const Divider(
+                      height: 0,
+                      color: Color(0xFF252525),
+                    ),
+                    const SizedBox(
+                      height: 5,
+                    ),
                     for (final order in orderData)
                       Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
-                          Text(order['productName'] as String),
-                          Text(order['quantity'].toString()),
-                          Text(order['variation'] as String)
+                          Expanded(
+                            flex: 1,
+                            child: Text(
+                              (order['productName'] as String).toUpperCase(),
+                              style: TextStyle(),
+                            ),
+                          ),
+                          Expanded(
+                            flex: 1,
+                            child: Text(
+                              order['quantity'].toString(),
+                              style: TextStyle(),
+                              textAlign: TextAlign.center,
+                            ),
+                          ),
+                          Expanded(
+                            flex: 1,
+                            child: Text(
+                              order['variation'] != null
+                                  ? order['variation'] as String
+                                  : "No Variation",
+                              style: TextStyle(),
+                              textAlign: TextAlign.center,
+                            ),
+                          )
                         ],
                       )
                   ],
