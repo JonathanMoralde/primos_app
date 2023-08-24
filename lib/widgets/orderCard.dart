@@ -1,3 +1,4 @@
+// import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:primos_app/widgets/styledButton.dart';
 import 'package:firebase_database/firebase_database.dart';
@@ -8,15 +9,9 @@ import 'package:primos_app/providers/kitchen/models.dart';
 import 'package:flutter/material.dart';
 
 class OrderCardDropdown extends ConsumerWidget {
-  // final String orderID;
-  // final String orderName;
-  // final List<Order> orders;
   final MapEntry<dynamic, dynamic> orderEntry;
 
   OrderCardDropdown({
-    // required this.orderID,
-    // required this.orderName,
-    // required this.orders,
     required this.orderEntry,
     Key? key,
   }) : super(key: key);
@@ -44,16 +39,12 @@ class OrderCardDropdown extends ConsumerWidget {
         quantity: quantity,
         variation: variation,
         serveStatus: serveStatus,
-        // orderName: orderName,
       );
     }).toList();
 
-    // print(orders[0].variation);
-    // print(orderID);
-    print(orderName);
     return Container(
       decoration: BoxDecoration(
-        color: Color(0xFFD9D9D9), // Set the background color for the container
+        color: Color(0xFFD9D9D9),
         border: Border.all(
           color: Color.fromARGB(255, 209, 209, 209),
           width: 1.0,
@@ -62,14 +53,13 @@ class OrderCardDropdown extends ConsumerWidget {
       ),
       width: 380,
       child: ExpansionTile(
-        backgroundColor:
-            Color(0xFFD9D9D9), // Set the background color for the ExpansionTile
+        backgroundColor: Color(0xFFD9D9D9),
         title: Text(
           orderName,
           style: TextStyle(letterSpacing: 1, fontSize: 20),
         ),
         subtitle: Text(
-          "DINE-IN",
+          orderName.contains("Takeout") ? "TAKEOUT" : "DINE-IN",
           style: TextStyle(
             color: Color(0xFFFE3034),
             letterSpacing: 1,
@@ -102,6 +92,14 @@ class OrderCardDropdown extends ConsumerWidget {
                   padding: EdgeInsets.only(left: 16, right: 16, top: 5),
                   child: Row(
                     children: [
+                      IconButton(
+                        padding: EdgeInsets.only(right: 10),
+                        constraints: BoxConstraints(),
+                        onPressed: null, icon: Icon(Icons.check_circle_outline),
+                        color: Colors.transparent, // Make the icon transparent
+                        disabledColor: Colors
+                            .transparent, // Make the icon transparent when disabled
+                      ),
                       Expanded(
                         flex: 2,
                         child: Text(
@@ -128,13 +126,33 @@ class OrderCardDropdown extends ConsumerWidget {
                     ],
                   ),
                 ),
-                for (final order in ordersList)
+                for (final (index, order) in ordersList.indexed)
                   if (order.serveStatus != 'Served')
                     Padding(
                       padding: const EdgeInsets.symmetric(
                           horizontal: 16, vertical: 8),
                       child: Row(
                         children: [
+                          IconButton(
+                              padding: EdgeInsets.only(right: 10),
+                              constraints: BoxConstraints(),
+                              onPressed: () {
+                                // TODO ADD A MODAL TO CONFIRM BEFORE UPDATING ITEM STATUS
+                                // TODO ADD WAITER PUSH NOTIF
+                                DatabaseReference productRef = FirebaseDatabase
+                                    .instance
+                                    .ref()
+                                    .child('orders')
+                                    .child(orderEntry.key)
+                                    .child('order_details')
+                                    .child('$index');
+
+                                productRef.update({
+                                  'serve_status': 'Served'
+                                }); // Change 'Served' to the desired status
+                              },
+                              icon:
+                                  Icon(Icons.check_box_outline_blank_rounded)),
                           Expanded(flex: 2, child: Text(order.name)),
                           Expanded(
                             flex: 1,

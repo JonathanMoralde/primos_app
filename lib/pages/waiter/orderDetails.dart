@@ -229,6 +229,11 @@ class OrderDetailsPage extends ConsumerWidget {
                     ref.read(orderNameProvider.notifier).state = null;
                     ref.read(subtotalProvider.notifier).state = 0.0;
 
+                    // Reset isTakeout to false
+                    if (isTakeout) {
+                      ref.read(isTakeoutProvider.notifier).state = false;
+                    }
+
                     Navigator.of(context).pushAndRemoveUntil(
                       MaterialPageRoute(builder: (context) {
                         if (isTakeout) {

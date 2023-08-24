@@ -51,7 +51,9 @@ class TakeoutPage extends ConsumerWidget {
                   return Column(
                     children: [
                       for (final entry in orderEntries)
-                        if (entry.value['payment_status'] == 'Unpaid')
+                        if (entry.value['payment_status'] == 'Unpaid' &&
+                            (entry.value['order_name'] as String)
+                                .contains("Takeout"))
                           TakeoutOrdersWaiter(
                             orderEntry: entry,
                           ),
