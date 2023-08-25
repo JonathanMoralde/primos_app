@@ -30,7 +30,7 @@ class OrderDetailsPage extends ConsumerWidget {
       backgroundColor: Color(0xfff8f8f7),
       appBar: AppBar(
         automaticallyImplyLeading: false,
-        title: Text("ORDER DETAILS $orderName"),
+        title: Text("ORDER DETAILS ${orderName?.toUpperCase()}"),
       ),
       body: SafeArea(
         child: SingleChildScrollView(
@@ -176,7 +176,16 @@ class OrderDetailsPage extends ConsumerWidget {
                           for (final order in ordersList)
                             Row(
                               children: [
-                                Expanded(flex: 2, child: Text(order.name)),
+                                Expanded(
+                                    flex: 2,
+                                    child: Text(
+                                      order.name,
+                                      style: TextStyle(
+                                          color: order.serveStatus == "Served"
+                                              ? Colors.green.shade700
+                                              : Color.fromARGB(
+                                                  255, 189, 151, 82)),
+                                    )),
                                 Expanded(
                                   flex: 1,
                                   child: Text(
@@ -184,6 +193,11 @@ class OrderDetailsPage extends ConsumerWidget {
                                         ? "N/A"
                                         : order.variation,
                                     textAlign: TextAlign.end,
+                                    style: TextStyle(
+                                        color: order.serveStatus == "Served"
+                                            ? Colors.green.shade700
+                                            : Color.fromARGB(
+                                                255, 189, 151, 82)),
                                   ),
                                 ),
                                 Expanded(
@@ -191,6 +205,11 @@ class OrderDetailsPage extends ConsumerWidget {
                                   child: Text(
                                     order.quantity.toString(),
                                     textAlign: TextAlign.end,
+                                    style: TextStyle(
+                                        color: order.serveStatus == "Served"
+                                            ? Colors.green.shade700
+                                            : Color.fromARGB(
+                                                255, 189, 151, 82)),
                                   ),
                                 ),
                                 Expanded(
@@ -198,6 +217,11 @@ class OrderDetailsPage extends ConsumerWidget {
                                   child: Text(
                                     order.price.toString(),
                                     textAlign: TextAlign.end,
+                                    style: TextStyle(
+                                        color: order.serveStatus == "Served"
+                                            ? Colors.green.shade700
+                                            : Color.fromARGB(
+                                                255, 189, 151, 82)),
                                   ),
                                 ),
                               ],
@@ -207,7 +231,47 @@ class OrderDetailsPage extends ConsumerWidget {
                     },
                     error: (error, stackTrace) => Text('Error: $error'),
                     loading: () => CircularProgressIndicator()),
-                //     // ORDER DETAILS
+                const SizedBox(height: 30),
+                Column(
+                  children: [
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Row(
+                          children: [
+                            Container(
+                              height: 10,
+                              width: 10,
+                              decoration:
+                                  BoxDecoration(color: Colors.green.shade700),
+                            ),
+                            const SizedBox(
+                              width: 5,
+                            ),
+                            Text("Read to be served"),
+                          ],
+                        ),
+                        const SizedBox(
+                          width: 20,
+                        ),
+                        Row(
+                          children: [
+                            Container(
+                              height: 10,
+                              width: 10,
+                              decoration:
+                                  BoxDecoration(color: Color(0xFFE2B563)),
+                            ),
+                            const SizedBox(
+                              width: 5,
+                            ),
+                            Text("Preparing"),
+                          ],
+                        ),
+                      ],
+                    )
+                  ],
+                )
               ],
             ),
           ),

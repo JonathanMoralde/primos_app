@@ -1,5 +1,6 @@
 // import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_animate/flutter_animate.dart';
 import 'package:primos_app/widgets/styledButton.dart';
 import 'package:firebase_database/firebase_database.dart';
 import 'package:primos_app/providers/kitchen/orderDetails_Provider.dart';
@@ -41,6 +42,94 @@ class OrderCardDropdown extends ConsumerWidget {
         serveStatus: serveStatus,
       );
     }).toList();
+
+    Future checkboxModal(String dishName, int index) async {
+      await showDialog(
+          context: context,
+          builder: (context) => AlertDialog(
+                contentPadding: EdgeInsets.zero,
+                content: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Container(
+                      padding: EdgeInsets.all(16.0),
+                      child: Text(
+                        dishName,
+                        textAlign: TextAlign.left,
+                      ),
+                    ),
+                    Divider(height: 0),
+                    Container(
+                      padding: EdgeInsets.all(16.0),
+                      child: Column(
+                        children: [
+                          Text("Is this dish ready to be served?"),
+                          const SizedBox(
+                            height: 5,
+                          ),
+                          const Row(
+                            children: [
+                              Icon(
+                                Icons.info_outline,
+                                size: 20,
+                              ),
+                              SizedBox(width: 4),
+                              Flexible(
+                                child: Text(
+                                  "Confirming this will remove it from display",
+                                  style: TextStyle(
+                                    fontSize: 12,
+                                    letterSpacing: 1,
+                                  ),
+                                ),
+                              ),
+                            ],
+                          ),
+                          const SizedBox(
+                            height: 5,
+                          ),
+                          Row(
+                            children: [
+                              Expanded(
+                                flex: 1,
+                                child: StyledButton(
+                                    btnText: "Cancel",
+                                    onClick: () {
+                                      Navigator.of(context).pop();
+                                    }),
+                              ),
+                              const SizedBox(
+                                width: 10,
+                              ),
+                              Expanded(
+                                flex: 1,
+                                child: StyledButton(
+                                    btnText: "Confirm",
+                                    onClick: () {
+                                      DatabaseReference productRef =
+                                          FirebaseDatabase.instance
+                                              .ref()
+                                              .child('orders')
+                                              .child(orderEntry.key)
+                                              .child('order_details')
+                                              .child('$index');
+
+                                      productRef.update({
+                                        'serve_status': 'Served'
+                                      }); // Change 'Served' to the desired status
+
+                                      Navigator.of(context).pop();
+                                    }),
+                              ),
+                            ],
+                          )
+                        ],
+                      ),
+                    ),
+                  ],
+                ),
+              ));
+    }
 
     return Container(
       decoration: BoxDecoration(
@@ -134,25 +223,13 @@ class OrderCardDropdown extends ConsumerWidget {
                       child: Row(
                         children: [
                           IconButton(
-                              padding: EdgeInsets.only(right: 10),
-                              constraints: BoxConstraints(),
-                              onPressed: () {
-                                // TODO ADD A MODAL TO CONFIRM BEFORE UPDATING ITEM STATUS
-                                // TODO ADD WAITER PUSH NOTIF
-                                DatabaseReference productRef = FirebaseDatabase
-                                    .instance
-                                    .ref()
-                                    .child('orders')
-                                    .child(orderEntry.key)
-                                    .child('order_details')
-                                    .child('$index');
-
-                                productRef.update({
-                                  'serve_status': 'Served'
-                                }); // Change 'Served' to the desired status
-                              },
-                              icon:
-                                  Icon(Icons.check_box_outline_blank_rounded)),
+                            padding: EdgeInsets.only(right: 10),
+                            constraints: BoxConstraints(),
+                            onPressed: () {
+                              checkboxModal(order.name, index);
+                            },
+                            icon: Icon(Icons.check_box_outline_blank_rounded),
+                          ).animate().scale(),
                           Expanded(flex: 2, child: Text(order.name)),
                           Expanded(
                             flex: 1,

@@ -385,7 +385,7 @@ class OrderViewPage extends StatelessWidget {
           iconSize: 35,
           onPressed: () => Navigator.of(context).pop(),
         ),
-        title: (Text("ORDER DETAILS $orderName")),
+        title: (Text("ORDER DETAILS ${orderName.toUpperCase()}")),
       ),
       body: SafeArea(
         child: SingleChildScrollView(
@@ -484,9 +484,6 @@ class OrderViewPage extends StatelessWidget {
                 const SizedBox(
                   height: 10,
                 ),
-
-                // TODO CHANGE TO LISt OF ITEMS ORDERED
-                // INDIV ITEMS
 
                 for (final order in ordersList)
                   Row(
