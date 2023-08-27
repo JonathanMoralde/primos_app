@@ -180,9 +180,7 @@ class OrderViewPage extends StatelessWidget {
                                                   : "0") /
                                           100))
                                 });
-                                orderRef.update({
-                                  'vat': (totalAmount * 0.12).toStringAsFixed(2)
-                                });
+                                orderRef.update({'vat': (totalAmount * 0.12)});
                                 orderRef.update({'payment_status': 'Paid'});
 
                                 Navigator.of(context).pushAndRemoveUntil(
