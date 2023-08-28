@@ -199,7 +199,7 @@ class _SalesCardState extends State<SalesCard> {
                                 SalesReportDetails(
                               date: widget.date,
                               orderKey: widget.orderKey,
-                              ordersStream: widget.allOrders,
+                              // ordersStream: widget.allOrders,
                             ),
                           ),
                         );

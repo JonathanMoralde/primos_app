@@ -1,8 +1,11 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:primos_app/pages/cashier/orders_view.dart';
 import 'package:primos_app/pages/waiter/orderDetails.dart';
+import 'package:primos_app/providers/waiter_menu/isTakeout_provider.dart';
+import 'package:primos_app/providers/waiter_menu/orderName_provider.dart';
 
-class TakeoutOrdersWaiter extends StatelessWidget {
+class TakeoutOrdersWaiter extends ConsumerWidget {
   // final dynamic? orderNum;
   // final void Function()? onPressed;
   final MapEntry<dynamic, dynamic> orderEntry;
@@ -10,7 +13,7 @@ class TakeoutOrdersWaiter extends StatelessWidget {
   const TakeoutOrdersWaiter({super.key, required this.orderEntry});
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
     final orderName = orderEntry.value['order_name'] as String?;
     return Padding(
       padding: const EdgeInsets.only(
@@ -36,6 +39,8 @@ class TakeoutOrdersWaiter extends StatelessWidget {
             ],
           ),
           onPressed: () {
+            ref.read(orderNameProvider.notifier).state = orderName;
+            ref.read(isTakeoutProvider.notifier).state = true;
             Navigator.of(context).push(
               MaterialPageRoute(
                 builder: (context) =>

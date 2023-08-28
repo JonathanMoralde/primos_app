@@ -263,15 +263,33 @@ class OrderViewPage extends StatelessWidget {
                             child: StyledButton(
                                 btnText: "Next",
                                 onClick: () {
-                                  double discountedTotal =
-                                      calculateDiscountedPrice(
-                                          totalAmount.toDouble(),
-                                          discountController.text.isEmpty
-                                              ? 0
-                                              : double.parse(
-                                                  discountController.text));
-                                  // print(discountedTotal);
-                                  nextModal(discountedTotal);
+                                  if (cashController.text.isEmpty) {
+                                    ScaffoldMessenger.of(context).showSnackBar(
+                                      SnackBar(
+                                          content: Text(
+                                              "Please enter amount received!")),
+                                    );
+                                  } else {
+                                    double discountedTotal =
+                                        calculateDiscountedPrice(
+                                            totalAmount.toDouble(),
+                                            discountController.text.isEmpty
+                                                ? 0
+                                                : double.parse(
+                                                    discountController.text));
+
+                                    if (double.parse(cashController.text) <
+                                        discountedTotal) {
+                                      ScaffoldMessenger.of(context)
+                                          .showSnackBar(
+                                        SnackBar(
+                                            content: Text(
+                                                "Please enter the right amount!")),
+                                      );
+                                    } else {
+                                      nextModal(discountedTotal);
+                                    }
+                                  }
                                 }),
                           ),
                         ],
@@ -444,30 +462,39 @@ class OrderViewPage extends StatelessWidget {
                 // ORDER ITEMS
                 const Row(
                   children: [
-                    Expanded(flex: 1, child: Text("ITEM")),
+                    Expanded(
+                        flex: 1,
+                        child: Text(
+                          "ITEM",
+                          style: TextStyle(fontWeight: FontWeight.w700),
+                        )),
                     Expanded(
                         flex: 1,
                         child: Text(
                           "QTY",
                           textAlign: TextAlign.end,
+                          style: TextStyle(fontWeight: FontWeight.w700),
                         )),
                     Expanded(
                         flex: 1,
                         child: Text(
                           "VARIANT",
                           textAlign: TextAlign.end,
+                          style: TextStyle(fontWeight: FontWeight.w700),
                         )),
                     Expanded(
                         flex: 1,
                         child: Text(
                           "UNIT PRICE",
                           textAlign: TextAlign.end,
+                          style: TextStyle(fontWeight: FontWeight.w700),
                         )),
                     Expanded(
                         flex: 1,
                         child: Text(
                           "TOTAL PRICE",
                           textAlign: TextAlign.end,
+                          style: TextStyle(fontWeight: FontWeight.w700),
                         )),
                   ],
                 ),
@@ -527,6 +554,7 @@ class OrderViewPage extends StatelessWidget {
           child: Column(
             children: [
               StyledButton(
+                btnIcon: const Icon(Icons.payments),
                 btnText: "PAYMENT",
                 onClick: () {
                   openModal();
@@ -543,6 +571,7 @@ class OrderViewPage extends StatelessWidget {
                   Expanded(
                     flex: 1,
                     child: StyledButton(
+                      btnIcon: Icon(Icons.remove_circle),
                       btnText: "VOID",
                       onClick: () {
                         voidModal();
@@ -557,6 +586,7 @@ class OrderViewPage extends StatelessWidget {
                   Expanded(
                     flex: 1,
                     child: StyledButton(
+                      btnIcon: Icon(Icons.print),
                       btnText: "PRINT",
                       onClick: () {},
                       btnColor: const Color(0xFFf8f8f7),

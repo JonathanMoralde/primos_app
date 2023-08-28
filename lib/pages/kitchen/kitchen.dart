@@ -14,7 +14,7 @@ class KitchenPage extends ConsumerWidget {
       drawer: SideMenu(pages: kitchenPages),
       backgroundColor: Color(0xfff8f8f7),
       appBar: AppBar(
-        title: Text("ORDERS"),
+        title: const Text("ORDERS"),
       ),
       body: SafeArea(
         child: SingleChildScrollView(
@@ -24,10 +24,6 @@ class KitchenPage extends ConsumerWidget {
               data: (ordersMap) {
                 final orderEntries = ordersMap.entries.toList();
 
-                // print(orderEntries);
-                // print(ordersMap['order_name']);
-                print(ordersStream);
-
                 // Sort the orderEntries based on the order_date
                 orderEntries.sort((a, b) {
                   final aDate = DateTime.parse(a.value['order_date']);
@@ -36,7 +32,6 @@ class KitchenPage extends ConsumerWidget {
                 });
 
                 return SingleChildScrollView(
-                  // scrollDirection: Axis.horizontal,
                   child: Wrap(
                     spacing: 10,
                     runSpacing: 10,
@@ -45,7 +40,6 @@ class KitchenPage extends ConsumerWidget {
                         if (entry.value['order_status'] ==
                             'Pending') // Filter by order_status
                           OrderCardDropdown(
-                            // orderName: entry.key, // Pass the order name
                             orderEntry: entry,
                           ),
                     ],

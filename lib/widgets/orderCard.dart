@@ -149,7 +149,7 @@ class OrderCardDropdown extends ConsumerWidget {
         ),
         subtitle: Text(
           orderName.contains("Takeout") ? "TAKEOUT" : "DINE-IN",
-          style: TextStyle(
+          style: const TextStyle(
             color: Color(0xFFFE3034),
             letterSpacing: 1,
             fontSize: 20,
@@ -160,7 +160,7 @@ class OrderCardDropdown extends ConsumerWidget {
             width: 350,
             decoration: BoxDecoration(
               color: backgroundColor,
-              borderRadius: BorderRadius.all(
+              borderRadius: const BorderRadius.all(
                 Radius.circular(8),
               ),
               boxShadow: [
@@ -200,7 +200,6 @@ class OrderCardDropdown extends ConsumerWidget {
                         flex: 1,
                         child: Text(
                           "Qty.",
-                          // textAlign: TextAlign.end,
                           style: TextStyle(fontSize: 12),
                         ),
                       ),
@@ -208,7 +207,6 @@ class OrderCardDropdown extends ConsumerWidget {
                         flex: 1,
                         child: Text(
                           "Var.",
-                          // textAlign: TextAlign.end,
                           style: TextStyle(fontSize: 12),
                         ),
                       ),
@@ -223,12 +221,13 @@ class OrderCardDropdown extends ConsumerWidget {
                       child: Row(
                         children: [
                           IconButton(
-                            padding: EdgeInsets.only(right: 10),
-                            constraints: BoxConstraints(),
+                            padding: const EdgeInsets.only(right: 10),
+                            constraints: const BoxConstraints(),
                             onPressed: () {
                               checkboxModal(order.name, index);
                             },
-                            icon: Icon(Icons.check_box_outline_blank_rounded),
+                            icon: const Icon(
+                                Icons.check_box_outline_blank_rounded),
                           ).animate().scale(),
                           Expanded(flex: 2, child: Text(order.name)),
                           Expanded(
@@ -242,6 +241,7 @@ class OrderCardDropdown extends ConsumerWidget {
                 Padding(
                   padding: const EdgeInsets.symmetric(horizontal: 16),
                   child: StyledButton(
+                    btnIcon: const Icon(Icons.check),
                     btnText: "DONE",
                     onClick: () {
                       final List<Object?> orderDetails =

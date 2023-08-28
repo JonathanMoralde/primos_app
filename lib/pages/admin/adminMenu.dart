@@ -20,9 +20,6 @@ import '../../providers/waiter_menu/menuItems_provider.dart';
 class AdminMenuPage extends ConsumerWidget {
   AdminMenuPage({Key? key});
 
-  // final CollectionReference itemsCollection =
-  //     FirebaseFirestore.instance.collection('menu');
-
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final menuItems = ref.watch(menuItemsStreamProvider);
@@ -52,8 +49,6 @@ class AdminMenuPage extends ConsumerWidget {
                           final productCategory = itemDoc['category'] as String;
                           final productName =
                               itemDoc['itemName'].toString().toLowerCase();
-                          // return activeCategory == "All" ||
-                          //     productCategory == activeCategory;
                           return (activeCategory == "All" ||
                                   productCategory == activeCategory) &&
                               (searchQuery.isEmpty ||
@@ -89,91 +84,74 @@ class AdminMenuPage extends ConsumerWidget {
                       error: (error, stackTrace) => Text("Error: $error"),
                       loading: () => CircularProgressIndicator());
                 }))
-                // StreamBuilder<QuerySnapshot>(
-                //   stream: itemsCollection.snapshots(),
-                //   builder: (context, snapshot) {
-                //     if (snapshot.hasError) {
-                //       return Text('Error: ${snapshot.error}');
-                //     }
-
-                //     if (!snapshot.hasData) {
-                //       return CircularProgressIndicator();
-                //     }
-
-                //     final itemDocs = snapshot.data!.docs;
-
-                //     return Padding(
-                //       padding: EdgeInsets.all(16),
-                //       child: Wrap(
-                //         spacing: 10,
-                //         runSpacing: 10,
-                //         children: itemDocs.map((itemDoc) {
-                //           final productId = itemDoc
-                //               .id; // Get the document ID as the productId
-                //           final productName = itemDoc['itemName'] as String;
-                //           final itemPrice = itemDoc['itemPrice'];
-                //           final double productPrice = (itemPrice is double)
-                //               ? itemPrice
-                //               : (itemPrice is int)
-                //                   ? itemPrice.toDouble()
-                //                   : 0.0;
-                //           final imageUrl = itemDoc['imageURL'] as String;
-
-                //           return ItemCard(
-                //             productId: productId, // Pass the productId
-                //             productName: productName,
-                //             productPrice: productPrice,
-                //             imageUrl: imageUrl,
-                //           );
-                //         }).toList(),
-                //       ),
-                //     );
-                //   },
-                // ),
               ],
             ),
           ),
         ),
       ),
       bottomNavigationBar: BottomBar(
-        height: 100,
+        height: 120,
         child: Padding(
           padding: const EdgeInsets.symmetric(horizontal: 16),
-          child: Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              Expanded(
-                flex: 1,
-                child: StyledButton(
-                  noShadow: true,
-                  btnText: "New Item",
-                  onClick: () {
-                    Navigator.of(context).push(
-                      MaterialPageRoute(builder: (BuildContext context) {
-                        return AdminMenuForm();
-                      }),
-                    );
-                  },
-                  btnColor: const Color(0xfff8f8f7),
-                ),
+              Row(
+                children: [
+                  Expanded(
+                    flex: 1,
+                    child: StyledButton(
+                      noShadow: true,
+                      btnIcon: const Icon(Icons.add),
+                      btnText: "New Item",
+                      onClick: () {
+                        Navigator.of(context).push(
+                          MaterialPageRoute(builder: (BuildContext context) {
+                            return AdminMenuForm();
+                          }),
+                        );
+                      },
+                      btnColor: const Color(0xfff8f8f7),
+                    ),
+                  ),
+                ],
               ),
               const SizedBox(
-                width: 10,
+                height: 10,
               ),
-              Expanded(
-                flex: 1,
-                child: StyledButton(
-                  noShadow: true,
-                  btnText: "New Category",
-                  onClick: () {
-                    Navigator.of(context).push(
-                      MaterialPageRoute(builder: (BuildContext context) {
-                        return AdminMenuCatForm();
-                      }),
-                    );
-                  },
-                  btnColor: const Color(0xfff8f8f7),
-                ),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  Expanded(
+                    flex: 1,
+                    child: StyledButton(
+                      noShadow: true,
+                      btnIcon: const Icon(Icons.delete),
+                      btnText: "Delete Category",
+                      onClick: () {},
+                      btnColor: const Color(0xfff8f8f7),
+                    ),
+                  ),
+                  const SizedBox(
+                    width: 10,
+                  ),
+                  Expanded(
+                    flex: 1,
+                    child: StyledButton(
+                      noShadow: true,
+                      btnIcon: const Icon(Icons.add),
+                      btnText: "New Category",
+                      onClick: () {
+                        Navigator.of(context).push(
+                          MaterialPageRoute(builder: (BuildContext context) {
+                            return AdminMenuCatForm();
+                          }),
+                        );
+                      },
+                      btnColor: const Color(0xfff8f8f7),
+                    ),
+                  ),
+                ],
               ),
             ],
           ),

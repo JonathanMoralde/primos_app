@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:primos_app/widgets/styledButton.dart';
+import 'package:primos_app/widgets/styledTextField.dart';
 
 class EmployeeDisplay extends StatelessWidget {
   final String employeeName;
@@ -119,24 +121,66 @@ class EmployeeDisplay extends StatelessWidget {
       builder: (BuildContext context) {
         return AlertDialog(
           title: const Text("Enter Your Password"),
-          content: TextField(
-            controller: passwordController,
-            obscureText: true,
-            decoration: const InputDecoration(labelText: "Password"),
+          content:
+              // TextField(
+              //   controller: passwordController,
+              //   obscureText: true,
+              //   decoration: const InputDecoration(labelText: "Password"),
+              // )
+              Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              StyledTextField(
+                controller: passwordController,
+                obscureText: true,
+                hintText: "Password",
+              ),
+              const SizedBox(
+                height: 10,
+              ),
+              const Row(
+                children: [
+                  Icon(
+                    Icons.info_outline,
+                    size: 20,
+                  ),
+                  SizedBox(
+                      width: 4), // Adding a small gap between the icon and text
+                  Flexible(
+                    child: Text(
+                      "This action cannot be undone, please enter password to proceed",
+                      style: TextStyle(
+                        fontSize: 12,
+                        letterSpacing: 1,
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            ],
           ),
           actions: [
-            TextButton(
-              onPressed: () {
-                Navigator.of(context).pop();
-              },
-              child: const Text("Cancel"),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                StyledButton(
+                    btnText: "Cancel",
+                    onClick: () {
+                      Navigator.of(context).pop();
+                    }),
+                const SizedBox(
+                  width: 10,
+                ),
+                StyledButton(
+                    btnText: "Confirm",
+                    onClick: () {
+                      Navigator.of(context).pop(passwordController.text);
+                    }),
+              ],
             ),
-            TextButton(
-              onPressed: () {
-                Navigator.of(context).pop(passwordController.text);
-              },
-              child: const Text("Confirm"),
-            ),
+            const SizedBox(
+              height: 10,
+            )
           ],
         );
       },

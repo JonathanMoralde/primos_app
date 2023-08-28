@@ -31,7 +31,10 @@ class OrdersCashier extends StatelessWidget {
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             crossAxisAlignment: CrossAxisAlignment.center,
             children: [
-              Text(orderName!),
+              Text(
+                orderName!,
+                style: TextStyle(letterSpacing: 1, fontWeight: FontWeight.w600),
+              ),
             ],
           ),
           onPressed: () {

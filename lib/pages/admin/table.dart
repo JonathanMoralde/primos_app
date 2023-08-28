@@ -51,6 +51,7 @@ class _TablePageState extends State<TablePage> {
     final fetchedData = querySnapshot.docs.map((doc) {
       final data = doc.data() as Map<String, dynamic>;
       return {
+        'tableId': doc.id,
         'tableName': data['tableName'] as String,
         'tableNumber': data['tableNumber'] as int,
       };
@@ -66,6 +67,11 @@ class _TablePageState extends State<TablePage> {
     setState(() {
       tablesData = fetchedData;
     });
+  }
+
+  // Callback function to refresh table data
+  Future<void> refreshTables() async {
+    await fetchTables();
   }
 
   late Future<void> fetchTablesFuture = fetchTables();
@@ -92,6 +98,7 @@ class _TablePageState extends State<TablePage> {
                 return ListView.builder(
                   itemCount: tablesData.length,
                   itemBuilder: (context, index) {
+                    final tableId = tablesData[index]['tableId'] as String;
                     final tableNum = tablesData[index]['tableNumber'] as int;
                     final tableName = tablesData[index]['tableName'] as String;
                     return Column(
@@ -100,8 +107,10 @@ class _TablePageState extends State<TablePage> {
                           width: double.infinity,
                           child: TableDisplay(
                             key: ValueKey<int>(tableNum),
+                            tableId: tableId,
                             tableNum: tableNum,
                             tableName: tableName,
+                            refreshCallback: refreshTables,
                           ),
                         ),
                         const SizedBox(
@@ -164,6 +173,7 @@ class _TablePageState extends State<TablePage> {
               ),
               StyledButton(
                 noShadow: true,
+                btnIcon: const Icon(Icons.add),
                 btnText: "ADD",
                 onClick: () {
                   addTables(quantity, quantity);

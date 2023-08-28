@@ -67,18 +67,7 @@ class TakeoutPage extends ConsumerWidget {
       ),
       floatingActionButton: FloatingActionButton(
         onPressed: () {
-          // When the floating action button is pressed, update the order name and last takeout number
-          // final currentDate = DateTime.now();
-          // final lastOrderDate = ref.watch(lastOrderDateProvider);
-
-          // if (lastOrderDate == null || currentDate.day != lastOrderDate.day) {
-          //   ref.read(lastTakeoutNumberProvider.notifier).state = 1;
-          //   ref.read(lastOrderDateProvider.notifier).state = currentDate;
-          // } else {
-          //   ref.read(lastTakeoutNumberProvider.notifier).state += 1;
-          // }
-          // final int takeoutNum = ref.watch(lastTakeoutNumberProvider);
-          final String orderName = "Takeout ${Random().nextInt(200)}";
+          final String orderName = "Takeout #${Random().nextInt(200)}";
 
           ref.read(orderNameProvider.notifier).state = orderName;
 

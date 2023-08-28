@@ -1,5 +1,6 @@
 import 'package:firebase_database/firebase_database.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_animate/flutter_animate.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:intl/intl.dart';
 import 'package:primos_app/pages/waiter/tables.dart';
@@ -244,7 +245,7 @@ class OrderDetailsPage extends ConsumerWidget {
                               width: 10,
                               decoration:
                                   BoxDecoration(color: Colors.green.shade700),
-                            ),
+                            ).animate().scale(),
                             const SizedBox(
                               width: 5,
                             ),
@@ -261,7 +262,7 @@ class OrderDetailsPage extends ConsumerWidget {
                               width: 10,
                               decoration:
                                   BoxDecoration(color: Color(0xFFE2B563)),
-                            ),
+                            ).animate().scale(),
                             const SizedBox(
                               width: 5,
                             ),
@@ -285,6 +286,7 @@ class OrderDetailsPage extends ConsumerWidget {
             children: [
               Expanded(
                 child: StyledButton(
+                  btnIcon: Icon(Icons.subdirectory_arrow_left_rounded),
                   btnText: isTakeout ? "BACK TO TAKEOUTS" : "BACK TO TABLES",
                   onClick: () {
                     // reset states

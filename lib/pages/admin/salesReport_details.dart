@@ -1,22 +1,27 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:intl/intl.dart';
+import 'package:primos_app/providers/kitchen/orderDetails_Provider.dart';
 
 class SalesReportDetails extends ConsumerWidget {
   final String date;
   final List<String> orderKey;
-  final AsyncValue<Map<dynamic, dynamic>> ordersStream;
-  const SalesReportDetails(
-      {super.key,
-      required this.date,
-      required this.orderKey,
-      required this.ordersStream});
+  // final AsyncValue<Map<dynamic, dynamic>> ordersStream;
+  SalesReportDetails({
+    super.key,
+    required this.date,
+    required this.orderKey,
+    // required this.ordersStream,
+  });
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    final ordersStream = ref.watch(ordersProvider);
+
     DateTime originalDate = DateTime.parse(date);
 
     String formattedDate = DateFormat('MMMM dd, yyyy').format(originalDate);
+
     return Scaffold(
       appBar: AppBar(
         title: Text(formattedDate),
@@ -28,14 +33,12 @@ class SalesReportDetails extends ConsumerWidget {
           child: ordersStream.when(
               data: (ordersMap) {
                 final orderEntries = ordersMap.entries.toList();
-
-                final List<Map<Object?, Object?>> orderData = [];
+                List<Map<Object?, Object?>> orderData = [];
 
                 for (final entry in orderEntries) {
                   final entryDate =
                       entry.value['order_date'].toString().split(' ')[0];
                   if (entryDate == date) {
-                    // orderData.add(entry.value['order_details']);
                     for (final order in entry.value['order_details']) {
                       orderData.add(order);
                     }

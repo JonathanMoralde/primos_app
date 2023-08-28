@@ -45,6 +45,8 @@ class SideMenu extends ConsumerWidget {
           // DYNAMIC PAGES
           ...pages.map((page) {
             return ListTile(
+              iconColor: Color(0xff252525),
+              leading: page.icon,
               title: Text(page.name),
               onTap: () async {
                 Navigator.of(context).push(MaterialPageRoute(
@@ -57,6 +59,7 @@ class SideMenu extends ConsumerWidget {
 
           // LOGOUT
           ListTile(
+            iconColor: Color(0xff252525),
             leading: const Icon(Icons.exit_to_app),
             title: const Text('Logout'),
             onTap: (() async {

@@ -78,6 +78,7 @@ class EmployeePage extends StatelessWidget {
                   flex: 1,
                   child: StyledButton(
                     noShadow: true,
+                    btnIcon: const Icon(Icons.add),
                     btnText: "NEW EMPLOYEE",
                     onClick: () {
                       Navigator.of(context).push(

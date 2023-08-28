@@ -14,8 +14,9 @@ import 'package:primos_app/pages/waiter/takeout.dart';
 class SideMenuPage {
   final String name;
   final Widget page; //used for navigator
+  final Widget? icon;
 
-  SideMenuPage({required this.name, required this.page});
+  SideMenuPage({required this.name, required this.page, this.icon});
 }
 
 // TODO CREATE THE LIST OF PAGES BELOW
@@ -26,21 +27,22 @@ class SideMenuPage {
 
 List<SideMenuPage> adminPages = [
   SideMenuPage(
-    name: "Sales Report",
-    page: SalesReportPage(),
-  ),
+      name: "Sales Report",
+      page: SalesReportPage(),
+      icon: Icon(Icons.analytics_rounded)),
   SideMenuPage(
-    name: "Menu",
-    page: AdminMenuPage(),
-  ),
+      name: "Menu",
+      page: AdminMenuPage(),
+      icon: Icon(Icons.restaurant_menu_rounded)),
   SideMenuPage(
     name: "Table",
     page: TablePage(),
+    icon: Icon(Icons.table_bar),
   ),
   SideMenuPage(
-    name: "Employee",
-    page: EmployeePage(),
-  ),
+      name: "Employee",
+      page: EmployeePage(),
+      icon: Icon(Icons.account_circle_rounded)),
 ];
 
 // END OF ADMIN PAGES
@@ -50,6 +52,7 @@ List<SideMenuPage> cashierPages = [
   SideMenuPage(
     name: "Orders",
     page: OrdersPage(),
+    icon: Icon(Icons.fastfood),
   ),
 ];
 // END OF CASHIER PAGES
@@ -59,10 +62,12 @@ List<SideMenuPage> waiterPages = [
   SideMenuPage(
     name: "Tables",
     page: WaiterTablePage(),
+    icon: Icon(Icons.table_bar),
   ),
   SideMenuPage(
     name: "Takeout",
     page: TakeoutPage(),
+    icon: Icon(Icons.takeout_dining),
   ),
 ];
 // END OF WAITER PAGES
@@ -71,5 +76,6 @@ List<SideMenuPage> kitchenPages = [
   SideMenuPage(
     name: "Orders",
     page: KitchenPage(),
+    icon: Icon(Icons.fastfood),
   ),
 ];

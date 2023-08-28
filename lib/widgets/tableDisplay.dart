@@ -1,12 +1,18 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 
 class TableDisplay extends StatefulWidget {
+  final String tableId;
   final int tableNum;
   final String tableName;
+  final VoidCallback refreshCallback;
+
   const TableDisplay({
     Key? key,
+    required this.tableId,
     required this.tableNum,
     required this.tableName,
+    required this.refreshCallback,
   }) : super(key: key);
 
   @override
@@ -34,14 +40,33 @@ class _TableDisplayState extends State<TableDisplay> {
             Text("Table: ${widget.tableNum}"),
             IconButton(
               icon: Icon(Icons.delete),
-              onPressed: () {
+              onPressed: () async {
                 // TODO: Implement the logic to delete the table
-                print("Delete table ${widget.tableNum}");
+                await deleteTable();
               },
             ),
           ],
         ),
       ),
     );
+  }
+
+  Future<void> deleteTable() async {
+    try {
+      // Delete the Firestore document associated with the user
+      final tableDocRef =
+          FirebaseFirestore.instance.collection('tables').doc(widget.tableId);
+      await tableDocRef.delete().then((value) {
+        ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
+          content: Text("Table deleted successfully."),
+          duration: Duration(seconds: 2),
+        ));
+
+        // Call the callback function to refresh the table data
+        widget.refreshCallback();
+      });
+    } catch (e) {
+      print("Error deleting table: $e");
+    }
   }
 }

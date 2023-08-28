@@ -102,13 +102,10 @@ class WaiterMenuCart extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final isAdditionalOrder = ref.watch(isAdditionalOrderProvider);
     final orderData = ref.watch(currentOrdersProvider);
-    // double totalAmount = orderData.fold(0, (double sum, OrderObject order) {
-    //   return sum + (order.price * order.quantity);
-    // });
     double totalAmount = calculateSubtotal(orderData);
 
     return Scaffold(
-      backgroundColor: Color(0xfff8f8f7),
+      backgroundColor: const Color(0xfff8f8f7),
       appBar: AppBar(
         leading: IconButton(
           //manual handle back button
@@ -116,7 +113,7 @@ class WaiterMenuCart extends ConsumerWidget {
           iconSize: 35,
           onPressed: () => Navigator.of(context).pop(),
         ),
-        title: Text("CURRENT ORDERS"),
+        title: const Text("CURRENT ORDERS"),
       ),
       body: SafeArea(
         child: Padding(
@@ -126,7 +123,6 @@ class WaiterMenuCart extends ConsumerWidget {
             itemBuilder: (BuildContext context, int index) {
               OrderObject order = orderData[index];
 
-              print(order);
               return Column(
                 children: [
                   ItemCard(
@@ -141,7 +137,7 @@ class WaiterMenuCart extends ConsumerWidget {
                         children: [
                           order.variation != null
                               ? Text("Variation: ${order.variation}")
-                              : SizedBox(),
+                              : const SizedBox(),
                           Row(
                             mainAxisAlignment: MainAxisAlignment.spaceBetween,
                             children: [
@@ -153,13 +149,8 @@ class WaiterMenuCart extends ConsumerWidget {
                                       .read(currentOrdersProvider.notifier)
                                       .state = orderData;
                                   updateSubtotal(ref);
-
-                                  print(ref.watch(currentOrdersProvider));
-                                  // setState(() {
-                                  //   widget.onDelete(index);
-                                  // });
                                 },
-                                icon: Icon(Icons.delete),
+                                icon: const Icon(Icons.delete),
                               ),
                             ],
                           )
@@ -183,13 +174,13 @@ class WaiterMenuCart extends ConsumerWidget {
               Row(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  Text(
+                  const Text(
                     "TOTAL AMOUNT: ",
                     style: TextStyle(letterSpacing: 1),
                   ),
                   Text(
                     "PHP ${ref.watch(subtotalProvider)}",
-                    style: TextStyle(
+                    style: const TextStyle(
                         fontWeight: FontWeight.w700, letterSpacing: 1),
                   )
                 ],
@@ -201,7 +192,8 @@ class WaiterMenuCart extends ConsumerWidget {
                 children: [
                   Expanded(
                     child: StyledButton(
-                      btnColor: Color(0xfff8f8f7),
+                      btnIcon: Icon(Icons.subdirectory_arrow_right_rounded),
+                      btnColor: const Color(0xfff8f8f7),
                       btnText: "CONFIRM ORDER",
                       onClick: () {
                         if (orderData.isNotEmpty) {
