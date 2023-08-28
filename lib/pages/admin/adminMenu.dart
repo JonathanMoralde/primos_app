@@ -3,6 +3,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:primos_app/pages/admin/adminMenu_CatForm.dart';
 import 'package:primos_app/pages/admin/adminMenu_Form.dart';
+import 'package:primos_app/pages/admin/category.dart';
 import 'package:primos_app/providers/categoryFilter/activeCategory_provider.dart';
 import 'package:primos_app/providers/searchBar/searchQuery_provider.dart';
 import 'package:primos_app/widgets/bottomBar.dart';
@@ -37,53 +38,58 @@ class AdminMenuPage extends ConsumerWidget {
               children: [
                 CustomSearchBar(),
                 FilterBtns(),
-                Consumer(builder: ((context, ref, child) {
-                  final activeCategory = ref.watch(activeCategoryProvider);
-                  final searchQuery =
-                      ref.watch(searchQueryProvider).toLowerCase();
+                Consumer(
+                  builder: ((context, ref, child) {
+                    final activeCategory = ref.watch(activeCategoryProvider);
+                    final searchQuery =
+                        ref.watch(searchQueryProvider).toLowerCase();
 
-                  return menuItems.when(
-                      data: (itemDocs) {
-                        // FILTER BASED ON ACTIVE CATEGORY
-                        final filteredItems = itemDocs.where((itemDoc) {
-                          final productCategory = itemDoc['category'] as String;
-                          final productName =
-                              itemDoc['itemName'].toString().toLowerCase();
-                          return (activeCategory == "All" ||
-                                  productCategory == activeCategory) &&
-                              (searchQuery.isEmpty ||
-                                  productName.contains(searchQuery));
-                        }).toList();
+                    return menuItems.when(
+                        data: (itemDocs) {
+                          // FILTER BASED ON ACTIVE CATEGORY
+                          final filteredItems = itemDocs.where((itemDoc) {
+                            final productCategory =
+                                itemDoc['category'] as String;
+                            final productName =
+                                itemDoc['itemName'].toString().toLowerCase();
+                            return (activeCategory == "All" ||
+                                    productCategory == activeCategory) &&
+                                (searchQuery.isEmpty ||
+                                    productName.contains(searchQuery));
+                          }).toList();
 
-                        return Padding(
-                          padding: EdgeInsets.all(16),
-                          child: Wrap(
-                            spacing: 10,
-                            runSpacing: 10,
-                            children: filteredItems.map((itemDoc) {
-                              final productId = itemDoc.id;
-                              final productName = itemDoc['itemName'] as String;
-                              final itemPrice = itemDoc['itemPrice'];
-                              final double productPrice = (itemPrice is double)
-                                  ? itemPrice
-                                  : (itemPrice is int)
-                                      ? itemPrice.toDouble()
-                                      : 0.0;
-                              final imageUrl = itemDoc['imageURL'] as String;
+                          return Padding(
+                            padding: EdgeInsets.all(16),
+                            child: Wrap(
+                              spacing: 10,
+                              runSpacing: 10,
+                              children: filteredItems.map((itemDoc) {
+                                final productId = itemDoc.id;
+                                final productName =
+                                    itemDoc['itemName'] as String;
+                                final itemPrice = itemDoc['itemPrice'];
+                                final double productPrice =
+                                    (itemPrice is double)
+                                        ? itemPrice
+                                        : (itemPrice is int)
+                                            ? itemPrice.toDouble()
+                                            : 0.0;
+                                final imageUrl = itemDoc['imageURL'] as String;
 
-                              return ItemCard(
-                                productId: productId, // Pass the productId
-                                productName: productName,
-                                productPrice: productPrice,
-                                imageUrl: imageUrl,
-                              );
-                            }).toList(),
-                          ),
-                        );
-                      },
-                      error: (error, stackTrace) => Text("Error: $error"),
-                      loading: () => CircularProgressIndicator());
-                }))
+                                return ItemCard(
+                                  productId: productId, // Pass the productId
+                                  productName: productName,
+                                  productPrice: productPrice,
+                                  imageUrl: imageUrl,
+                                );
+                              }).toList(),
+                            ),
+                          );
+                        },
+                        error: (error, stackTrace) => Text("Error: $error"),
+                        loading: () => CircularProgressIndicator());
+                  }),
+                ),
               ],
             ),
           ),
@@ -126,9 +132,14 @@ class AdminMenuPage extends ConsumerWidget {
                     flex: 1,
                     child: StyledButton(
                       noShadow: true,
-                      btnIcon: const Icon(Icons.delete),
                       btnText: "Delete Category",
-                      onClick: () {},
+                      onClick: () {
+                        Navigator.of(context).push(
+                          MaterialPageRoute(
+                            builder: (BuildContext context) => Categories(),
+                          ),
+                        );
+                      },
                       btnColor: const Color(0xfff8f8f7),
                     ),
                   ),
@@ -139,7 +150,6 @@ class AdminMenuPage extends ConsumerWidget {
                     flex: 1,
                     child: StyledButton(
                       noShadow: true,
-                      btnIcon: const Icon(Icons.add),
                       btnText: "New Category",
                       onClick: () {
                         Navigator.of(context).push(

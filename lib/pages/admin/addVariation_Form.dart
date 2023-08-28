@@ -90,6 +90,7 @@ class _AddVariationFormState extends State<AddVariationForm> {
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
                   StyledButton(
+                    btnIcon: const Icon(Icons.add),
                     btnText: 'ADD',
                     onClick: () {
                       setState(() {

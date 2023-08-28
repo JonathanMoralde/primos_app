@@ -1,16 +1,13 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:primos_app/providers/categoryFilter/fetchCategory_provider.dart';
 import 'package:primos_app/widgets/styledTextField.dart';
 import 'package:primos_app/widgets/styledButton.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 
-class AdminMenuCatForm extends StatefulWidget {
+class AdminMenuCatForm extends ConsumerWidget {
   AdminMenuCatForm({super.key});
 
-  @override
-  State<AdminMenuCatForm> createState() => _AdminMenuCatFormState();
-}
-
-class _AdminMenuCatFormState extends State<AdminMenuCatForm> {
   final categoryNameController = TextEditingController();
 
   Future<void> addCategory() async {
@@ -32,7 +29,7 @@ class _AdminMenuCatFormState extends State<AdminMenuCatForm> {
   }
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
     return Scaffold(
         backgroundColor: const Color(0xFFf7f7f7),
         appBar: AppBar(
@@ -58,9 +55,12 @@ class _AdminMenuCatFormState extends State<AdminMenuCatForm> {
                   height: 20,
                 ),
                 StyledButton(
+                  btnIcon: const Icon(Icons.add),
                   btnText: "ADD",
                   onClick: () {
                     addCategory();
+                    ref.refresh(fetchCategoriesOnlyProvider);
+                    ref.refresh(fetchCategoryProvider);
                   },
                   btnWidth: 250,
                 )

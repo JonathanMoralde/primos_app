@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:primos_app/pages/admin/adminMenu_Form.dart';
+import 'package:primos_app/providers/waiter_menu/menuItems_provider.dart';
 import 'package:primos_app/widgets/imageLoader.dart';
 import 'package:primos_app/widgets/styledButton.dart';
 import 'package:firebase_storage/firebase_storage.dart';
@@ -7,7 +9,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:primos_app/pages/admin/addVariation_Form.dart';
 
-class ItemCard extends StatefulWidget {
+class ItemCard extends ConsumerWidget {
   final String productId;
   final String productName;
   final double productPrice;
@@ -15,14 +17,6 @@ class ItemCard extends StatefulWidget {
   final double? cardHeight;
   final bool? isRow;
   final String imageUrl;
-
-  /*
-  to change the footer section below:
-  pass this parameter
-  Row(mainAxisAlignment: MainAxisAlignment.spaceBetween,children:[Text("replace this"), Text("Replace this")]),
-   */
-
-  // TODO DO NOT ALLOW THE IMAGE TO RERENDER ONCE LOADED FOR USER EXPERIENCE
 
   const ItemCard({
     Key? key,
@@ -35,27 +29,103 @@ class ItemCard extends StatefulWidget {
     required this.imageUrl,
   }) : super(key: key);
 
-  @override
-  State<ItemCard> createState() => _ItemCardState();
-}
+  Future<void> delModal(BuildContext context, WidgetRef ref) => showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+            contentPadding: EdgeInsets.zero,
+            content: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Container(
+                  padding: EdgeInsets.all(16.0),
+                  child: Text(
+                    productName,
+                    textAlign: TextAlign.left,
+                  ),
+                ),
+                Divider(height: 0),
+                Container(
+                  padding: EdgeInsets.all(16.0),
+                  child: Column(
+                    children: [
+                      Text(
+                          "Are you sure you want to delete this from the menu?"),
+                      const SizedBox(
+                        height: 5,
+                      ),
+                      const Row(
+                        children: [
+                          Icon(
+                            Icons.info_outline,
+                            size: 20,
+                          ),
+                          SizedBox(
+                              width:
+                                  4), // Adding a small gap between the icon and text
+                          Flexible(
+                            child: Text(
+                              "Confirming this action cannot be undone",
+                              style: TextStyle(
+                                fontSize: 12,
+                                letterSpacing: 1,
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
+                      const SizedBox(
+                        height: 5,
+                      ),
+                      Row(
+                        children: [
+                          Expanded(
+                            flex: 1,
+                            child: StyledButton(
+                                btnText: "Cancel",
+                                onClick: () {
+                                  Navigator.of(context).pop();
+                                }),
+                          ),
+                          const SizedBox(
+                            width: 10,
+                          ),
+                          Expanded(
+                            flex: 1,
+                            child: StyledButton(
+                                btnText: "Confirm",
+                                onClick: () async {
+                                  _deleteMenuItem(context, ref);
+                                  // Trigger a refresh after category deletion
+                                  // ref.refresh(fetchCategoriesOnlyProvider);
+                                  // ref.refresh(fetchCategoryProvider);
 
-class _ItemCardState extends State<ItemCard> {
+                                  Navigator.of(context).pop();
+                                }),
+                          ),
+                        ],
+                      )
+                    ],
+                  ),
+                ),
+              ],
+            ),
+          ));
+
   // Future<String> _getImageUrl(String productId) async {
-  Future<void> _deleteMenuItem(BuildContext context) async {
+  Future<void> _deleteMenuItem(BuildContext context, WidgetRef ref) async {
     try {
       // Delete the menu item from Firestore
       await FirebaseFirestore.instance
           .collection('menu')
-          .doc(widget.productId)
+          .doc(productId)
           .delete();
 
       // Delete the image from Firebase Storage
-      final storageRef = FirebaseStorage.instance
-          .ref()
-          .child('menu_images/${widget.productId}.jpg');
+      final storageRef =
+          FirebaseStorage.instance.ref().child('menu_images/$productId.jpg');
       await storageRef.delete();
 
-      // You can also show a confirmation dialog or take other actions if needed
+      ref.refresh(menuItemsStreamProvider);
 
       // Reload the UI to reflect the updated data (you can use a StreamBuilder for this)
     } catch (error) {
@@ -65,10 +135,10 @@ class _ItemCardState extends State<ItemCard> {
   }
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
     return Container(
-      height: widget.cardHeight ?? 300,
-      width: widget.isRow == true ? double.infinity : 174,
+      height: cardHeight ?? 300,
+      width: isRow == true ? double.infinity : 174,
       decoration: BoxDecoration(
         boxShadow: [
           BoxShadow(
@@ -81,23 +151,23 @@ class _ItemCardState extends State<ItemCard> {
         borderRadius: BorderRadius.circular(8),
         color: Colors.grey.shade300,
       ),
-      child: widget.isRow == true
+      child: isRow == true
           ? Row(
               children: [
                 Expanded(
                   flex: 1,
                   child: ClipRRect(
-                      borderRadius: widget.isRow == true
-                          ? BorderRadius.only(
+                      borderRadius: isRow == true
+                          ? const BorderRadius.only(
                               topLeft: Radius.circular(8),
                               bottomLeft: Radius.circular(8),
                             )
-                          : BorderRadius.only(
+                          : const BorderRadius.only(
                               topLeft: Radius.circular(8),
                               topRight: Radius.circular(8),
                             ),
                       child: CachedNetworkImage(
-                        imageUrl: widget.imageUrl,
+                        imageUrl: imageUrl,
                         width: double.infinity,
                         fit: BoxFit.cover,
                       )),
@@ -116,16 +186,16 @@ class _ItemCardState extends State<ItemCard> {
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          Text(widget.productName),
+                          Text(productName),
                           const SizedBox(
                             height: 8,
                           ),
-                          Text("${widget.productPrice} PHP"),
+                          Text("$productPrice PHP"),
                           const SizedBox(
                             height: 8,
                           ),
                           // Footer section
-                          widget.footerSection ??
+                          footerSection ??
                               Row(
                                 mainAxisAlignment:
                                     MainAxisAlignment.spaceBetween,
@@ -138,9 +208,9 @@ class _ItemCardState extends State<ItemCard> {
                                         MaterialPageRoute(
                                           builder: (BuildContext context) {
                                             return AdminMenuForm(
-                                              productId: widget.productId,
-                                              productName: widget.productName,
-                                              productPrice: widget.productPrice,
+                                              productId: productId,
+                                              productName: productName,
+                                              productPrice: productPrice,
                                             );
                                           },
                                         ),
@@ -153,7 +223,8 @@ class _ItemCardState extends State<ItemCard> {
                                     btnText: "Delete",
                                     onClick: () {
                                       // Call the delete function when the "Delete" button is pressed
-                                      _deleteMenuItem(context);
+                                      // _deleteMenuItem(context);
+                                      delModal(context, ref);
                                     },
                                     btnHeight: 30,
                                   ),
@@ -177,7 +248,7 @@ class _ItemCardState extends State<ItemCard> {
                         topRight: Radius.circular(8),
                       ),
                       child: CachedNetworkImage(
-                        imageUrl: widget.imageUrl,
+                        imageUrl: imageUrl,
                         width: double.infinity,
                         fit: BoxFit.cover,
                       )),
@@ -191,18 +262,18 @@ class _ItemCardState extends State<ItemCard> {
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          Text(widget.productName),
+                          Text(productName),
                           const SizedBox(
                             height: 8,
                           ),
-                          Text("${widget.productPrice} PHP"),
+                          Text("$productPrice PHP"),
                           const SizedBox(
                             height: 8,
                           ),
                           // Footer section
                           Column(
                             children: [
-                              widget.footerSection ??
+                              footerSection ??
                                   Column(
                                     children: [
                                       Row(
@@ -218,12 +289,10 @@ class _ItemCardState extends State<ItemCard> {
                                                   builder:
                                                       (BuildContext context) {
                                                     return AdminMenuForm(
-                                                      productId:
-                                                          widget.productId,
-                                                      productName:
-                                                          widget.productName,
+                                                      productId: productId,
+                                                      productName: productName,
                                                       productPrice:
-                                                          widget.productPrice,
+                                                          productPrice,
                                                     );
                                                   },
                                                 ),
@@ -236,7 +305,8 @@ class _ItemCardState extends State<ItemCard> {
                                             btnText: "Delete",
                                             onClick: () {
                                               // Call the delete function when the "Delete" button is pressed
-                                              _deleteMenuItem(context);
+                                              // _deleteMenuItem(context);
+                                              delModal(context, ref);
                                             },
                                             btnHeight: 30,
                                           ),
@@ -253,7 +323,7 @@ class _ItemCardState extends State<ItemCard> {
                                             MaterialPageRoute(
                                               builder: (BuildContext context) {
                                                 return AddVariationForm(
-                                                  productId: widget.productId,
+                                                  productId: productId,
                                                 );
                                               },
                                             ),

@@ -31,6 +31,19 @@ class _AdminMenuFormState extends State<AdminMenuForm> {
   String? category;
   String? selectedImagePath;
 
+  @override
+  void initState() {
+    super.initState();
+
+    // Set initial values if productName and productPrice are not null
+    if (widget.productName != null) {
+      itemNameController.text = widget.productName!;
+    }
+    if (widget.productPrice != null) {
+      itemPriceController.text = widget.productPrice!.toInt().toString();
+    }
+  }
+
   Future<void> updateMenu(String imageUrl) async {
     final String itemName = itemNameController.text;
     final double itemPrice = double.tryParse(itemPriceController.text) ?? 0.0;
@@ -228,7 +241,14 @@ class _AdminMenuFormState extends State<AdminMenuForm> {
                 height: 20,
               ),
               StyledButton(
-                btnText: "ADD",
+                btnIcon:
+                    widget.productName != null && widget.productPrice != null
+                        ? Icon(Icons.save_alt_rounded)
+                        : Icon(Icons.add),
+                btnText:
+                    widget.productName != null && widget.productPrice != null
+                        ? "EDIT"
+                        : "ADD",
                 onClick: _uploadImageAndUpdateMenu,
                 btnWidth: 250,
               ),
