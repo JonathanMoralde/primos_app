@@ -88,17 +88,6 @@ class _SalesCardState extends State<SalesCard> {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    // Align(
-                    //   alignment: Alignment.center,
-                    //   child: Text(
-                    //     formattedDate,
-                    //     style: const TextStyle(
-                    //       fontWeight: FontWeight.w600,
-                    //       letterSpacing: 1,
-                    //       fontSize: 16,
-                    //     ),
-                    //   ),
-                    // ),
                     const SizedBox(
                       height: 10,
                     ),
@@ -191,6 +180,7 @@ class _SalesCardState extends State<SalesCard> {
                       height: 20,
                     ),
                     StyledButton(
+                      btnIcon: const Icon(Icons.remove_red_eye_rounded),
                       btnText: "View Sold Dishes",
                       onClick: () {
                         Navigator.of(context).push(

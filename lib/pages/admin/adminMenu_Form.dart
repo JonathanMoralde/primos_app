@@ -30,6 +30,7 @@ class _AdminMenuFormState extends State<AdminMenuForm> {
   final itemPriceController = TextEditingController();
   String? category;
   String? selectedImagePath;
+  File? selectedImageFile;
 
   @override
   void initState() {
@@ -79,6 +80,7 @@ class _AdminMenuFormState extends State<AdminMenuForm> {
     if (image != null) {
       setState(() {
         selectedImagePath = image.path; // Store the selected image path
+        selectedImageFile = File(image.path);
       });
     }
   }
@@ -204,6 +206,23 @@ class _AdminMenuFormState extends State<AdminMenuForm> {
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
+              if (selectedImageFile != null)
+                Column(
+                  children: [
+                    ClipRRect(
+                      borderRadius: BorderRadius.circular(8),
+                      child: Image.file(
+                        selectedImageFile!,
+                        width: 250,
+                        height: 250,
+                        fit: BoxFit.cover,
+                      ),
+                    ),
+                    const SizedBox(
+                      height: 30,
+                    )
+                  ],
+                ),
               StyledTextField(
                 controller: itemNameController,
                 hintText: "Item Name",
@@ -216,6 +235,7 @@ class _AdminMenuFormState extends State<AdminMenuForm> {
                 controller: itemPriceController,
                 hintText: "Item Price",
                 obscureText: false,
+                keyboardType: TextInputType.number,
               ),
               const SizedBox(
                 height: 10,

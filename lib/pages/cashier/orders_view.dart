@@ -1,17 +1,21 @@
 // import 'package:cloud_firestore/cloud_firestore.dart';
+// ignore_for_file: prefer_const_constructors
+
+import 'dart:math';
+
 import 'package:firebase_database/firebase_database.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:intl/intl.dart';
 import 'package:primos_app/pages/cashier/orders.dart';
+import 'package:primos_app/pages/cashier/print_page.dart';
+import 'package:primos_app/providers/session/user_provider.dart';
 import 'package:primos_app/widgets/bottomBar.dart';
 import 'package:primos_app/widgets/styledButton.dart';
 import 'package:primos_app/widgets/styledTextField.dart';
 import 'package:primos_app/providers/kitchen/models.dart';
 
-// TODO REFACTOR HARD CODED TO USE DATA FROM DB
-// TODO ADD BLUETOOTH FUNCTIONALITY IN PRINT BUTTON
-
-class OrderViewPage extends StatelessWidget {
+class OrderViewPage extends ConsumerWidget {
   final MapEntry<dynamic, dynamic> orderEntry;
   OrderViewPage({super.key, required this.orderEntry});
 
@@ -19,7 +23,7 @@ class OrderViewPage extends StatelessWidget {
   final discountController = TextEditingController();
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
     // Extract the order details from orderEntry.value
     final orderDetails = orderEntry.value['order_details'] as List<dynamic>?;
     final orderName = orderEntry.value['order_name'] as String?;
@@ -28,6 +32,7 @@ class OrderViewPage extends StatelessWidget {
     final waiterName = orderEntry.value['served_by'] as String?;
     String formattedDate =
         DateFormat('dd-MM-yyyy hh:mm a').format(orderDate.toLocal());
+    final cashierName = ref.read(userNameProvider);
 
     if (orderDetails == null || orderName == null) {
       return SizedBox.shrink(); // Handle if the data is missing
@@ -59,6 +64,21 @@ class OrderViewPage extends StatelessWidget {
     double calculateDiscountedPrice(
         double originalPrice, double discountPercentage) {
       return originalPrice - (originalPrice * (discountPercentage / 100));
+    }
+
+    String generateUniqueReferenceNumber() {
+      // Generate a timestamp
+      DateTime now = DateTime.now();
+      String timestamp = now.microsecondsSinceEpoch.toString();
+
+      // Generate a random number
+      Random random = Random();
+      String randomComponent = random.nextInt(1000).toString().padLeft(3, '0');
+
+      // Combine timestamp and random number to create the reference number
+      String referenceNumber = '$timestamp$randomComponent';
+
+      return referenceNumber;
     }
 
     Future nextModal(double discountedTotal) => showDialog(
@@ -163,6 +183,35 @@ class OrderViewPage extends StatelessWidget {
                           StyledButton(
                               btnText: "Confirm & Print",
                               onClick: () {
+                                // ! DATAS THAT NEED TO BE SENT TO THE PRINT PAGE:
+                                // ! DATE
+                                // ! ORDER NUMBER
+                                // ! ORDER REFERENCE NUMBER
+                                // payment method
+                                // ! ROLE + WAITER NAME
+                                // ! ORDER DETAILS/DESCRIPTION
+                                // ! SUBTOTAL
+                                // ! VAT
+                                // ! DISCOUNTS
+                                // ! GRAND TOTAL
+                                // ! AMOUNT PAID
+                                // ! CASHIER NAME
+                                String referenceNumber =
+                                    generateUniqueReferenceNumber();
+
+                                double vatAmount = totalAmount * 0.12;
+                                double discountAmount = (totalAmount *
+                                    (double.parse(
+                                            discountController.text.isNotEmpty
+                                                ? discountController.text
+                                                : "0") /
+                                        100));
+                                double amountReceived =
+                                    double.parse(cashController.text);
+                                double changeAmount =
+                                    (int.parse(cashController.text) -
+                                        discountedTotal);
+
                                 DatabaseReference orderRef = FirebaseDatabase
                                     .instance
                                     .ref()
@@ -172,22 +221,31 @@ class OrderViewPage extends StatelessWidget {
                                 orderRef.update({'bill_amount': totalAmount});
                                 orderRef
                                     .update({'total_amount': discountedTotal});
-                                orderRef.update({
-                                  'discount': (totalAmount *
-                                      (double.parse(
-                                              discountController.text.isNotEmpty
-                                                  ? discountController.text
-                                                  : "0") /
-                                          100))
-                                });
-                                orderRef.update({'vat': (totalAmount * 0.12)});
+                                orderRef.update({'discount': discountAmount});
+                                orderRef.update({'vat': vatAmount});
                                 orderRef.update({'payment_status': 'Paid'});
+                                orderRef
+                                    .update({'receipt_ref': referenceNumber});
 
-                                Navigator.of(context).pushAndRemoveUntil(
-                                    MaterialPageRoute(
-                                        builder: (BuildContext context) {
-                                  return OrdersPage();
-                                }), (route) => false);
+                                Navigator.of(context).push(
+                                  MaterialPageRoute(
+                                      builder: (BuildContext context) {
+                                    return PrintPage(
+                                      formattedDate: formattedDate,
+                                      orderName: orderName,
+                                      receiptNum: referenceNumber,
+                                      waiterName: waiterName,
+                                      orderDetails: orderDetails,
+                                      subtotal: totalAmount.toDouble(),
+                                      vatAmount: vatAmount,
+                                      discountAmount: discountAmount,
+                                      grandTotal: discountedTotal,
+                                      amountReceived: amountReceived,
+                                      changeAmount: changeAmount,
+                                      cashierName: cashierName,
+                                    );
+                                  }),
+                                );
                               }),
                         ],
                       )
@@ -438,7 +496,6 @@ class OrderViewPage extends StatelessWidget {
                             "ORDER DATE & TIME",
                             style: TextStyle(fontWeight: FontWeight.w600),
                           ),
-                          // Text("20 March 2023 03:43 PM")
                           Text(formattedDate)
                         ],
                       ),
@@ -587,8 +644,21 @@ class OrderViewPage extends StatelessWidget {
                     flex: 1,
                     child: StyledButton(
                       btnIcon: Icon(Icons.print),
-                      btnText: "PRINT",
-                      onClick: () {},
+                      btnText: "PRINT BILL",
+                      onClick: () {
+                        Navigator.of(context).push(
+                          MaterialPageRoute(
+                            builder: (BuildContext context) => PrintPage(
+                              formattedDate: formattedDate,
+                              orderName: orderName,
+                              waiterName: waiterName,
+                              orderDetails: orderDetails,
+                              subtotal: totalAmount.toDouble(),
+                              cashierName: cashierName,
+                            ),
+                          ),
+                        );
+                      },
                       btnColor: const Color(0xFFf8f8f7),
                       noShadow: true,
                     ),

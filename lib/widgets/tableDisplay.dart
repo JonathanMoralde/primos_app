@@ -23,11 +23,11 @@ class _TableDisplayState extends State<TableDisplay> {
   @override
   Widget build(BuildContext context) {
     return Container(
-      decoration: BoxDecoration(
+      decoration: const BoxDecoration(
         borderRadius: BorderRadius.all(
           Radius.circular(8),
         ),
-        color: const Color(0xFFE2B563),
+        color: Color(0xFFE2B563),
       ),
       height: 45,
       width: 175,
@@ -41,7 +41,6 @@ class _TableDisplayState extends State<TableDisplay> {
             IconButton(
               icon: Icon(Icons.delete),
               onPressed: () async {
-                // TODO: Implement the logic to delete the table
                 await deleteTable();
               },
             ),

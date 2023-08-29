@@ -2,6 +2,7 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:primos_app/providers/session/userRole_provider.dart';
 import 'package:primos_app/providers/session/user_provider.dart';
 import 'package:primos_app/widgets/pageObject.dart';
 import 'package:primos_app/pages/loginScreen.dart';
@@ -20,6 +21,24 @@ class SideMenu extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final String? userName = ref.watch(userNameProvider);
+    final String? userRole = ref.watch(userRoleProvider);
+    print(userRole);
+
+    String getRoleImagePath(String role) {
+      switch (role) {
+        case 'Admin':
+          return 'lib/images/admin.png';
+        case 'Waiter':
+          return 'lib/images/waiter.png';
+        case 'Cashier':
+          return 'lib/images/cashier.png';
+        case 'Kitchen':
+          return 'lib/images/kitchen.png';
+        default:
+          return 'lib/images/default.png'; // Provide a default image if the role is unknown
+      }
+    }
+
     return Drawer(
       child: ListView(
         shrinkWrap: true,
@@ -34,10 +53,20 @@ class SideMenu extends ConsumerWidget {
                 crossAxisAlignment: CrossAxisAlignment.center,
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  Icon(
-                    Icons.account_circle,
-                    size: 85,
+                  Container(
+                    height: 100,
+                    decoration: BoxDecoration(
+                        // color: Colors.grey.shade600,
+                        borderRadius: BorderRadius.circular(8)),
+                    child: Image.asset(
+                      getRoleImagePath(userRole ?? 'default'),
+                      height: double.infinity,
+                    ),
                   ),
+                  const SizedBox(
+                    height: 5,
+                  ),
+                  // Text(userRole ?? 'Default'),
                   Text(userName ?? "User"),
                 ]),
           ),

@@ -41,6 +41,8 @@ class _TablePageState extends State<TablePage> {
         'tableNumber': newTableNumber,
       });
     }
+
+    refreshTables();
   }
 
   Future<void> fetchTables() async {

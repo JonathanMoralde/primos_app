@@ -24,6 +24,15 @@ class SalesReportDetails extends ConsumerWidget {
 
     return Scaffold(
       appBar: AppBar(
+        leading: IconButton(
+          //manual handle back button
+          icon: const Icon(Icons.keyboard_arrow_left),
+          iconSize: 35,
+          onPressed: () {
+            ref.refresh(ordersProvider);
+            Navigator.of(context).pop();
+          },
+        ),
         title: Text(formattedDate),
       ),
       body: SafeArea(
@@ -41,6 +50,29 @@ class SalesReportDetails extends ConsumerWidget {
                   if (entryDate == date) {
                     for (final order in entry.value['order_details']) {
                       orderData.add(order);
+                      // ! BUG: QUANTITY KEEPS ADDING WHEN NAVIGATING BACK TO THIS PAGE
+                      // ! CAUSE: ordersStream?
+
+                      //   final productName = order['productName'];
+                      //   final variation = order['variation'];
+                      //   final quantity = order['quantity'];
+
+                      //   bool found = false;
+
+                      //   for (final o in orderData) {
+                      //     if (o['productName'] == productName &&
+                      //         o['variation'] == variation) {
+                      //       o['quantity'] = (o['quantity'] as int) + quantity;
+                      //       print("Updated quantity: $o");
+                      //       found = true;
+                      //       break;
+                      //     }
+                      //   }
+
+                      //   if (!found) {
+                      //     orderData.add(order);
+                      //     print("Added new order: $order");
+                      //   }
                     }
                   }
                 }

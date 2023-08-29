@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:primos_app/pages/forgotPassForm.dart';
 import 'package:primos_app/pages/kitchen/kitchen.dart';
 import 'package:primos_app/pages/waiter/tables.dart';
+import 'package:primos_app/providers/session/userRole_provider.dart';
 
 // widgets
 import 'package:primos_app/widgets/styledButton.dart';
@@ -68,6 +69,8 @@ class LoginSreen extends ConsumerWidget {
               userSnapshot['role']; // Assuming 'role' is a field in Firestore
           String fullName = userSnapshot['fullName'];
           ref.read(userNameProvider.notifier).state = fullName;
+          ref.read(userRoleProvider.notifier).state = role;
+          print(role);
 
           // store role in sharedPreferences
           // Store role in SharedPreferences with a user-specific key
