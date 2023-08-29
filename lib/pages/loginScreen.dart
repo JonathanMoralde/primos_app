@@ -105,102 +105,130 @@ class LoginSreen extends ConsumerWidget {
     }
 
     return Scaffold(
-      backgroundColor: const Color(0xFFF8F8F7),
-      body: Container(
-        decoration: BoxDecoration(
-          gradient: LinearGradient(
-            begin: Alignment.topCenter,
-            end: Alignment.bottomCenter,
-            stops: const [0.1, 0.6],
-            colors: [
-              const Color(0xFFE2B563).withOpacity(0.3),
-              const Color(0xFFF8F8F7)
-            ],
-          ),
-        ),
-        child: SafeArea(
-          child: Center(
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                // LOGO
-                // const SizedBox(
-                //   height: 65,
-                // ),
-                Image.asset(
-                  'lib/images/PrimosLogo.png',
-                ),
-                // TITLE
-                const SizedBox(
-                  height: 35,
-                ),
-
-                Text(
-                  "WELCOME TO",
-                  style: Theme.of(context).textTheme.titleLarge?.merge(
-                        const TextStyle(fontWeight: FontWeight.w600),
-                      ),
-                  // TextStyle(fontSize: 20, fontWeight: FontWeight.w600),
-                ),
-                const SizedBox(
-                  height: 8,
-                ),
-                Text(
-                  "PRIMO'S BISTRO POS",
-                  style: Theme.of(context).textTheme.titleLarge?.merge(
-                        const TextStyle(fontWeight: FontWeight.w600),
-                      ),
-                  // TextStyle(fontSize: 20, fontWeight: FontWeight.w600),
-                )
-                // Username textfield
-                ,
-                const SizedBox(
-                  height: 35,
-                ),
-                StyledTextField(
-                  controller: emailController,
-                  hintText: 'Email',
-                  obscureText: false,
-                ),
-                // Password textfield
-                const SizedBox(
-                  height: 10,
-                ),
-                StyledTextField(
-                    controller: passwordController,
-                    hintText: "Password",
-                    obscureText: true),
-                const SizedBox(
-                  height: 20,
-                ),
-
-                // Sign in button
-                StyledButton(
-                  btnText: btnText,
-                  onClick: handleSignin,
-                  btnIcon: const Icon(Icons.login),
-                  btnWidth: 250,
-                ),
-                const SizedBox(
-                  height: 20,
-                ),
-                GestureDetector(
-                  onTap: () {
-                    Navigator.of(context).push(
-                      MaterialPageRoute(builder: (BuildContext context) {
-                        return ForgotPassPage();
-                      }),
-                    );
-                  },
-                  child: const Text(
-                    "Forgot Password?",
-                    style: TextStyle(letterSpacing: 1),
-                  ),
-                )
-              ],
+      // backgroundColor: const Color(0xFFF8F8F7),
+      // backgroundColor: Colors.transparent,
+      body: Stack(
+        children: [
+          Opacity(
+            opacity: 0.4, // Adjust the opacity as needed
+            child: Image.asset(
+              'lib/images/bg1.jpg', // Replace with your image path
+              fit: BoxFit.cover,
+              width: double.infinity,
+              height: double.infinity,
             ),
           ),
-        ),
+          Container(
+            decoration: BoxDecoration(
+              gradient: LinearGradient(
+                begin: Alignment.topCenter,
+                end: Alignment.bottomCenter,
+                stops: const [0.1, 0.5],
+                colors: [
+                  const Color(0xFFE2B563).withOpacity(0.3),
+                  Color.fromARGB(224, 248, 248, 247)
+                ],
+              ),
+            ),
+            child: SafeArea(
+              child: Center(
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    // LOGO
+                    // const SizedBox(
+                    //   height: 65,
+                    // ),
+                    Container(
+                      decoration: BoxDecoration(
+                        borderRadius: BorderRadius.circular(100),
+                        boxShadow: [
+                          BoxShadow(
+                            color:
+                                Colors.black.withOpacity(0.2), // Shadow color
+                            blurRadius: 10, // Spread of the shadow
+                            spreadRadius: -8,
+                            offset: Offset(0, 0), // Offset in x and y direction
+                          ),
+                        ],
+                      ),
+                      child: Image.asset(
+                        'lib/images/PrimosLogo.png',
+                      ),
+                    ),
+                    // TITLE
+                    const SizedBox(
+                      height: 35,
+                    ),
+
+                    Text(
+                      "WELCOME TO",
+                      style: Theme.of(context).textTheme.titleLarge?.merge(
+                            const TextStyle(fontWeight: FontWeight.w600),
+                          ),
+                      // TextStyle(fontSize: 20, fontWeight: FontWeight.w600),
+                    ),
+                    const SizedBox(
+                      height: 8,
+                    ),
+                    Text(
+                      "PRIMO'S BISTRO POS!",
+                      style: Theme.of(context).textTheme.titleLarge?.merge(
+                            const TextStyle(fontWeight: FontWeight.w600),
+                          ),
+                      // TextStyle(fontSize: 20, fontWeight: FontWeight.w600),
+                    )
+                    // Username textfield
+                    ,
+                    const SizedBox(
+                      height: 35,
+                    ),
+                    StyledTextField(
+                      controller: emailController,
+                      hintText: 'Email',
+                      obscureText: false,
+                    ),
+                    // Password textfield
+                    const SizedBox(
+                      height: 10,
+                    ),
+                    StyledTextField(
+                        controller: passwordController,
+                        hintText: "Password",
+                        obscureText: true),
+                    const SizedBox(
+                      height: 20,
+                    ),
+
+                    // Sign in button
+                    StyledButton(
+                      btnText: btnText,
+                      onClick: handleSignin,
+                      btnIcon: const Icon(Icons.login),
+                      btnWidth: 250,
+                    ),
+                    const SizedBox(
+                      height: 20,
+                    ),
+                    GestureDetector(
+                      onTap: () {
+                        Navigator.of(context).push(
+                          MaterialPageRoute(builder: (BuildContext context) {
+                            return ForgotPassPage();
+                          }),
+                        );
+                      },
+                      child: const Text(
+                        "Forgot Password?",
+                        style: TextStyle(letterSpacing: 1),
+                      ),
+                    )
+                  ],
+                ),
+              ),
+            ),
+          ),
+        ],
       ),
     );
   }
