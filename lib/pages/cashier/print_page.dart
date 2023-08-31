@@ -36,9 +36,10 @@ class PrintPage extends StatefulWidget {
 }
 
 class _PrintPageState extends State<PrintPage> {
-  BluetoothPrint bluetoothprint = BluetoothPrint.instance;
+  BluetoothPrint bluetoothPrint = BluetoothPrint.instance;
   List<BluetoothDevice> _devices = [];
   String _devicesMsg = '';
+  bool isConnected = false; // Track connection state
 
   @override
   void initState() {
@@ -47,19 +48,15 @@ class _PrintPageState extends State<PrintPage> {
   }
 
   Future<void> initPrinter() async {
-    bluetoothprint.startScan(
-      timeout: Duration(seconds: 4),
-    );
-
+    bluetoothPrint.startScan(timeout: Duration(seconds: 5));
     if (!mounted) return;
-    bluetoothprint.scanResults.listen((val) {
+    bluetoothPrint.scanResults.listen((val) {
+      if (!mounted) return;
       setState(() {
         _devices = val;
       });
       if (_devices.isEmpty) {
-        setState(() {
-          _devicesMsg = "No Devices";
-        });
+        _devicesMsg = "No Devices";
       }
     });
   }
@@ -91,7 +88,16 @@ class _PrintPageState extends State<PrintPage> {
 
   Future<void> _startPrint(BluetoothDevice device) async {
     if (device != null && device.address != null) {
-      await bluetoothprint.connect(device);
+      if (!isConnected) {
+        try {
+          await bluetoothPrint.connect(device);
+          isConnected = true;
+        } catch (e) {
+          // Handle connection error
+          print("Connection error: $e");
+          return;
+        }
+      }
 
       Map<String, dynamic> config = Map();
       List<LineText> list = [
@@ -387,6 +393,19 @@ class _PrintPageState extends State<PrintPage> {
           ),
         );
       }
+      print("executed");
+      // print(list);
+      try {
+        await bluetoothPrint.printReceipt(config, list);
+        // await bluetoothprint.printLabel(config, list);
+      } catch (e) {
+        print(e);
+      }
+      // print(bluetoothprint.state);
+
+      // Disconnect after printing
+      await bluetoothPrint.disconnect();
+      isConnected = false;
     }
   }
 }

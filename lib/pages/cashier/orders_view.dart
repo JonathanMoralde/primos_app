@@ -1,10 +1,12 @@
 // import 'package:cloud_firestore/cloud_firestore.dart';
 // ignore_for_file: prefer_const_constructors
 
+import 'dart:io';
 import 'dart:math';
 
 import 'package:firebase_database/firebase_database.dart';
 import 'package:flutter/material.dart';
+// import 'package:flutter_blue_plus/flutter_blue_plus.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:intl/intl.dart';
 import 'package:primos_app/pages/cashier/orders.dart';
@@ -645,19 +647,30 @@ class OrderViewPage extends ConsumerWidget {
                     child: StyledButton(
                       btnIcon: Icon(Icons.print),
                       btnText: "PRINT BILL",
-                      onClick: () {
-                        Navigator.of(context).push(
-                          MaterialPageRoute(
-                            builder: (BuildContext context) => PrintPage(
-                              formattedDate: formattedDate,
-                              orderName: orderName,
-                              waiterName: waiterName,
-                              orderDetails: orderDetails,
-                              subtotal: totalAmount.toDouble(),
-                              cashierName: cashierName,
+                      onClick: () async {
+                        // check adapter availability
+                        // if (await FlutterBluePlus.isAvailable == false) {
+                        //   print("Bluetooth not supported by this device");
+                        //   return;
+                        // }
+
+                        // turn on bluetooth ourself if we can
+                        // for iOS, the user controls bluetooth enable/disable
+                        if (Platform.isAndroid) {
+                          // await FlutterBluePlus.turnOn();
+                          Navigator.of(context).push(
+                            MaterialPageRoute(
+                              builder: (BuildContext context) => PrintPage(
+                                formattedDate: formattedDate,
+                                orderName: orderName,
+                                waiterName: waiterName,
+                                orderDetails: orderDetails,
+                                subtotal: totalAmount.toDouble(),
+                                cashierName: cashierName,
+                              ),
                             ),
-                          ),
-                        );
+                          );
+                        }
                       },
                       btnColor: const Color(0xFFf8f8f7),
                       noShadow: true,

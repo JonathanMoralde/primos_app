@@ -17,6 +17,7 @@ class ItemCard extends ConsumerWidget {
   final double? cardHeight;
   final bool? isRow;
   final String imageUrl;
+  final double? cardWidth;
 
   const ItemCard({
     Key? key,
@@ -27,6 +28,7 @@ class ItemCard extends ConsumerWidget {
     this.cardHeight,
     this.isRow,
     required this.imageUrl,
+    this.cardWidth,
   }) : super(key: key);
 
   Future<void> delModal(BuildContext context, WidgetRef ref) => showDialog(
@@ -138,7 +140,7 @@ class ItemCard extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     return Container(
       height: cardHeight ?? 300,
-      width: isRow == true ? double.infinity : 174,
+      width: isRow == true ? double.infinity : cardWidth ?? 170,
       decoration: BoxDecoration(
         boxShadow: [
           BoxShadow(
@@ -186,7 +188,14 @@ class ItemCard extends ConsumerWidget {
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          Text(productName),
+                          SingleChildScrollView(
+                            scrollDirection: Axis.horizontal,
+                            child: Text(
+                              productName,
+                              overflow: TextOverflow.clip,
+                              softWrap: false,
+                            ),
+                          ),
                           const SizedBox(
                             height: 8,
                           ),
@@ -262,7 +271,14 @@ class ItemCard extends ConsumerWidget {
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          Text(productName),
+                          SingleChildScrollView(
+                            scrollDirection: Axis.horizontal,
+                            child: Text(
+                              productName,
+                              overflow: TextOverflow.clip,
+                              softWrap: false,
+                            ),
+                          ),
                           const SizedBox(
                             height: 8,
                           ),

@@ -1,0 +1,191 @@
+import 'package:blue_thermal_printer/blue_thermal_printer.dart' as thermal;
+import 'package:flutter/material.dart';
+
+import 'package:flutter_blue_plus/flutter_blue_plus.dart' as blue;
+import 'package:intl/intl.dart';
+import 'package:primos_app/widgets/styledButton.dart';
+
+class PrintPage extends StatefulWidget {
+  final String? formattedDate;
+  final String? orderName;
+  final String? receiptNum;
+  final String? waiterName;
+  final List<dynamic>? orderDetails;
+  final double? subtotal;
+  final double? vatAmount;
+  final double? discountAmount;
+  final double? grandTotal;
+  final String? cashierName;
+  final double? amountReceived;
+  final double? changeAmount;
+
+  const PrintPage(
+      {super.key,
+      this.formattedDate,
+      this.orderName,
+      this.receiptNum,
+      this.waiterName,
+      this.orderDetails,
+      this.subtotal,
+      this.vatAmount,
+      this.discountAmount,
+      this.grandTotal,
+      this.cashierName,
+      this.amountReceived,
+      this.changeAmount});
+
+  @override
+  State<PrintPage> createState() => _PrintPageState();
+}
+
+class _PrintPageState extends State<PrintPage> {
+  thermal.BlueThermalPrinter bluetooth = thermal.BlueThermalPrinter.instance;
+  // List<BluetoothDevice> discoveredDevices = [];
+
+  blue.BluetoothDevice? connectedDevice; // Track the connected device
+
+  // ... Rest of your code ...
+
+  void _connectToDevice(blue.BluetoothDevice device) async {
+    try {
+      await device.connect(autoConnect: false);
+      setState(() {
+        connectedDevice = device;
+        print(connectedDevice);
+      });
+      // If the connection is successful, you can navigate to a new page or perform any actions needed.
+      // Navigator.push(
+      //   context,
+      //   MaterialPageRoute(
+      //     builder: (context) => DeviceConnectedPage(device: device),
+      //   ),
+      // );
+    } catch (e) {
+      print('Error connecting to device: $e');
+    }
+  }
+
+  void _disconnectDevice(blue.BluetoothDevice device) async {
+    try {
+      await device.disconnect();
+      setState(() {
+        connectedDevice = null;
+      });
+    } catch (e) {
+      print('Error disconnecting from device: $e');
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    thermal.BluetoothDevice? printerDevice;
+    return Scaffold(
+      appBar: AppBar(
+        title: Text("PRINTER TEST"),
+      ),
+      body: SafeArea(
+        child: SingleChildScrollView(
+          child: Column(
+            children: <Widget>[
+              StreamBuilder<List<blue.ScanResult>>(
+                stream: blue.FlutterBluePlus.scanResults,
+                initialData: [],
+                builder: (context, snapshot) {
+                  if (snapshot.hasData) {
+                    return ListView.builder(
+                      shrinkWrap: true,
+                      itemCount: snapshot.data!.length,
+                      itemBuilder: (context, index) {
+                        final data = snapshot.data![index];
+                        final isConnected = connectedDevice == data.device;
+
+                        return Card(
+                          elevation: 2,
+                          child: ListTile(
+                            onTap: () {
+                              data.device.connect();
+                              printerDevice = thermal.BluetoothDevice(
+                                  connectedDevice!.localName,
+                                  connectedDevice!.remoteId.str);
+                              bluetooth.connect(printerDevice!);
+                            },
+                            title: Text(data.device.localName),
+                            subtitle: Text(data.device.remoteId.str),
+                            trailing: ElevatedButton(
+                              onPressed: isConnected
+                                  ? () => _disconnectDevice(data.device)
+                                  : () => _connectToDevice(data.device),
+                              child:
+                                  Text(isConnected ? 'DISCONNECT' : 'CONNECT'),
+                            ),
+                          ),
+                        );
+                      },
+                    );
+                  } else {
+                    return Center(
+                      child: Text("No devices found"),
+                    );
+                  }
+                },
+              ),
+              StyledButton(
+                  btnText: "PRINT",
+                  onClick: () {
+                    _testPrint();
+                  })
+            ],
+          ),
+        ),
+      ),
+      floatingActionButton: StreamBuilder<bool>(
+        stream: blue.FlutterBluePlus.isScanning,
+        initialData: false,
+        builder: (c, snapshot) {
+          if (snapshot.data ?? false) {
+            return FloatingActionButton(
+              child: const Icon(Icons.stop),
+              onPressed: () async {
+                try {
+                  blue.FlutterBluePlus.stopScan();
+                } catch (e) {
+                  print(e);
+                }
+              },
+              backgroundColor: Colors.red,
+            );
+          } else {
+            return FloatingActionButton(
+                child: const Text("SCAN"),
+                onPressed: () async {
+                  try {
+                    if (blue.FlutterBluePlus.isScanningNow == false) {
+                      blue.FlutterBluePlus.startScan(
+                        timeout: const Duration(seconds: 15),
+                      );
+
+                      print("executed");
+                    }
+                  } catch (e) {
+                    print(e);
+                  }
+                  setState(() {}); // force refresh of connectedSystemDevices
+                });
+          }
+        },
+      ),
+    );
+  }
+
+  Future _testPrint() async {
+    // bluetooth.printNewLine();
+    // bluetooth.printCustom("HEADER", 0, 1);
+
+    bluetooth.printNewLine();
+    bluetooth.printCustom("HEADER", 0, 1);
+    bluetooth.printNewLine();
+    bluetooth.onStateChanged().listen((state) {
+      print(state);
+    });
+  }
+}

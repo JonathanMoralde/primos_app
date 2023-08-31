@@ -24,7 +24,7 @@ class StyledDropdown<T> extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    return ref.watch(fetchCategoryProvider).when(
+    return ref.watch(fetchCategoryExceptAllProvider).when(
           data: (categories) {
             final uniqueCategories = categories.toSet().toList();
             final availableCategories =

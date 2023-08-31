@@ -33,7 +33,7 @@ class WaiterMenu extends ConsumerWidget {
         .get();
     print('Variations snapshot data: ${variationsSnapshot.data()}');
 
-    final variationsData = variationsSnapshot.data()?['variationName'];
+    final variationsData = variationsSnapshot.data()?['variations'];
     if (variationsData is List<dynamic>) {
       final variations = variationsData.cast<String>();
       print('Variations list: $variations');
@@ -319,6 +319,7 @@ class WaiterMenu extends ConsumerWidget {
                             final imageUrl = itemDoc['imageURL'] as String;
 
                             return ItemCard(
+                              cardWidth: 165,
                               cardHeight: 220,
                               key: ValueKey(productId),
                               productId: productId,
