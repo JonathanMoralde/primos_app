@@ -51,15 +51,8 @@ dependencies:
   badges: ^3.1.1
   flutter_animate: ^4.2.0+1
   permission_handler: ^10.4.3
-  # blue_print_pos: ^0.0.14
-  # esc_pos_bluetooth: ^0.4.1
-  # blue_thermal_printer: ^1.2.3
-  # bluetooth_thermal_printer: ^0.0.6
-  # esc_pos_utils: ^1.1.0
-  # flutter_blue_plus: ^1.14.11
-  # flutter_bluetooth_basic: ^0.1.7
-  # esc_pos_bluetooth: ^0.4.1
-  bluetooth_print: ^4.3.0
+  esc_pos_utils: ^1.1.0
+  esc_pos_bluetooth: ^0.4.1
   fluttertoast: ^8.2.2
 
 dev_dependencies:

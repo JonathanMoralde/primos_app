@@ -1,6 +1,7 @@
-import 'package:bluetooth_print/bluetooth_print.dart';
-import 'package:bluetooth_print/bluetooth_print_model.dart';
 import 'package:flutter/material.dart';
+import 'package:esc_pos_bluetooth/esc_pos_bluetooth.dart';
+import 'package:esc_pos_utils/esc_pos_utils.dart';
+import 'package:intl/intl.dart';
 
 class PrintPage extends StatefulWidget {
   final String? formattedDate;
@@ -36,10 +37,9 @@ class PrintPage extends StatefulWidget {
 }
 
 class _PrintPageState extends State<PrintPage> {
-  BluetoothPrint bluetoothPrint = BluetoothPrint.instance;
-  List<BluetoothDevice> _devices = [];
   String _devicesMsg = '';
-  bool isConnected = false; // Track connection state
+  PrinterBluetoothManager _printerManager = PrinterBluetoothManager();
+  List<PrinterBluetooth> _devices = [];
 
   @override
   void initState() {
@@ -48,16 +48,13 @@ class _PrintPageState extends State<PrintPage> {
   }
 
   Future<void> initPrinter() async {
-    bluetoothPrint.startScan(timeout: Duration(seconds: 5));
-    if (!mounted) return;
-    bluetoothPrint.scanResults.listen((val) {
+    _printerManager.startScan(Duration(seconds: 2));
+    _printerManager.scanResults.listen((val) {
+      print(val);
       if (!mounted) return;
       setState(() {
         _devices = val;
       });
-      if (_devices.isEmpty) {
-        _devicesMsg = "No Devices";
-      }
     });
   }
 
@@ -86,326 +83,145 @@ class _PrintPageState extends State<PrintPage> {
     );
   }
 
-  Future<void> _startPrint(BluetoothDevice device) async {
-    if (device != null && device.address != null) {
-      if (!isConnected) {
-        try {
-          await bluetoothPrint.connect(device);
-          isConnected = true;
-        } catch (e) {
-          // Handle connection error
-          print("Connection error: $e");
-          return;
-        }
-      }
+  Future<List<int>> demoReceipt(
+      PaperSize paper, CapabilityProfile profile) async {
+    final Generator ticket = Generator(paper, profile);
+    List<int> bytes = [];
 
-      Map<String, dynamic> config = Map();
-      List<LineText> list = [
-        LineText(
-          type: LineText.TYPE_TEXT,
-          content: "PRIMO'S BISTRO",
-          weight: 2,
-          height: 2,
-          align: LineText.ALIGN_CENTER,
-          linefeed: 1,
-        ),
-        LineText(
-          type: LineText.TYPE_TEXT,
-          content:
-              "G/F D Park View Hotel, Blumentritt Street Barangay Guilid 4504 Palimbang",
-          weight: 0,
-          align: LineText.ALIGN_CENTER,
-          linefeed: 1,
-        ),
-        LineText(
-          type: LineText.TYPE_TEXT,
-          content: "Ligao City, Albay",
-          weight: 0,
-          align: LineText.ALIGN_CENTER,
-          linefeed: 2,
-        ),
-        LineText(
-          type: LineText.TYPE_TEXT,
-          content: "DATE & TIME:",
-          weight: 0,
-          align: LineText.ALIGN_LEFT,
-          linefeed: 0,
-        ),
-        LineText(
-          type: LineText.TYPE_TEXT,
-          content: widget.formattedDate,
-          weight: 0,
-          align: LineText.ALIGN_RIGHT,
-          linefeed: 1,
-        ),
-        LineText(
-          type: LineText.TYPE_TEXT,
-          content: "ORDER NO:",
-          weight: 0,
-          align: LineText.ALIGN_LEFT,
-          linefeed: 0,
-        ),
-        LineText(
-          type: LineText.TYPE_TEXT,
-          content: widget.orderName,
-          weight: 0,
-          align: LineText.ALIGN_RIGHT,
-          linefeed: 1,
-        ),
-      ];
+    // Print image
+    // final ByteData data = await rootBundle.load('assets/rabbit_black.jpg');
+    // final Uint8List imageBytes = data.buffer.asUint8List();
+    // final Image? image = decodeImage(imageBytes);
+    // bytes += ticket.image(image);
 
-      if (widget.receiptNum != null) {
-        list.add(
-          LineText(
-            type: LineText.TYPE_TEXT,
-            content: "RECEIPT NO:",
-            weight: 0,
-            align: LineText.ALIGN_LEFT,
-            linefeed: 0,
-          ),
-        );
-        list.add(
-          LineText(
-            type: LineText.TYPE_TEXT,
-            content: widget.receiptNum,
-            weight: 0,
-            align: LineText.ALIGN_RIGHT,
-            linefeed: 1,
-          ),
-        );
-      }
-      list.add(
-        LineText(
-          type: LineText.TYPE_TEXT,
-          content: "WAITER:",
-          weight: 0,
-          align: LineText.ALIGN_LEFT,
-          linefeed: 0,
+    bytes += ticket.text('GROCERYLY',
+        styles: PosStyles(
+          align: PosAlign.center,
+          height: PosTextSize.size2,
+          width: PosTextSize.size2,
         ),
-      );
-      list.add(
-        LineText(
-          type: LineText.TYPE_TEXT,
-          content: widget.waiterName,
-          weight: 0,
-          align: LineText.ALIGN_RIGHT,
-          linefeed: 2,
-        ),
-      );
-      list.add(
-        LineText(
-          type: LineText.TYPE_TEXT,
-          content: '-------------------------',
-          align: LineText.ALIGN_CENTER,
-          linefeed: 1,
-        ),
-      );
+        linesAfter: 1);
 
-      for (final order in widget.orderDetails!) {
-        int price = order['productPrice'];
-        int quantity = order['quantity'];
-        list.add(
-          LineText(
-            type: LineText.TYPE_TEXT,
-            content: order['productName'],
-            align: LineText.ALIGN_LEFT,
-            linefeed: 0,
-          ),
-        );
-        list.add(
-          LineText(
-            type: LineText.TYPE_TEXT,
-            content: '$price x',
-            align: LineText.ALIGN_CENTER,
-            linefeed: 0,
-          ),
-        );
-        list.add(
-          LineText(
-            type: LineText.TYPE_TEXT,
-            content: ' $quantity',
-            align: LineText.ALIGN_CENTER,
-            linefeed: 0,
-          ),
-        );
-        list.add(
-          LineText(
-            type: LineText.TYPE_TEXT,
-            content: 'PHP ${price * quantity}',
-            align: LineText.ALIGN_RIGHT,
-            linefeed: 1,
-          ),
-        );
-      }
-      list.add(
-        LineText(
-          type: LineText.TYPE_TEXT,
-          content: '-------------------------',
-          align: LineText.ALIGN_CENTER,
-          linefeed: 1,
-        ),
-      );
+    bytes += ticket.text('889  Watson Lane',
+        styles: PosStyles(align: PosAlign.center));
+    bytes += ticket.text('New Braunfels, TX',
+        styles: PosStyles(align: PosAlign.center));
+    bytes += ticket.text('Tel: 830-221-1234',
+        styles: PosStyles(align: PosAlign.center));
+    bytes += ticket.text('Web: www.example.com',
+        styles: PosStyles(align: PosAlign.center), linesAfter: 1);
 
-      if (widget.vatAmount != null &&
-          widget.discountAmount != null &&
-          widget.grandTotal != null &&
-          widget.amountReceived != null &&
-          widget.changeAmount != null) {
-        list.add(
-          LineText(
-            type: LineText.TYPE_TEXT,
-            content: "SUBTOTAL:",
-            align: LineText.ALIGN_LEFT,
-            linefeed: 0,
-          ),
-        );
-        list.add(
-          LineText(
-            type: LineText.TYPE_TEXT,
-            content: widget.subtotal.toString(),
-            align: LineText.ALIGN_RIGHT,
-            linefeed: 1,
-          ),
-        );
-        list.add(
-          LineText(
-            type: LineText.TYPE_TEXT,
-            content: "VAT (12%):",
-            align: LineText.ALIGN_LEFT,
-            linefeed: 0,
-          ),
-        );
-        list.add(
-          LineText(
-            type: LineText.TYPE_TEXT,
-            content: widget.vatAmount.toString(),
-            align: LineText.ALIGN_RIGHT,
-            linefeed: 1,
-          ),
-        );
-        list.add(
-          LineText(
-            type: LineText.TYPE_TEXT,
-            content: "DISCOUNTS:",
-            align: LineText.ALIGN_LEFT,
-            linefeed: 0,
-          ),
-        );
-        list.add(
-          LineText(
-            type: LineText.TYPE_TEXT,
-            content: widget.discountAmount.toString(),
-            align: LineText.ALIGN_RIGHT,
-            linefeed: 1,
-          ),
-        );
-        list.add(
-          LineText(
-            type: LineText.TYPE_TEXT,
-            content: "TOTAL:",
-            weight: 1,
-            align: LineText.ALIGN_LEFT,
-            linefeed: 0,
-          ),
-        );
-        list.add(
-          LineText(
-            type: LineText.TYPE_TEXT,
-            content: 'PHP ${widget.grandTotal}',
-            weight: 1,
-            align: LineText.ALIGN_RIGHT,
-            linefeed: 1,
-          ),
-        );
-        list.add(
-          LineText(
-            type: LineText.TYPE_TEXT,
-            content: "AMOUNT PAID:",
-            align: LineText.ALIGN_LEFT,
-            linefeed: 0,
-          ),
-        );
-        list.add(
-          LineText(
-            type: LineText.TYPE_TEXT,
-            content: 'PHP ${widget.amountReceived}',
-            align: LineText.ALIGN_RIGHT,
-            linefeed: 1,
-          ),
-        );
-        list.add(
-          LineText(
-            type: LineText.TYPE_TEXT,
-            content: "CHANGE:",
-            align: LineText.ALIGN_LEFT,
-            linefeed: 0,
-          ),
-        );
-        list.add(
-          LineText(
-            type: LineText.TYPE_TEXT,
-            content: 'PHP ${widget.changeAmount}',
-            align: LineText.ALIGN_RIGHT,
-            linefeed: 1,
-          ),
-        );
-        list.add(
-          LineText(
-            type: LineText.TYPE_TEXT,
-            content: '-------------------------',
-            align: LineText.ALIGN_CENTER,
-            linefeed: 2,
-          ),
-        );
-        list.add(
-          LineText(
-            type: LineText.TYPE_TEXT,
-            content: "CASHIER:",
-            align: LineText.ALIGN_LEFT,
-            linefeed: 0,
-          ),
-        );
-        list.add(
-          LineText(
-            type: LineText.TYPE_TEXT,
-            content: widget.cashierName,
-            align: LineText.ALIGN_RIGHT,
-            linefeed: 1,
-          ),
-        );
-      } else {
-        list.add(
-          LineText(
-            type: LineText.TYPE_TEXT,
-            content: "BILL AMOUNT:",
-            weight: 1,
-            align: LineText.ALIGN_LEFT,
-            linefeed: 0,
-          ),
-        );
-        list.add(
-          LineText(
-            type: LineText.TYPE_TEXT,
-            weight: 1,
-            content: widget.subtotal.toString(),
-            align: LineText.ALIGN_RIGHT,
-            linefeed: 1,
-          ),
-        );
-      }
-      print("executed");
-      // print(list);
-      try {
-        await bluetoothPrint.printReceipt(config, list);
-        // await bluetoothprint.printLabel(config, list);
-      } catch (e) {
-        print(e);
-      }
-      // print(bluetoothprint.state);
+    bytes += ticket.hr();
+    bytes += ticket.row([
+      PosColumn(text: 'Qty', width: 1),
+      PosColumn(text: 'Item', width: 7),
+      PosColumn(
+          text: 'Price', width: 2, styles: PosStyles(align: PosAlign.right)),
+      PosColumn(
+          text: 'Total', width: 2, styles: PosStyles(align: PosAlign.right)),
+    ]);
 
-      // Disconnect after printing
-      await bluetoothPrint.disconnect();
-      isConnected = false;
+    bytes += ticket.row([
+      PosColumn(text: '2', width: 1),
+      PosColumn(text: 'ONION RINGS', width: 7),
+      PosColumn(
+          text: '0.99', width: 2, styles: PosStyles(align: PosAlign.right)),
+      PosColumn(
+          text: '1.98', width: 2, styles: PosStyles(align: PosAlign.right)),
+    ]);
+    bytes += ticket.row([
+      PosColumn(text: '1', width: 1),
+      PosColumn(text: 'PIZZA', width: 7),
+      PosColumn(
+          text: '3.45', width: 2, styles: PosStyles(align: PosAlign.right)),
+      PosColumn(
+          text: '3.45', width: 2, styles: PosStyles(align: PosAlign.right)),
+    ]);
+    bytes += ticket.row([
+      PosColumn(text: '1', width: 1),
+      PosColumn(text: 'SPRING ROLLS', width: 7),
+      PosColumn(
+          text: '2.99', width: 2, styles: PosStyles(align: PosAlign.right)),
+      PosColumn(
+          text: '2.99', width: 2, styles: PosStyles(align: PosAlign.right)),
+    ]);
+    bytes += ticket.row([
+      PosColumn(text: '3', width: 1),
+      PosColumn(text: 'CRUNCHY STICKS', width: 7),
+      PosColumn(
+          text: '0.85', width: 2, styles: PosStyles(align: PosAlign.right)),
+      PosColumn(
+          text: '2.55', width: 2, styles: PosStyles(align: PosAlign.right)),
+    ]);
+    bytes += ticket.hr();
+
+    bytes += ticket.row([
+      PosColumn(
+          text: 'TOTAL',
+          width: 6,
+          styles: PosStyles(
+            height: PosTextSize.size2,
+            width: PosTextSize.size2,
+          )),
+      PosColumn(
+          text: '\$10.97',
+          width: 6,
+          styles: PosStyles(
+            align: PosAlign.right,
+            height: PosTextSize.size2,
+            width: PosTextSize.size2,
+          )),
+    ]);
+
+    bytes += ticket.hr(ch: '=', linesAfter: 1);
+
+    bytes += ticket.row([
+      PosColumn(
+          text: 'Cash',
+          width: 7,
+          styles: PosStyles(align: PosAlign.right, width: PosTextSize.size2)),
+      PosColumn(
+          text: '\$15.00',
+          width: 5,
+          styles: PosStyles(align: PosAlign.right, width: PosTextSize.size2)),
+    ]);
+    bytes += ticket.row([
+      PosColumn(
+          text: 'Change',
+          width: 7,
+          styles: PosStyles(align: PosAlign.right, width: PosTextSize.size2)),
+      PosColumn(
+          text: '\$4.03',
+          width: 5,
+          styles: PosStyles(align: PosAlign.right, width: PosTextSize.size2)),
+    ]);
+
+    bytes += ticket.feed(2);
+    bytes += ticket.text('Thank you!',
+        styles: PosStyles(align: PosAlign.center, bold: true));
+
+    final now = DateTime.now();
+    final formatter = DateFormat('MM/dd/yyyy H:m');
+    final String timestamp = formatter.format(now);
+    bytes += ticket.text(timestamp,
+        styles: PosStyles(align: PosAlign.center), linesAfter: 2);
+
+    ticket.feed(2);
+    ticket.cut();
+    return bytes;
+  }
+
+  Future<void> _startPrint(PrinterBluetooth printer) async {
+    _printerManager.selectPrinter(printer);
+    const PaperSize paper = PaperSize.mm58; // Adjust paper size as needed
+    final profile = await CapabilityProfile.load();
+
+    try {
+      final PosPrintResult res =
+          await _printerManager.printTicket(await demoReceipt(paper, profile));
+      print("Printing result: ${res.msg}");
+    } catch (e) {
+      print("Printing error: $e");
     }
   }
 }
