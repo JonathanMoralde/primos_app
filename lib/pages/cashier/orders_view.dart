@@ -47,7 +47,7 @@ class OrderViewPage extends ConsumerWidget {
     final List<Order> ordersList = orderDetails.map<Order>((orderDetail) {
       final name = orderDetail['productName'] ?? 'No Name';
       final quantity = orderDetail['quantity'] ?? 0;
-      final variation = orderDetail['variation'] ?? 'No Variation';
+      final variation = orderDetail['variation'] ?? '-';
       final price = orderDetail['productPrice'] ?? 0;
 
       return Order(
@@ -236,7 +236,7 @@ class OrderViewPage extends ConsumerWidget {
                                       formattedDate: formattedDate,
                                       orderName: orderName,
                                       receiptNum: referenceNumber,
-                                      waiterName: waiterName,
+                                      waiterName: waiterName!,
                                       orderDetails: orderDetails,
                                       subtotal: totalAmount.toDouble(),
                                       vatAmount: vatAmount,
@@ -244,7 +244,7 @@ class OrderViewPage extends ConsumerWidget {
                                       grandTotal: discountedTotal,
                                       amountReceived: amountReceived,
                                       changeAmount: changeAmount,
-                                      cashierName: cashierName,
+                                      cashierName: cashierName!,
                                     );
                                   }),
                                 );
@@ -663,10 +663,10 @@ class OrderViewPage extends ConsumerWidget {
                               builder: (BuildContext context) => PrintPage(
                                 formattedDate: formattedDate,
                                 orderName: orderName,
-                                waiterName: waiterName,
+                                waiterName: waiterName!,
                                 orderDetails: orderDetails,
                                 subtotal: totalAmount.toDouble(),
-                                cashierName: cashierName,
+                                cashierName: cashierName!,
                               ),
                             ),
                           );

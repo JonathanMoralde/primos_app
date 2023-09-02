@@ -4,31 +4,31 @@ import 'package:esc_pos_utils/esc_pos_utils.dart';
 import 'package:intl/intl.dart';
 
 class PrintPage extends StatefulWidget {
-  final String? formattedDate;
-  final String? orderName;
+  final String formattedDate;
+  final String orderName;
   final String? receiptNum;
-  final String? waiterName;
-  final List<dynamic>? orderDetails;
-  final double? subtotal;
+  final String waiterName;
+  final List<dynamic> orderDetails;
+  final double subtotal;
   final double? vatAmount;
   final double? discountAmount;
   final double? grandTotal;
-  final String? cashierName;
+  final String cashierName;
   final double? amountReceived;
   final double? changeAmount;
 
   const PrintPage(
       {super.key,
-      this.formattedDate,
-      this.orderName,
+      required this.formattedDate,
+      required this.orderName,
       this.receiptNum,
-      this.waiterName,
-      this.orderDetails,
-      this.subtotal,
+      required this.waiterName,
+      required this.orderDetails,
+      required this.subtotal,
       this.vatAmount,
       this.discountAmount,
       this.grandTotal,
-      this.cashierName,
+      required this.cashierName,
       this.amountReceived,
       this.changeAmount});
 
@@ -76,7 +76,7 @@ class _PrintPageState extends State<PrintPage> {
                   title: Text(_devices[i].name!),
                   subtitle: Text(_devices[i].address!),
                   onTap: () {
-                    _startPrint(_devices[i]);
+                    _startPrint(_devices[i], context);
                   },
                 );
               }),
@@ -94,7 +94,7 @@ class _PrintPageState extends State<PrintPage> {
     // final Image? image = decodeImage(imageBytes);
     // bytes += ticket.image(image);
 
-    bytes += ticket.text('GROCERYLY',
+    bytes += ticket.text('Primo\'s Bistro',
         styles: PosStyles(
           align: PosAlign.center,
           height: PosTextSize.size2,
@@ -102,116 +102,185 @@ class _PrintPageState extends State<PrintPage> {
         ),
         linesAfter: 1);
 
-    bytes += ticket.text('889  Watson Lane',
+    bytes += ticket.text(
+        'G/F D Park View Hotel, Blumentritt Street Barangay Guilid 4504 Palimbang',
         styles: PosStyles(align: PosAlign.center));
-    bytes += ticket.text('New Braunfels, TX',
-        styles: PosStyles(align: PosAlign.center));
-    bytes += ticket.text('Tel: 830-221-1234',
-        styles: PosStyles(align: PosAlign.center));
-    bytes += ticket.text('Web: www.example.com',
+    bytes += ticket.text('Ligao City, Albay',
         styles: PosStyles(align: PosAlign.center), linesAfter: 1);
 
     bytes += ticket.hr();
     bytes += ticket.row([
-      PosColumn(text: 'Qty', width: 1),
-      PosColumn(text: 'Item', width: 7),
+      PosColumn(text: 'DATE:', styles: PosStyles(align: PosAlign.left)),
       PosColumn(
-          text: 'Price', width: 2, styles: PosStyles(align: PosAlign.right)),
+          text: widget.formattedDate, styles: PosStyles(align: PosAlign.right)),
+    ]);
+    bytes += ticket.row([
+      PosColumn(text: 'ORDER:', styles: PosStyles(align: PosAlign.left)),
       PosColumn(
-          text: 'Total', width: 2, styles: PosStyles(align: PosAlign.right)),
+          text: widget.orderName, styles: PosStyles(align: PosAlign.right)),
+    ]);
+    if (widget.receiptNum != null) {
+      bytes += ticket.row([
+        PosColumn(
+            text: 'RECEIPT NO.:', styles: PosStyles(align: PosAlign.left)),
+        PosColumn(
+            text: widget.receiptNum!, styles: PosStyles(align: PosAlign.right)),
+      ]);
+    }
+    bytes += ticket.row([
+      PosColumn(text: 'WAITER:', styles: PosStyles(align: PosAlign.left)),
+      PosColumn(
+          text: widget.waiterName, styles: PosStyles(align: PosAlign.right)),
     ]);
 
+    bytes += ticket.hr();
     bytes += ticket.row([
-      PosColumn(text: '2', width: 1),
-      PosColumn(text: 'ONION RINGS', width: 7),
+      PosColumn(text: 'ITEM NAME', width: 7),
+      PosColumn(text: 'QTY', width: 1),
+      PosColumn(text: 'VARIATION', width: 2),
       PosColumn(
-          text: '0.99', width: 2, styles: PosStyles(align: PosAlign.right)),
+          text: 'UNIT PRICE',
+          width: 2,
+          styles: PosStyles(align: PosAlign.right)),
       PosColumn(
-          text: '1.98', width: 2, styles: PosStyles(align: PosAlign.right)),
+          text: 'TOTAL PRICE',
+          width: 2,
+          styles: PosStyles(align: PosAlign.right)),
     ]);
-    bytes += ticket.row([
-      PosColumn(text: '1', width: 1),
-      PosColumn(text: 'PIZZA', width: 7),
-      PosColumn(
-          text: '3.45', width: 2, styles: PosStyles(align: PosAlign.right)),
-      PosColumn(
-          text: '3.45', width: 2, styles: PosStyles(align: PosAlign.right)),
-    ]);
-    bytes += ticket.row([
-      PosColumn(text: '1', width: 1),
-      PosColumn(text: 'SPRING ROLLS', width: 7),
-      PosColumn(
-          text: '2.99', width: 2, styles: PosStyles(align: PosAlign.right)),
-      PosColumn(
-          text: '2.99', width: 2, styles: PosStyles(align: PosAlign.right)),
-    ]);
-    bytes += ticket.row([
-      PosColumn(text: '3', width: 1),
-      PosColumn(text: 'CRUNCHY STICKS', width: 7),
-      PosColumn(
-          text: '0.85', width: 2, styles: PosStyles(align: PosAlign.right)),
-      PosColumn(
-          text: '2.55', width: 2, styles: PosStyles(align: PosAlign.right)),
-    ]);
+    for (final order in widget.orderDetails) {
+      bytes += ticket.row([
+        PosColumn(text: order['productName'], width: 7),
+        PosColumn(text: order['quantity'], width: 1),
+        PosColumn(text: order['variation'] ?? "-", width: 2),
+        PosColumn(
+            text: order['productPrice'],
+            width: 2,
+            styles: PosStyles(align: PosAlign.right)),
+        PosColumn(
+            text: (double.parse(order['quantity']) *
+                    double.parse(order['productPrice']))
+                .toString(),
+            width: 2,
+            styles: PosStyles(align: PosAlign.right)),
+      ]);
+    }
     bytes += ticket.hr();
 
-    bytes += ticket.row([
-      PosColumn(
-          text: 'TOTAL',
+    if (widget.receiptNum == null) {
+      bytes += ticket.row([
+        PosColumn(
+            text: 'BILL AMOUNT:',
+            width: 6,
+            styles: PosStyles(
+              height: PosTextSize.size2,
+              width: PosTextSize.size2,
+            )),
+        PosColumn(
+            text: 'PHP ${widget.subtotal}',
+            width: 6,
+            styles: PosStyles(
+              align: PosAlign.right,
+              height: PosTextSize.size2,
+              width: PosTextSize.size2,
+            )),
+      ]);
+    } else {
+      bytes += ticket.row([
+        PosColumn(
+          text: 'SUBTOTAL:',
           width: 6,
-          styles: PosStyles(
-            height: PosTextSize.size2,
-            width: PosTextSize.size2,
-          )),
-      PosColumn(
-          text: '\$10.97',
+        ),
+        PosColumn(
+            text: 'PHP ${widget.subtotal}',
+            width: 6,
+            styles: PosStyles(
+              align: PosAlign.right,
+            )),
+      ]);
+      bytes += ticket.row([
+        PosColumn(
+          text: 'VAT (12%):',
           width: 6,
-          styles: PosStyles(
-            align: PosAlign.right,
-            height: PosTextSize.size2,
-            width: PosTextSize.size2,
-          )),
-    ]);
+        ),
+        PosColumn(
+            text: 'PHP ${widget.vatAmount}',
+            width: 6,
+            styles: PosStyles(
+              align: PosAlign.right,
+            )),
+      ]);
+      bytes += ticket.row([
+        PosColumn(
+          text: 'DISCOUNTS:',
+          width: 6,
+        ),
+        PosColumn(
+            text: 'PHP ${widget.discountAmount}',
+            width: 6,
+            styles: PosStyles(
+              align: PosAlign.right,
+            )),
+      ]);
+      bytes += ticket.row([
+        PosColumn(
+            text: 'GRAND TOTAL',
+            width: 6,
+            styles: PosStyles(
+              height: PosTextSize.size2,
+              width: PosTextSize.size2,
+            )),
+        PosColumn(
+            text: 'PHP ${widget.grandTotal}',
+            width: 6,
+            styles: PosStyles(
+              align: PosAlign.right,
+              height: PosTextSize.size2,
+              width: PosTextSize.size2,
+            )),
+      ]);
+      bytes += ticket.hr(ch: '=', linesAfter: 1);
 
-    bytes += ticket.hr(ch: '=', linesAfter: 1);
-
-    bytes += ticket.row([
-      PosColumn(
-          text: 'Cash',
-          width: 7,
-          styles: PosStyles(align: PosAlign.right, width: PosTextSize.size2)),
-      PosColumn(
-          text: '\$15.00',
-          width: 5,
-          styles: PosStyles(align: PosAlign.right, width: PosTextSize.size2)),
-    ]);
-    bytes += ticket.row([
-      PosColumn(
-          text: 'Change',
-          width: 7,
-          styles: PosStyles(align: PosAlign.right, width: PosTextSize.size2)),
-      PosColumn(
-          text: '\$4.03',
-          width: 5,
-          styles: PosStyles(align: PosAlign.right, width: PosTextSize.size2)),
-    ]);
+      bytes += ticket.row([
+        PosColumn(
+            text: 'CASH:',
+            width: 7,
+            styles: PosStyles(align: PosAlign.right, width: PosTextSize.size2)),
+        PosColumn(
+            text: 'PHP ${widget.amountReceived}',
+            width: 5,
+            styles: PosStyles(align: PosAlign.right, width: PosTextSize.size2)),
+      ]);
+      bytes += ticket.row([
+        PosColumn(
+            text: 'CHANGE:',
+            width: 7,
+            styles: PosStyles(align: PosAlign.right, width: PosTextSize.size2)),
+        PosColumn(
+            text: 'PHP ${widget.changeAmount}',
+            width: 5,
+            styles: PosStyles(align: PosAlign.right, width: PosTextSize.size2)),
+      ]);
+      bytes += ticket.hr(linesAfter: 1);
+      bytes += ticket.row([
+        PosColumn(text: 'CASHIER:', styles: PosStyles(align: PosAlign.left)),
+        PosColumn(
+            text: widget.cashierName, styles: PosStyles(align: PosAlign.right)),
+      ]);
+    }
 
     bytes += ticket.feed(2);
     bytes += ticket.text('Thank you!',
         styles: PosStyles(align: PosAlign.center, bold: true));
 
-    final now = DateTime.now();
-    final formatter = DateFormat('MM/dd/yyyy H:m');
-    final String timestamp = formatter.format(now);
-    bytes += ticket.text(timestamp,
-        styles: PosStyles(align: PosAlign.center), linesAfter: 2);
+    ;
 
     ticket.feed(2);
     ticket.cut();
     return bytes;
   }
 
-  Future<void> _startPrint(PrinterBluetooth printer) async {
+  Future<void> _startPrint(
+      PrinterBluetooth printer, BuildContext context) async {
     _printerManager.selectPrinter(printer);
     const PaperSize paper = PaperSize.mm58; // Adjust paper size as needed
     final profile = await CapabilityProfile.load();
@@ -220,6 +289,9 @@ class _PrintPageState extends State<PrintPage> {
       final PosPrintResult res =
           await _printerManager.printTicket(await demoReceipt(paper, profile));
       print("Printing result: ${res.msg}");
+
+      // ONCE PRINTED
+      Navigator.of(context).pop();
     } catch (e) {
       print("Printing error: $e");
     }
