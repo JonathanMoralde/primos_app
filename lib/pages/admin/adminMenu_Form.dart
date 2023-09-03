@@ -108,9 +108,7 @@ class _AdminMenuFormState extends State<AdminMenuForm> {
       return; // Do not proceed
     }
 
-    if (itemNameController.text.isEmpty ||
-        itemPriceController.text.isEmpty ||
-        category == null) {
+    if (itemNameController.text.isEmpty || category == null) {
       // Show an error if any required fields are missing
       showDialog(
         context: context,
@@ -271,6 +269,32 @@ class _AdminMenuFormState extends State<AdminMenuForm> {
                         : "ADD",
                 onClick: _uploadImageAndUpdateMenu,
                 btnWidth: 250,
+              ),
+              const SizedBox(
+                height: 30,
+              ),
+              const Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Icon(
+                    Icons.info_outline,
+                    size: 20,
+                  ),
+                  SizedBox(
+                      width: 4), // Adding a small gap between the icon and text
+                  SizedBox(
+                    width: 250,
+                    child: Flexible(
+                      child: Text(
+                        "If the item has variations, you can leave the item price blank for now.",
+                        style: TextStyle(
+                          fontSize: 12,
+                          letterSpacing: 1,
+                        ),
+                      ),
+                    ),
+                  ),
+                ],
               ),
             ],
           ),

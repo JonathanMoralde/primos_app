@@ -140,24 +140,44 @@ class OrderDetailsPage extends ConsumerWidget {
                           // ORDER ITEMS
                           const Row(
                             children: [
-                              Expanded(flex: 2, child: Text("ITEM")),
                               Expanded(
-                                  flex: 1,
+                                  flex: 2,
                                   child: Text(
-                                    "VARIANT",
-                                    textAlign: TextAlign.end,
+                                    "ITEM",
+                                    style:
+                                        TextStyle(fontWeight: FontWeight.w700),
                                   )),
                               Expanded(
                                   flex: 1,
                                   child: Text(
                                     "QTY",
-                                    textAlign: TextAlign.end,
+                                    textAlign: TextAlign.center,
+                                    style:
+                                        TextStyle(fontWeight: FontWeight.w700),
                                   )),
                               Expanded(
                                   flex: 1,
                                   child: Text(
-                                    "PRICE",
+                                    "VARIANT",
+                                    textAlign: TextAlign.center,
+                                    style:
+                                        TextStyle(fontWeight: FontWeight.w700),
+                                  )),
+                              Expanded(
+                                  flex: 1,
+                                  child: Text(
+                                    "UNIT PRICE",
                                     textAlign: TextAlign.end,
+                                    style:
+                                        TextStyle(fontWeight: FontWeight.w700),
+                                  )),
+                              Expanded(
+                                  flex: 1,
+                                  child: Text(
+                                    "TOTAL PRICE",
+                                    textAlign: TextAlign.end,
+                                    style:
+                                        TextStyle(fontWeight: FontWeight.w700),
                                   )),
                             ],
                           ),
@@ -190,10 +210,8 @@ class OrderDetailsPage extends ConsumerWidget {
                                 Expanded(
                                   flex: 1,
                                   child: Text(
-                                    order.variation == "No Variation"
-                                        ? "N/A"
-                                        : order.variation,
-                                    textAlign: TextAlign.end,
+                                    order.quantity.toString(),
+                                    textAlign: TextAlign.center,
                                     style: TextStyle(
                                         color: order.serveStatus == "Served"
                                             ? Colors.green.shade700
@@ -204,8 +222,10 @@ class OrderDetailsPage extends ConsumerWidget {
                                 Expanded(
                                   flex: 1,
                                   child: Text(
-                                    order.quantity.toString(),
-                                    textAlign: TextAlign.end,
+                                    order.variation == "No Variation"
+                                        ? "-"
+                                        : order.variation,
+                                    textAlign: TextAlign.center,
                                     style: TextStyle(
                                         color: order.serveStatus == "Served"
                                             ? Colors.green.shade700
@@ -217,6 +237,18 @@ class OrderDetailsPage extends ConsumerWidget {
                                   flex: 1,
                                   child: Text(
                                     order.price.toString(),
+                                    textAlign: TextAlign.end,
+                                    style: TextStyle(
+                                        color: order.serveStatus == "Served"
+                                            ? Colors.green.shade700
+                                            : Color.fromARGB(
+                                                255, 189, 151, 82)),
+                                  ),
+                                ),
+                                Expanded(
+                                  flex: 1,
+                                  child: Text(
+                                    (order.price! * order.quantity).toString(),
                                     textAlign: TextAlign.end,
                                     style: TextStyle(
                                         color: order.serveStatus == "Served"

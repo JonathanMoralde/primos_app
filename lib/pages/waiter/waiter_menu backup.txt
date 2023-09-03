@@ -6,7 +6,6 @@ import 'package:primos_app/providers/waiter_menu/currentOrder_provider.dart';
 import 'package:primos_app/providers/waiter_menu/isTakeout_provider.dart';
 import 'package:primos_app/providers/waiter_menu/menuItems_provider.dart';
 import 'package:primos_app/providers/waiter_menu/orderName_provider.dart';
-import 'package:primos_app/providers/waiter_menu/variations_provider.dart';
 import 'package:primos_app/widgets/bottomBar.dart';
 import 'package:primos_app/widgets/filterBtns.dart';
 import 'package:primos_app/widgets/searchBar.dart';
@@ -26,32 +25,24 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 class WaiterMenu extends ConsumerWidget {
   WaiterMenu({super.key});
 
-  // final variationsProvider =
-  //     FutureProvider.family<List<String>, String>((ref, productId) async {
-  //   final variationsSnapshot = await FirebaseFirestore.instance
-  //       .collection('variations')
-  //       .doc(productId)
-  //       .get();
-  //   print('Variations snapshot data: ${variationsSnapshot.data()}');
+  final variationsProvider =
+      FutureProvider.family<List<String>, String>((ref, productId) async {
+    final variationsSnapshot = await FirebaseFirestore.instance
+        .collection('variations')
+        .doc(productId)
+        .get();
+    print('Variations snapshot data: ${variationsSnapshot.data()}');
 
-  //   final variationsData = variationsSnapshot.data()?['variations'];
-  //   if (variationsData is List<dynamic>) {
-  //     final variations = variationsData.cast<String>();
-  //     print('Variations list: $variations');
-  //     return variations;
-  //   } else {
-  //     print('No variations found or variations data is not a List');
-  //     return []; // Return an empty list when variations data is not a List
-  //   }
-  // });
-  // final variationsProvider =
-  //     FutureProvider.family<List<String>, String>((ref, productId) async {
-  //   final variationsSnapshot = await FirebaseFirestore.instance
-  //       .collection('variations')
-  //       .doc(productId)
-  //       .get();
-  //   return variationsSnapshot; // Return the entire document snapshot
-  // });
+    final variationsData = variationsSnapshot.data()?['variations'];
+    if (variationsData is List<dynamic>) {
+      final variations = variationsData.cast<String>();
+      print('Variations list: $variations');
+      return variations;
+    } else {
+      print('No variations found or variations data is not a List');
+      return []; // Return an empty list when variations data is not a List
+    }
+  });
 
   double calculateSubtotal(List<OrderObject> orders) {
     return orders.fold(0, (double sum, OrderObject order) {
@@ -82,10 +73,8 @@ class WaiterMenu extends ConsumerWidget {
     final currentOrders = ref.watch(currentOrdersProvider);
 
     int localQuantity = 1;
-    String? localVariation;
-    // productVariations.isNotEmpty ? productVariations.first : null;
-    String? selectedVarPrice;
-    // productVariations.isNotEmpty ? productPrice.first : null;
+    String? localVariation =
+        productVariations.isNotEmpty ? productVariations.first : null;
 
     showDialog(
       context: context,
@@ -126,11 +115,7 @@ class WaiterMenu extends ConsumerWidget {
                                   onChange: (String? newValue) {
                                     setState(() {
                                       localVariation = newValue;
-                                      selectedVarPrice = productPrice[
-                                          productVariations.indexOf(newValue!)];
                                     });
-
-                                    print(selectedVarPrice);
                                   },
                                   hintText: "Select Variation",
                                   items: productVariations,
@@ -213,11 +198,7 @@ class WaiterMenu extends ConsumerWidget {
                                     (order) =>
                                         order.name == productName &&
                                         order.variation == localVariation &&
-                                        order.price ==
-                                            (productVariations.isEmpty
-                                                ? productPrice
-                                                : double.parse(
-                                                    selectedVarPrice!)),
+                                        order.price == productPrice,
                                   );
 
                                   if (existingIndex != -1) {
@@ -229,9 +210,7 @@ class WaiterMenu extends ConsumerWidget {
                                     final currentOrder = OrderObject(
                                       id: productId,
                                       name: productName,
-                                      price: productVariations.isEmpty
-                                          ? productPrice
-                                          : double.parse(selectedVarPrice!),
+                                      price: productPrice,
                                       variation: localVariation,
                                       quantity: localQuantity,
                                       imageUrl: imageUrl,
@@ -265,7 +244,6 @@ class WaiterMenu extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final subtotal = ref.watch(subtotalProvider);
     final menuItems = ref.watch(menuItemsStreamProvider);
-    final variationsStream = ref.watch(variationsStreamProvider);
 
     return WillPopScope(
       onWillPop: () async {
@@ -340,120 +318,53 @@ class WaiterMenu extends ConsumerWidget {
                                     : 0.0;
                             final imageUrl = itemDoc['imageURL'] as String;
 
-                            return variationsStream.when(
-                                data: (varDoc) {
-                                  List<dynamic>? varList;
-                                  List<dynamic>? varPriceList;
-                                  List<String> variations = [];
-                                  List<String> prices = [];
-                                  for (final itemVar in varDoc)
-                                    if (itemVar.id == productId) {
-                                      varList = itemVar['variations'];
-                                      varPriceList = itemVar['prices'];
-                                    }
-
-                                  if (varList is List<dynamic>) {
-                                    variations = varList.cast<String>();
-                                  }
-                                  if (varPriceList is List<dynamic>) {
-                                    prices = varPriceList.cast<String>();
-                                  }
-
-                                  return ItemCard(
-                                    cardWidth: 165,
-                                    cardHeight: 220,
-                                    key: ValueKey(productId),
-                                    productId: productId,
-                                    productName: productName,
-                                    productPrice: productPrice,
-                                    variations: variations.isNotEmpty
-                                        ? variations
-                                        : null,
-                                    prices: prices.isNotEmpty ? prices : null,
-                                    imageUrl: imageUrl,
-                                    footerSection: Column(children: [
-                                      StyledButton(
+                            return ItemCard(
+                              cardWidth: 165,
+                              cardHeight: 220,
+                              key: ValueKey(productId),
+                              productId: productId,
+                              productName: productName,
+                              productPrice: productPrice,
+                              imageUrl: imageUrl,
+                              footerSection: Column(
+                                children: [
+                                  FutureBuilder<List<String>>(
+                                    future: ref.read(variationsProvider(
+                                            productId)
+                                        .future), // Fetch variations using the provider
+                                    builder: (context, snapshot) {
+                                      if (snapshot.connectionState ==
+                                          ConnectionState.waiting) {
+                                        return CircularProgressIndicator();
+                                      } else if (snapshot.hasError) {
+                                        return Text("Error: ${snapshot.error}");
+                                      } else {
+                                        final productVariations =
+                                            snapshot.data ?? [];
+                                        return StyledButton(
                                           btnIcon: Icon(Icons.add),
                                           noShadow: true,
                                           btnWidth: double.infinity,
                                           btnHeight: 35,
                                           btnText: "Add",
                                           onClick: () {
-                                            if (variations.isNotEmpty) {
-                                              addModal(
-                                                context,
-                                                ref,
-                                                productId,
-                                                productName,
-                                                prices,
-                                                variations, // Pass the fetched variations
-                                                imageUrl,
-                                              );
-                                            } else {
-                                              addModal(
-                                                context,
-                                                ref,
-                                                productId,
-                                                productName,
-                                                productPrice,
-                                                variations, // Pass the fetched variations
-                                                imageUrl,
-                                              );
-                                            }
-                                          })
-                                    ]),
-                                  );
-                                },
-                                error: (error, stackTrace) =>
-                                    Text("Error: $error"),
-                                loading: () => CircularProgressIndicator());
-                            // ItemCard(
-                            //   cardWidth: 165,
-                            //   cardHeight: 220,
-                            //   key: ValueKey(productId),
-                            //   productId: productId,
-                            //   productName: productName,
-                            //   productPrice: productPrice,
-                            //   imageUrl: imageUrl,
-                            //   footerSection: Column(
-                            //     children: [
-                            //       FutureBuilder<List<String>>(
-                            //         future: ref.read(variationsProvider(
-                            //                 productId)
-                            //             .future), // Fetch variations using the provider
-                            //         builder: (context, snapshot) {
-                            //           if (snapshot.connectionState ==
-                            //               ConnectionState.waiting) {
-                            //             return CircularProgressIndicator();
-                            //           } else if (snapshot.hasError) {
-                            //             return Text("Error: ${snapshot.error}");
-                            //           } else {
-                            //             final productVariations =
-                            //                 snapshot.data ?? [];
-                            //             return StyledButton(
-                            //               btnIcon: Icon(Icons.add),
-                            //               noShadow: true,
-                            //               btnWidth: double.infinity,
-                            //               btnHeight: 35,
-                            //               btnText: "Add",
-                            //               onClick: () {
-                            //                 addModal(
-                            //                   context,
-                            //                   ref,
-                            //                   productId,
-                            //                   productName,
-                            //                   productPrice,
-                            //                   productVariations, // Pass the fetched variations
-                            //                   imageUrl,
-                            //                 );
-                            //               },
-                            //             );
-                            //           }
-                            //         },
-                            //       ),
-                            //     ],
-                            //   ),
-                            // );
+                                            addModal(
+                                              context,
+                                              ref,
+                                              productId,
+                                              productName,
+                                              productPrice,
+                                              productVariations, // Pass the fetched variations
+                                              imageUrl,
+                                            );
+                                          },
+                                        );
+                                      }
+                                    },
+                                  ),
+                                ],
+                              ),
+                            );
                           }).toList(),
                         ),
                       );

@@ -18,6 +18,8 @@ class ItemCard extends ConsumerWidget {
   final bool? isRow;
   final String imageUrl;
   final double? cardWidth;
+  final List<String>? variations;
+  final List<String>? prices;
 
   const ItemCard({
     Key? key,
@@ -29,6 +31,8 @@ class ItemCard extends ConsumerWidget {
     this.isRow,
     required this.imageUrl,
     this.cardWidth,
+    this.variations,
+    this.prices,
   }) : super(key: key);
 
   Future<void> delModal(BuildContext context, WidgetRef ref) => showDialog(
@@ -138,6 +142,7 @@ class ItemCard extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    print(variations);
     return Container(
       height: cardHeight ?? 300,
       width: isRow == true ? double.infinity : cardWidth ?? 170,
@@ -199,7 +204,7 @@ class ItemCard extends ConsumerWidget {
                           const SizedBox(
                             height: 8,
                           ),
-                          Text("$productPrice PHP"),
+                          Text(prices?[0] ?? productPrice.toString()),
                           const SizedBox(
                             height: 8,
                           ),
@@ -282,7 +287,20 @@ class ItemCard extends ConsumerWidget {
                           const SizedBox(
                             height: 8,
                           ),
-                          Text("$productPrice PHP"),
+                          if (variations == null) Text("PHP $productPrice"),
+                          if (variations != null)
+                            // Add a for loop to display variations and prices
+                            if (variations != null && prices != null)
+                              SingleChildScrollView(
+                                scrollDirection: Axis.horizontal,
+                                child: Row(
+                                  children: [
+                                    for (int i = 0; i < variations!.length; i++)
+                                      Text(
+                                          "${variations![i]} - PHP ${prices![i]}"),
+                                  ],
+                                ),
+                              ),
                           const SizedBox(
                             height: 8,
                           ),

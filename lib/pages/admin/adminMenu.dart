@@ -6,6 +6,7 @@ import 'package:primos_app/pages/admin/adminMenu_Form.dart';
 import 'package:primos_app/pages/admin/category.dart';
 import 'package:primos_app/providers/categoryFilter/activeCategory_provider.dart';
 import 'package:primos_app/providers/searchBar/searchQuery_provider.dart';
+import 'package:primos_app/providers/waiter_menu/variations_provider.dart';
 import 'package:primos_app/widgets/bottomBar.dart';
 import 'package:primos_app/widgets/filterBtns.dart';
 import 'package:primos_app/widgets/itemCard.dart';
@@ -24,6 +25,7 @@ class AdminMenuPage extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final menuItems = ref.watch(menuItemsStreamProvider);
+    final variationsStream = ref.watch(variationsStreamProvider);
     return Scaffold(
       backgroundColor: const Color(0xFFF8F8F7),
       drawer: SideMenu(pages: adminPages),
@@ -76,12 +78,42 @@ class AdminMenuPage extends ConsumerWidget {
                                             : 0.0;
                                 final imageUrl = itemDoc['imageURL'] as String;
 
-                                return ItemCard(
-                                  productId: productId, // Pass the productId
-                                  productName: productName,
-                                  productPrice: productPrice,
-                                  imageUrl: imageUrl,
-                                );
+                                return variationsStream.when(
+                                    data: (varDoc) {
+                                      List<dynamic>? varList;
+                                      List<dynamic>? varPriceList;
+                                      List<String> variations = [];
+                                      List<String> prices = [];
+                                      for (final itemVar in varDoc)
+                                        if (itemVar.id == productId) {
+                                          varList = itemVar['variations'];
+                                          varPriceList = itemVar['prices'];
+                                        }
+
+                                      if (varList is List<dynamic>) {
+                                        variations = varList.cast<String>();
+                                      }
+                                      if (varPriceList is List<dynamic>) {
+                                        prices = varPriceList.cast<String>();
+                                      }
+
+                                      return ItemCard(
+                                        cardWidth: 165,
+                                        key: ValueKey(productId),
+                                        productId: productId,
+                                        productName: productName,
+                                        productPrice: productPrice,
+                                        variations: variations.isNotEmpty
+                                            ? variations
+                                            : null,
+                                        prices:
+                                            prices.isNotEmpty ? prices : null,
+                                        imageUrl: imageUrl,
+                                      );
+                                    },
+                                    error: (error, stackTrace) =>
+                                        Text("Error: $error"),
+                                    loading: () => CircularProgressIndicator());
                               }).toList(),
                             ),
                           );

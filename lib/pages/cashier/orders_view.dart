@@ -522,7 +522,7 @@ class OrderViewPage extends ConsumerWidget {
                 const Row(
                   children: [
                     Expanded(
-                        flex: 1,
+                        flex: 2,
                         child: Text(
                           "ITEM",
                           style: TextStyle(fontWeight: FontWeight.w700),
@@ -531,14 +531,14 @@ class OrderViewPage extends ConsumerWidget {
                         flex: 1,
                         child: Text(
                           "QTY",
-                          textAlign: TextAlign.end,
+                          textAlign: TextAlign.center,
                           style: TextStyle(fontWeight: FontWeight.w700),
                         )),
                     Expanded(
                         flex: 1,
                         child: Text(
                           "VARIANT",
-                          textAlign: TextAlign.end,
+                          textAlign: TextAlign.center,
                           style: TextStyle(fontWeight: FontWeight.w700),
                         )),
                     Expanded(
@@ -572,20 +572,20 @@ class OrderViewPage extends ConsumerWidget {
                 for (final order in ordersList)
                   Row(
                     children: [
-                      Expanded(flex: 1, child: Text(order.name)),
+                      Expanded(flex: 2, child: Text(order.name)),
                       Expanded(
                           flex: 1,
                           child: Text(
                             order.quantity.toString(),
-                            textAlign: TextAlign.end,
+                            textAlign: TextAlign.center,
                           )),
                       Expanded(
                           flex: 1,
                           child: Text(
                             order.variation == "No Variation"
-                                ? "N/A"
+                                ? "-"
                                 : order.variation,
-                            textAlign: TextAlign.end,
+                            textAlign: TextAlign.center,
                           )),
                       Expanded(
                           flex: 1,
