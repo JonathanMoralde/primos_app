@@ -39,15 +39,9 @@ class _SalesCardState extends State<SalesCard> {
     DateTime originalDate = DateTime.parse(widget.date);
 
     String formattedDate = DateFormat('MMMM dd, yyyy').format(originalDate);
-    // print(date);
-    // print(totalBillAmount);
-    // print(totalDiscount);
-    // print(totalAmount);
-    // print(totalVat);
-    // print(orderKey.length);
+
     return Container(
       width: 360,
-      // height: 183,
       decoration: BoxDecoration(
         color: const Color(0xffffffff),
         borderRadius: BorderRadius.circular(8),
@@ -112,7 +106,8 @@ class _SalesCardState extends State<SalesCard> {
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
                         const Text("Gross Sales:"),
-                        Text('PHP ${widget.totalBillAmount.toString()}'),
+                        Text(
+                            'PHP ${widget.totalBillAmount.toStringAsFixed(2)}'),
                       ],
                     ),
                     const Divider(
@@ -126,7 +121,7 @@ class _SalesCardState extends State<SalesCard> {
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
                         const Text("Total discounts given:"),
-                        Text('PHP ${widget.totalDiscount.toString()}'),
+                        Text('PHP ${widget.totalDiscount.toStringAsFixed(2)}'),
                       ],
                     ),
                     const Divider(
@@ -140,7 +135,7 @@ class _SalesCardState extends State<SalesCard> {
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
                         const Text("Grand Total:"),
-                        Text('PHP ${widget.totalAmount.toString()}'),
+                        Text('PHP ${widget.totalAmount.toStringAsFixed(2)}'),
                       ],
                     ),
                     const Divider(
@@ -154,7 +149,7 @@ class _SalesCardState extends State<SalesCard> {
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
                         const Text("Total VAT amount:"),
-                        Text('PHP ${widget.totalVat.toString()}'),
+                        Text('PHP ${widget.totalVat.toStringAsFixed(2)}'),
                       ],
                     ),
                     const Divider(

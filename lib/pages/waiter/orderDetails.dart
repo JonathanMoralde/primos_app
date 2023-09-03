@@ -130,7 +130,8 @@ class OrderDetailsPage extends ConsumerWidget {
                                       style: TextStyle(
                                           fontWeight: FontWeight.w600),
                                     ),
-                                    Text("PHP $totalAmount")
+                                    Text(
+                                        "PHP ${totalAmount.toStringAsFixed(2)}")
                                   ],
                                 ),
                               ],
@@ -263,7 +264,10 @@ class OrderDetailsPage extends ConsumerWidget {
                       );
                     },
                     error: (error, stackTrace) => Text('Error: $error'),
-                    loading: () => CircularProgressIndicator()),
+                    loading: () => Center(
+                            child: CircularProgressIndicator(
+                          color: Color(0xFFE2B563),
+                        ))),
                 const SizedBox(height: 30),
                 Column(
                   children: [

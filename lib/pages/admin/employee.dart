@@ -26,7 +26,10 @@ class EmployeePage extends StatelessWidget {
             stream: FirebaseFirestore.instance.collection('users').snapshots(),
             builder: (context, snapshot) {
               if (snapshot.connectionState == ConnectionState.waiting) {
-                return CircularProgressIndicator();
+                return Center(
+                    child: CircularProgressIndicator(
+                  color: Color(0xFFE2B563),
+                ));
               } else if (snapshot.hasError) {
                 return Text('Error: ${snapshot.error}');
               } else if (!snapshot.hasData || snapshot.data!.docs.isEmpty) {

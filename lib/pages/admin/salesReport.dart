@@ -59,8 +59,6 @@ class SalesReportPage extends ConsumerWidget {
                       final orderDate =
                           orderData['order_date'].toString().split(' ')[0];
 
-                      // print(orderDate);
-
                       if (!salesData.containsKey(orderDate) &&
                           !salesDataKey.containsKey(orderDate)) {
                         salesData[orderDate] = [];
@@ -70,9 +68,6 @@ class SalesReportPage extends ConsumerWidget {
                       salesData[orderDate]!.add(orderData);
                       salesDataKey[orderDate]!.add(orderKey);
                     });
-
-                    // print(salesData);
-                    // print(salesDataKey);
 
                     final List<SalesObject> salesObjects = [];
 
@@ -89,12 +84,6 @@ class SalesReportPage extends ConsumerWidget {
                         totalVat += (order['vat'] as num).toDouble();
                         grandTotal += (order['total_amount'] as num).toDouble();
                       }
-                      // print(date);
-                      // print(totalBillAmount);
-                      // print(totalDiscount);
-                      // print(totalVat);
-                      // print(grandTotal);
-                      // print(salesDataKey[date]!);
 
                       salesObjects.add(SalesObject(
                         date: date,
@@ -116,9 +105,6 @@ class SalesReportPage extends ConsumerWidget {
 
                       filteredSalesObjects = salesObjects.where((object) {
                         final toDate = DateTime.parse(object.date);
-                        print(toDate);
-                        print(singleDate);
-                        print(toDate.isAtSameMomentAs(singleDate!));
                         return toDate.isAtSameMomentAs(singleDate!);
                       }).toList();
                     } else if (isDateRange) {
@@ -136,7 +122,14 @@ class SalesReportPage extends ConsumerWidget {
                       filteredSalesObjects = salesObjects;
                     }
 
-                    // print(salesObjects[0].date);
+                    // Sort the filteredSalesObjects list based on the date in descending order (most recent to older)
+                    filteredSalesObjects.sort((a, b) {
+                      final dateA = DateTime.parse(a.date);
+                      final dateB = DateTime.parse(b.date);
+                      return dateB
+                          .compareTo(dateA); // Compare in descending order
+                    });
+
                     return Wrap(
                       runSpacing: 10,
                       spacing: 10,
@@ -153,7 +146,10 @@ class SalesReportPage extends ConsumerWidget {
                       ],
                     );
                   },
-                  loading: () => CircularProgressIndicator(),
+                  loading: () => Center(
+                      child: CircularProgressIndicator(
+                    color: Color(0xFFE2B563),
+                  )),
                   error: (error, stackTrace) => Text('Error: $error'),
                 )
               ],

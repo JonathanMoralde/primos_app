@@ -65,7 +65,10 @@ class StyledDropdown<T> extends ConsumerWidget {
               ),
             );
           },
-          loading: () => CircularProgressIndicator(),
+          loading: () => Center(
+              child: CircularProgressIndicator(
+            color: Color(0xFFE2B563),
+          )),
           error: (error, stackTrace) {
             print("Error fetching categories: $error");
             return Text("Error fetching categories");

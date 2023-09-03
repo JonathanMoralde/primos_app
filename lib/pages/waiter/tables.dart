@@ -57,7 +57,10 @@ class WaiterTablePage extends ConsumerWidget {
                 );
               },
               error: (error, stackTrace) => Text("Error: $error"),
-              loading: () => CircularProgressIndicator());
+              loading: () => Center(
+                      child: CircularProgressIndicator(
+                    color: Color(0xFFE2B563),
+                  )));
         }))),
       ),
       bottomNavigationBar: Container(

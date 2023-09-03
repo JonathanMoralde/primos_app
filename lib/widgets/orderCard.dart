@@ -32,7 +32,7 @@ class OrderCardDropdown extends ConsumerWidget {
     final List<Order> ordersList = orderDetails.map<Order>((orderDetail) {
       final name = orderDetail['productName'] ?? 'No Name';
       final quantity = orderDetail['quantity'] ?? 0;
-      final variation = orderDetail['variation'] ?? 'No Variation';
+      final variation = orderDetail['variation'] ?? '-';
       final serveStatus = orderDetail['serve_status'] ?? 'Pending';
 
       return Order(
@@ -117,6 +117,114 @@ class OrderCardDropdown extends ConsumerWidget {
                                       productRef.update({
                                         'serve_status': 'Served'
                                       }); // Change 'Served' to the desired status
+
+                                      Navigator.of(context).pop();
+                                    }),
+                              ),
+                            ],
+                          )
+                        ],
+                      ),
+                    ),
+                  ],
+                ),
+              ));
+    }
+
+    Future doneModal() async {
+      await showDialog(
+          context: context,
+          builder: (context) => AlertDialog(
+                contentPadding: EdgeInsets.zero,
+                content: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Container(
+                      padding: EdgeInsets.all(16.0),
+                      child: Text(
+                        orderEntry.value['order_name'] as String,
+                        textAlign: TextAlign.left,
+                      ),
+                    ),
+                    Divider(height: 0),
+                    Container(
+                      padding: EdgeInsets.all(16.0),
+                      child: Column(
+                        children: [
+                          Text(
+                            "All dish are done and ready to be served?",
+                            textAlign: TextAlign.center,
+                          ),
+                          const SizedBox(
+                            height: 5,
+                          ),
+                          const Row(
+                            children: [
+                              Icon(
+                                Icons.info_outline,
+                                size: 20,
+                              ),
+                              SizedBox(width: 4),
+                              Flexible(
+                                child: Text(
+                                  "Confirming this will remove it from display",
+                                  style: TextStyle(
+                                    fontSize: 12,
+                                    letterSpacing: 1,
+                                  ),
+                                ),
+                              ),
+                            ],
+                          ),
+                          const SizedBox(
+                            height: 5,
+                          ),
+                          Row(
+                            children: [
+                              Expanded(
+                                flex: 1,
+                                child: StyledButton(
+                                    btnText: "Cancel",
+                                    onClick: () {
+                                      Navigator.of(context).pop();
+                                    }),
+                              ),
+                              const SizedBox(
+                                width: 10,
+                              ),
+                              Expanded(
+                                flex: 1,
+                                child: StyledButton(
+                                    btnText: "Confirm",
+                                    onClick: () {
+                                      final List<Object?> orderDetails =
+                                          orderEntry.value['order_details'];
+                                      DatabaseReference orderRef =
+                                          FirebaseDatabase.instance
+                                              .ref()
+                                              .child('orders')
+                                              .child(orderEntry.key);
+
+                                      // Inside the onClick function
+                                      for (int i = 0;
+                                          i < orderDetails.length;
+                                          i++) {
+                                        DatabaseReference productRef =
+                                            FirebaseDatabase.instance
+                                                .ref()
+                                                .child('orders')
+                                                .child(orderEntry.key)
+                                                .child('order_details')
+                                                .child('$i');
+
+                                        // Update the serve_status for the specific order item
+                                        productRef.update({
+                                          'serve_status': 'Served'
+                                        }); // Change 'Served' to the desired status
+                                      }
+                                      orderRef.update({'order_status': 'DONE'});
+                                      // print(orderDetails);
+                                      // print(orderEntry.value['order_date']);
 
                                       Navigator.of(context).pop();
                                     }),
@@ -243,32 +351,7 @@ class OrderCardDropdown extends ConsumerWidget {
                   child: StyledButton(
                     btnIcon: const Icon(Icons.check),
                     btnText: "DONE",
-                    onClick: () {
-                      final List<Object?> orderDetails =
-                          orderEntry.value['order_details'];
-                      DatabaseReference orderRef = FirebaseDatabase.instance
-                          .ref()
-                          .child('orders')
-                          .child(orderEntry.key);
-
-                      // Inside the onClick function
-                      for (int i = 0; i < orderDetails.length; i++) {
-                        DatabaseReference productRef = FirebaseDatabase.instance
-                            .ref()
-                            .child('orders')
-                            .child(orderEntry.key)
-                            .child('order_details')
-                            .child('$i');
-
-                        // Update the serve_status for the specific order item
-                        productRef.update({
-                          'serve_status': 'Served'
-                        }); // Change 'Served' to the desired status
-                      }
-                      orderRef.update({'order_status': 'DONE'});
-                      // print(orderDetails);
-                      // print(orderEntry.value['order_date']);
-                    },
+                    onClick: doneModal,
                     btnWidth: double.infinity,
                     noShadow: true,
                   ),

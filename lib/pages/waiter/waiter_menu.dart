@@ -26,33 +26,6 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 class WaiterMenu extends ConsumerWidget {
   WaiterMenu({super.key});
 
-  // final variationsProvider =
-  //     FutureProvider.family<List<String>, String>((ref, productId) async {
-  //   final variationsSnapshot = await FirebaseFirestore.instance
-  //       .collection('variations')
-  //       .doc(productId)
-  //       .get();
-  //   print('Variations snapshot data: ${variationsSnapshot.data()}');
-
-  //   final variationsData = variationsSnapshot.data()?['variations'];
-  //   if (variationsData is List<dynamic>) {
-  //     final variations = variationsData.cast<String>();
-  //     print('Variations list: $variations');
-  //     return variations;
-  //   } else {
-  //     print('No variations found or variations data is not a List');
-  //     return []; // Return an empty list when variations data is not a List
-  //   }
-  // });
-  // final variationsProvider =
-  //     FutureProvider.family<List<String>, String>((ref, productId) async {
-  //   final variationsSnapshot = await FirebaseFirestore.instance
-  //       .collection('variations')
-  //       .doc(productId)
-  //       .get();
-  //   return variationsSnapshot; // Return the entire document snapshot
-  // });
-
   double calculateSubtotal(List<OrderObject> orders) {
     return orders.fold(0, (double sum, OrderObject order) {
       return sum + (order.price * order.quantity);
@@ -406,60 +379,19 @@ class WaiterMenu extends ConsumerWidget {
                                 },
                                 error: (error, stackTrace) =>
                                     Text("Error: $error"),
-                                loading: () => CircularProgressIndicator());
-                            // ItemCard(
-                            //   cardWidth: 165,
-                            //   cardHeight: 220,
-                            //   key: ValueKey(productId),
-                            //   productId: productId,
-                            //   productName: productName,
-                            //   productPrice: productPrice,
-                            //   imageUrl: imageUrl,
-                            //   footerSection: Column(
-                            //     children: [
-                            //       FutureBuilder<List<String>>(
-                            //         future: ref.read(variationsProvider(
-                            //                 productId)
-                            //             .future), // Fetch variations using the provider
-                            //         builder: (context, snapshot) {
-                            //           if (snapshot.connectionState ==
-                            //               ConnectionState.waiting) {
-                            //             return CircularProgressIndicator();
-                            //           } else if (snapshot.hasError) {
-                            //             return Text("Error: ${snapshot.error}");
-                            //           } else {
-                            //             final productVariations =
-                            //                 snapshot.data ?? [];
-                            //             return StyledButton(
-                            //               btnIcon: Icon(Icons.add),
-                            //               noShadow: true,
-                            //               btnWidth: double.infinity,
-                            //               btnHeight: 35,
-                            //               btnText: "Add",
-                            //               onClick: () {
-                            //                 addModal(
-                            //                   context,
-                            //                   ref,
-                            //                   productId,
-                            //                   productName,
-                            //                   productPrice,
-                            //                   productVariations, // Pass the fetched variations
-                            //                   imageUrl,
-                            //                 );
-                            //               },
-                            //             );
-                            //           }
-                            //         },
-                            //       ),
-                            //     ],
-                            //   ),
-                            // );
+                                loading: () => Center(
+                                        child: CircularProgressIndicator(
+                                      color: Color(0xFFE2B563),
+                                    )));
                           }).toList(),
                         ),
                       );
                     },
                     error: (error, stackTrace) => Text("Error: $error"),
-                    loading: () => CircularProgressIndicator(),
+                    loading: () => Center(
+                        child: CircularProgressIndicator(
+                      color: Color(0xFFE2B563),
+                    )),
                   );
                 }))
               ],
@@ -478,15 +410,11 @@ class WaiterMenu extends ConsumerWidget {
                     btnIcon: Icon(Icons.shopping_cart_checkout),
                     noShadow: true,
                     btnText: "View Orders",
-                    secondText: "PHP $subtotal",
+                    secondText: "PHP ${subtotal.toStringAsFixed(2)}",
                     onClick: () {
                       Navigator.of(context).push(
                         MaterialPageRoute(builder: (BuildContext context) {
-                          return WaiterMenuCart(
-                              // orderData: currentOrders,
-                              // onDelete: removeOrder,
-                              // onDelete: (int) {},
-                              );
+                          return WaiterMenuCart();
                         }),
                       );
                     },

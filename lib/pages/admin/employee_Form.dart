@@ -25,6 +25,8 @@ class _EmployeeFormState extends State<EmployeeForm> {
 
   String? role;
 
+  bool isLoading = false;
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -38,86 +40,102 @@ class _EmployeeFormState extends State<EmployeeForm> {
         ),
         title: const Text("NEW EMPLOYEE"),
       ),
-      body: SafeArea(
-        child: SizedBox(
-          width: double.infinity,
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              StyledTextField(
-                  controller: fullNameController,
-                  hintText: "Full Name",
-                  obscureText: false),
-              const SizedBox(
-                height: 10,
+      body: Stack(
+        children: [
+          SafeArea(
+            child: SizedBox(
+              width: double.infinity,
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  StyledTextField(
+                      controller: fullNameController,
+                      hintText: "Full Name",
+                      obscureText: false),
+                  const SizedBox(
+                    height: 10,
+                  ),
+                  StyledTextField(
+                      controller: emailController,
+                      hintText: "Email",
+                      obscureText: false),
+                  const SizedBox(
+                    height: 10,
+                  ),
+                  StyledTextField(
+                      controller: passwordController,
+                      hintText: "Password",
+                      obscureText: true),
+                  const SizedBox(
+                    height: 10,
+                  ),
+                  StyledDropdown<String>(
+                    value: role,
+                    onChange: (String? newValue) {
+                      setState(() {
+                        role = newValue;
+                      });
+                    },
+                    hintText: "Role",
+                    items: const ['Admin', 'Waiter', 'Cashier', 'Kitchen'],
+                    showFetchedCategories: false,
+                  ),
+                  const SizedBox(
+                    height: 20,
+                  ),
+                  StyledButton(
+                    btnText: "ADD",
+                    onClick: () async {
+                      try {
+                        setState(() {
+                          isLoading = true;
+                        });
+                        if (passwordController.text.length < 6) {
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            const SnackBar(
+                              content: Text(
+                                  "Password should be at least 6 characters."),
+                            ),
+                          );
+                          return;
+                        }
+                        final authResult = await FirebaseAuth.instance
+                            .createUserWithEmailAndPassword(
+                          email: emailController.text,
+                          password: passwordController.text,
+                        );
+                        await users.doc(authResult.user!.uid).set({
+                          'fullName': fullNameController.text,
+                          'role': role,
+                          'email': emailController.text
+                        });
+                        Navigator.of(context).pushReplacement(
+                          MaterialPageRoute(
+                            builder: (BuildContext context) {
+                              return EmployeePage(); //* Replace page depending on user type
+                            },
+                          ),
+                        );
+                        setState(() {
+                          isLoading = false;
+                        });
+                      } catch (error) {
+                        print('error detected: $error');
+                      }
+                    },
+                    btnWidth: 250,
+                  )
+                ],
               ),
-              StyledTextField(
-                  controller: emailController,
-                  hintText: "Email",
-                  obscureText: false),
-              const SizedBox(
-                height: 10,
-              ),
-              StyledTextField(
-                  controller: passwordController,
-                  hintText: "Password",
-                  obscureText: true),
-              const SizedBox(
-                height: 10,
-              ),
-              StyledDropdown<String>(
-                value: role,
-                onChange: (String? newValue) {
-                  setState(() {
-                    role = newValue;
-                  });
-                },
-                hintText: "Role",
-                items: const ['Admin', 'Waiter', 'Cashier', 'Kitchen'],
-                showFetchedCategories: false,
-              ),
-              const SizedBox(
-                height: 20,
-              ),
-              StyledButton(
-                btnText: "ADD",
-                onClick: () async {
-                  try {
-                    if (passwordController.text.length < 6) {
-                      ScaffoldMessenger.of(context).showSnackBar(
-                        const SnackBar(
-                          content:
-                              Text("Password should be at least 6 characters."),
-                        ),
-                      );
-                      return;
-                    }
-                    final authResult = await FirebaseAuth.instance
-                        .createUserWithEmailAndPassword(
-                      email: emailController.text,
-                      password: passwordController.text,
-                    );
-                    await users.doc(authResult.user!.uid).set({
-                      'fullName': fullNameController.text,
-                      'role': role,
-                      'email': emailController.text
-                    });
-                    Navigator.of(context).pushReplacement(
-                      MaterialPageRoute(
-                        builder: (BuildContext context) {
-                          return EmployeePage(); //* Replace page depending on user type
-                        },
-                      ),
-                    );
-                  } catch (error) {
-                    print('error detected: $error');
-                  }
-                },
-                btnWidth: 250,
-              )
-            ],
+            ),
           ),
-        ),
+          if (isLoading)
+            Center(
+              child: CircularProgressIndicator(
+                color: Color(0xFFE2B563),
+              ),
+            )
+        ],
       ),
     );
   }

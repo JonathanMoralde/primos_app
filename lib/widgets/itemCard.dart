@@ -199,12 +199,29 @@ class ItemCard extends ConsumerWidget {
                               productName,
                               overflow: TextOverflow.clip,
                               softWrap: false,
+                              style: TextStyle(
+                                  fontWeight: FontWeight.w600,
+                                  letterSpacing: 1),
                             ),
                           ),
                           const SizedBox(
                             height: 8,
                           ),
-                          Text(prices?[0] ?? productPrice.toString()),
+                          if (variations == null)
+                            Text("PHP ${productPrice.toStringAsFixed(2)}"),
+                          if (variations != null)
+                            // Add a for loop to display variations and prices
+                            if (variations != null && prices != null)
+                              SingleChildScrollView(
+                                scrollDirection: Axis.horizontal,
+                                child: Row(
+                                  children: [
+                                    for (int i = 0; i < variations!.length; i++)
+                                      Text(
+                                          "${variations![i]} - PHP ${double.parse(prices![i]).toStringAsFixed(2)}"),
+                                  ],
+                                ),
+                              ),
                           const SizedBox(
                             height: 8,
                           ),
@@ -282,12 +299,16 @@ class ItemCard extends ConsumerWidget {
                               productName,
                               overflow: TextOverflow.clip,
                               softWrap: false,
+                              style: TextStyle(
+                                  fontWeight: FontWeight.w600,
+                                  letterSpacing: 1),
                             ),
                           ),
                           const SizedBox(
                             height: 8,
                           ),
-                          if (variations == null) Text("PHP $productPrice"),
+                          if (variations == null)
+                            Text("PHP ${productPrice.toStringAsFixed(2)}"),
                           if (variations != null)
                             // Add a for loop to display variations and prices
                             if (variations != null && prices != null)
@@ -297,7 +318,7 @@ class ItemCard extends ConsumerWidget {
                                   children: [
                                     for (int i = 0; i < variations!.length; i++)
                                       Text(
-                                          "${variations![i]} - PHP ${prices![i]}"),
+                                          "${variations![i]} - PHP ${double.parse(prices![i]).toStringAsFixed(2)}"),
                                   ],
                                 ),
                               ),

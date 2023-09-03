@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_animate/flutter_animate.dart';
 import 'package:primos_app/pages/forgotPassForm.dart';
 import 'package:primos_app/pages/kitchen/kitchen.dart';
 import 'package:primos_app/pages/waiter/tables.dart';
+import 'package:primos_app/providers/loading/isLoading_provider.dart';
 import 'package:primos_app/providers/session/userRole_provider.dart';
 
 // widgets
@@ -44,6 +46,8 @@ class LoginSreen extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    final isLoading = ref.watch(isLoadingProvider);
+
     void handleSignin() {
       final String email = emailController.text.trim();
       final String password = passwordController.text;
@@ -54,6 +58,7 @@ class LoginSreen extends ConsumerWidget {
         );
         return;
       }
+      ref.read(isLoadingProvider.notifier).state = true;
 
       FirebaseAuth.instance
           .signInWithEmailAndPassword(email: email, password: password)
@@ -70,12 +75,12 @@ class LoginSreen extends ConsumerWidget {
           String fullName = userSnapshot['fullName'];
           ref.read(userNameProvider.notifier).state = fullName;
           ref.read(userRoleProvider.notifier).state = role;
-          print(role);
 
           // store role in sharedPreferences
           // Store role in SharedPreferences with a user-specific key
           SharedPreferences prefs = await SharedPreferences.getInstance();
           prefs.setString('lastVisitedPage', role);
+          prefs.setString('userName', fullName);
 
           Navigator.of(context).pushReplacement(
             MaterialPageRoute(
@@ -96,8 +101,11 @@ class LoginSreen extends ConsumerWidget {
             ),
           );
         }
+      }).whenComplete(() {
+        ref.read(isLoadingProvider.notifier).state = false;
       }).catchError((error) {
         print(error);
+        ref.read(isLoadingProvider.notifier).state = false;
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(content: Text("Incorrect Email or Password")),
         );
@@ -107,7 +115,13 @@ class LoginSreen extends ConsumerWidget {
     return Scaffold(
       // backgroundColor: const Color(0xFFF8F8F7),
       // backgroundColor: Colors.transparent,
-      body: Stack(
+      body:
+          // isLoading
+          //     ? Center(
+          //         child: CircularProgressIndicator(color: Color(0xFFE2B563)),
+          //       ).animate().fade()
+          //     :
+          Stack(
         children: [
           Opacity(
             opacity: 0.4, // Adjust the opacity as needed
@@ -135,10 +149,6 @@ class LoginSreen extends ConsumerWidget {
                 child: Column(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
-                    // LOGO
-                    // const SizedBox(
-                    //   height: 65,
-                    // ),
                     Container(
                       decoration: BoxDecoration(
                         borderRadius: BorderRadius.circular(100),
@@ -222,12 +232,19 @@ class LoginSreen extends ConsumerWidget {
                         "Forgot Password?",
                         style: TextStyle(letterSpacing: 1),
                       ),
-                    )
+                    ),
                   ],
                 ),
               ),
             ),
           ),
+          // Floating loading indicator
+          if (isLoading)
+            Center(
+              child: CircularProgressIndicator(
+                color: Color(0xFFE2B563),
+              ),
+            )
         ],
       ),
     );

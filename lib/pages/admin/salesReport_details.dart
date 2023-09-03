@@ -121,41 +121,54 @@ class SalesReportDetails extends ConsumerWidget {
                       height: 5,
                     ),
                     for (final order in orderData)
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      Column(
                         children: [
-                          Expanded(
-                            flex: 1,
-                            child: Text(
-                              (order['productName'] as String).toUpperCase(),
-                              style: TextStyle(),
-                            ),
+                          Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            children: [
+                              Expanded(
+                                flex: 1,
+                                child: Text(
+                                  (order['productName'] as String),
+                                  style: TextStyle(),
+                                ),
+                              ),
+                              Expanded(
+                                flex: 1,
+                                child: Text(
+                                  order['quantity'].toString(),
+                                  style: TextStyle(),
+                                  textAlign: TextAlign.center,
+                                ),
+                              ),
+                              Expanded(
+                                flex: 1,
+                                child: Text(
+                                  order['variation'] != null
+                                      ? order['variation'] as String
+                                      : "-",
+                                  style: TextStyle(),
+                                  textAlign: TextAlign.center,
+                                ),
+                              )
+                            ],
                           ),
-                          Expanded(
-                            flex: 1,
-                            child: Text(
-                              order['quantity'].toString(),
-                              style: TextStyle(),
-                              textAlign: TextAlign.center,
-                            ),
+                          Divider(
+                            height: 0,
                           ),
-                          Expanded(
-                            flex: 1,
-                            child: Text(
-                              order['variation'] != null
-                                  ? order['variation'] as String
-                                  : "No Variation",
-                              style: TextStyle(),
-                              textAlign: TextAlign.center,
-                            ),
+                          const SizedBox(
+                            height: 3,
                           )
                         ],
-                      )
+                      ),
                   ],
                 );
               },
               error: (error, stackTrace) => Text('Error: $error'),
-              loading: () => CircularProgressIndicator()),
+              loading: () => Center(
+                      child: CircularProgressIndicator(
+                    color: Color(0xFFE2B563),
+                  ))),
         ),
       )),
     );

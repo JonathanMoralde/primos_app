@@ -21,6 +21,7 @@ class _AddVariationFormState extends State<AddVariationForm> {
   List<String> variations = [];
   List<String> prices = [];
   bool isConfirmButtonEnabled = false; // Add this variable
+  bool isLoading = false;
 
   void _resetUI() {
     setState(() {
@@ -38,6 +39,9 @@ class _AddVariationFormState extends State<AddVariationForm> {
   }
 
   void _confirmVariations() async {
+    setState(() {
+      isLoading = true;
+    });
     final DocumentReference docRef = FirebaseFirestore.instance
         .collection('variations')
         .doc(widget.productId);
@@ -72,7 +76,9 @@ class _AddVariationFormState extends State<AddVariationForm> {
         'prices': FieldValue.arrayUnion(prices),
       });
     }
-
+    setState(() {
+      isLoading = false;
+    });
     _resetUI();
     _showSnackBar('Variation/s added successfully!');
   }
@@ -83,131 +89,142 @@ class _AddVariationFormState extends State<AddVariationForm> {
       appBar: AppBar(
         title: Text('ADD VARIATION'),
       ),
-      body: SafeArea(
-        child: SizedBox(
-          width: double.infinity,
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              Row(
+      body: Stack(
+        children: [
+          SafeArea(
+            child: SizedBox(
+              width: double.infinity,
+              child: Column(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  StyledTextField(
-                    borderRadius: BorderRadius.only(
-                        topLeft: Radius.circular(8),
-                        bottomLeft: Radius.circular(8)),
-                    width: 200,
-                    controller: variationController,
-                    hintText: 'Add Variation',
-                    obscureText: false,
-                  ),
-                  StyledButton(
-                    borderRadius: BorderRadius.only(
-                      topRight: Radius.circular(8),
-                      bottomRight: Radius.circular(8),
-                    ),
-                    noShadow: true,
-                    btnIcon: const Icon(Icons.add),
-                    btnText: 'ADD',
-                    onClick: () {
-                      setState(() {
-                        variations.add(variationController.text);
-                        variationController.clear();
-                      });
-                    },
-                  ),
-                ],
-              ),
-              const SizedBox(
-                height: 15,
-              ),
-              Row(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  StyledTextField(
-                    borderRadius: BorderRadius.only(
-                        topLeft: Radius.circular(8),
-                        bottomLeft: Radius.circular(8)),
-                    width: 200,
-                    controller: varPriceController,
-                    hintText: 'Add Variation Price',
-                    obscureText: false,
-                    keyboardType: TextInputType.number,
-                  ),
-                  StyledButton(
-                    borderRadius: BorderRadius.only(
-                      topRight: Radius.circular(8),
-                      bottomRight: Radius.circular(8),
-                    ),
-                    noShadow: true,
-                    btnIcon: const Icon(Icons.add),
-                    btnText: 'ADD',
-                    onClick: () {
-                      setState(() {
-                        prices.add(varPriceController.text);
-                        varPriceController.clear();
-                        isConfirmButtonEnabled =
-                            true; // Enable the "CONFIRM" button
-                      });
-                    },
-                  ),
-                ],
-              ),
-              const SizedBox(height: 20),
-              StyledButton(
-                btnText: 'CONFIRM',
-                onClick: isConfirmButtonEnabled ? _confirmVariations : null,
-                // Disable the button if no variations added
-              ),
-              const SizedBox(height: 10),
-              if (variations.isNotEmpty &&
-                  prices.isNotEmpty &&
-                  variations.length == prices.length)
-                Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      'Added Variations:',
-                      style: TextStyle(fontWeight: FontWeight.bold),
-                    ),
-                    const SizedBox(height: 5),
-                    for (var i = 0; i < variations.length; i++)
-                      Container(
-                        padding: EdgeInsets.symmetric(vertical: 5),
-                        child: Text(
-                            '${i + 1}. ${variations[i]} - PHP ${prices[i]}'),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      StyledTextField(
+                        borderRadius: BorderRadius.only(
+                            topLeft: Radius.circular(8),
+                            bottomLeft: Radius.circular(8)),
+                        width: 200,
+                        controller: variationController,
+                        hintText: 'Add Variation',
+                        obscureText: false,
                       ),
-                  ],
-                ),
-              const SizedBox(
-                height: 20,
-              ),
-              const Row(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  Icon(
-                    Icons.info_outline,
-                    size: 20,
+                      StyledButton(
+                        borderRadius: BorderRadius.only(
+                          topRight: Radius.circular(8),
+                          bottomRight: Radius.circular(8),
+                        ),
+                        noShadow: true,
+                        btnIcon: const Icon(Icons.add),
+                        btnText: 'ADD',
+                        onClick: () {
+                          setState(() {
+                            variations.add(variationController.text);
+                            variationController.clear();
+                          });
+                        },
+                      ),
+                    ],
                   ),
-                  SizedBox(
-                      width: 4), // Adding a small gap between the icon and text
-                  SizedBox(
-                    width: 250,
-                    child: Flexible(
-                      child: Text(
-                        "Enter price at the same order as you've entered variation.",
-                        style: TextStyle(
-                          fontSize: 12,
-                          letterSpacing: 1,
+                  const SizedBox(
+                    height: 15,
+                  ),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      StyledTextField(
+                        borderRadius: BorderRadius.only(
+                            topLeft: Radius.circular(8),
+                            bottomLeft: Radius.circular(8)),
+                        width: 200,
+                        controller: varPriceController,
+                        hintText: 'Add Variation Price',
+                        obscureText: false,
+                        keyboardType: TextInputType.number,
+                      ),
+                      StyledButton(
+                        borderRadius: BorderRadius.only(
+                          topRight: Radius.circular(8),
+                          bottomRight: Radius.circular(8),
+                        ),
+                        noShadow: true,
+                        btnIcon: const Icon(Icons.add),
+                        btnText: 'ADD',
+                        onClick: () {
+                          setState(() {
+                            prices.add(varPriceController.text);
+                            varPriceController.clear();
+                            isConfirmButtonEnabled =
+                                true; // Enable the "CONFIRM" button
+                          });
+                        },
+                      ),
+                    ],
+                  ),
+                  const SizedBox(height: 20),
+                  StyledButton(
+                    btnText: 'CONFIRM',
+                    onClick: isConfirmButtonEnabled ? _confirmVariations : null,
+                    // Disable the button if no variations added
+                  ),
+                  const SizedBox(height: 10),
+                  if (variations.isNotEmpty &&
+                      prices.isNotEmpty &&
+                      variations.length == prices.length)
+                    Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          'Added Variations:',
+                          style: TextStyle(fontWeight: FontWeight.bold),
+                        ),
+                        const SizedBox(height: 5),
+                        for (var i = 0; i < variations.length; i++)
+                          Container(
+                            padding: EdgeInsets.symmetric(vertical: 5),
+                            child: Text(
+                                '${i + 1}. ${variations[i]} - PHP ${prices[i]}'),
+                          ),
+                      ],
+                    ),
+                  const SizedBox(
+                    height: 20,
+                  ),
+                  const Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Icon(
+                        Icons.info_outline,
+                        size: 20,
+                      ),
+                      SizedBox(
+                          width:
+                              4), // Adding a small gap between the icon and text
+                      SizedBox(
+                        width: 250,
+                        child: Flexible(
+                          child: Text(
+                            "Enter price at the same order as you've entered variation.",
+                            style: TextStyle(
+                              fontSize: 12,
+                              letterSpacing: 1,
+                            ),
+                          ),
                         ),
                       ),
-                    ),
+                    ],
                   ),
                 ],
               ),
-            ],
+            ),
           ),
-        ),
+          if (isLoading)
+            Center(
+              child: CircularProgressIndicator(
+                color: Color(0xFFE2B563),
+              ),
+            )
+        ],
       ),
     );
   }

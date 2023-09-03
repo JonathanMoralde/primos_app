@@ -98,6 +98,8 @@ class SideMenu extends ConsumerWidget {
                 // store role in sharedPreferences
                 SharedPreferences prefs = await SharedPreferences.getInstance();
                 prefs.setString('lastVisitedPage', "LoginScreen");
+                prefs.setString('userRole', "n/a");
+                prefs.setString('userName', "User");
 
                 Navigator.of(context).pushAndRemoveUntil(
                   MaterialPageRoute(

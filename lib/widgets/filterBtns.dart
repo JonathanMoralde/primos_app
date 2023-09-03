@@ -16,6 +16,7 @@ class FilterBtns extends ConsumerWidget {
 
     return categoriesState.when(
       data: (category) {
+        category.sort();
         return Padding(
           padding: const EdgeInsets.only(left: 16),
           child: SizedBox(

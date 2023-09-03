@@ -46,7 +46,10 @@ class KitchenPage extends ConsumerWidget {
                   ),
                 );
               },
-              loading: () => CircularProgressIndicator(),
+              loading: () => Center(
+                  child: CircularProgressIndicator(
+                color: Color(0xFFE2B563),
+              )),
               error: (error, stackTrace) => Text('Error: $error'),
             ),
           ),

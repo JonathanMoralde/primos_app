@@ -131,18 +131,23 @@ class WaiterMenuCart extends ConsumerWidget {
                     productPrice: order.price,
                     imageUrl: order.imageUrl,
                     isRow: true,
-                    cardHeight: order.variation != null ? 150 : 130,
+                    cardHeight: order.variation != null ? 130 : 110,
                     footerSection: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           order.variation != null
                               ? Text("Variation: ${order.variation}")
                               : const SizedBox(),
+                          // const SizedBox(
+                          //   height: 5,
+                          // ),
                           Row(
                             mainAxisAlignment: MainAxisAlignment.spaceBetween,
                             children: [
                               Text("Quantity: ${order.quantity.toString()}"),
                               IconButton(
+                                padding: EdgeInsets.zero,
+                                constraints: BoxConstraints(),
                                 onPressed: () {
                                   orderData.removeAt(index);
                                   ref
@@ -179,7 +184,7 @@ class WaiterMenuCart extends ConsumerWidget {
                     style: TextStyle(letterSpacing: 1),
                   ),
                   Text(
-                    "PHP ${ref.watch(subtotalProvider)}",
+                    "PHP ${ref.watch(subtotalProvider).toStringAsFixed(2)}",
                     style: const TextStyle(
                         fontWeight: FontWeight.w700, letterSpacing: 1),
                   )

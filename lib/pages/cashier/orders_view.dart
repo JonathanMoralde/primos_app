@@ -90,171 +90,188 @@ class OrderViewPage extends ConsumerWidget {
           context: context,
           builder: (context) => AlertDialog(
             contentPadding: EdgeInsets.zero,
-            content: Column(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                Container(
-                  padding: EdgeInsets.all(16.0),
-                  child: Text(
-                    "Receipt:",
-                    textAlign: TextAlign.left,
+            content: SizedBox(
+              width: 320,
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Container(
+                    padding: EdgeInsets.all(16.0),
+                    child: Text(
+                      "Receipt:",
+                      textAlign: TextAlign.left,
+                      style: TextStyle(letterSpacing: 1),
+                    ),
                   ),
-                ),
-                Divider(height: 0),
-                Container(
-                  padding: EdgeInsets.all(16.0),
-                  child: Column(
-                    children: [
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        children: [
-                          Text("Amount Received: "),
-                          Text("PHP ${cashController.text}"),
-                        ],
-                      ),
-                      const SizedBox(
-                        height: 5,
-                      ),
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        children: [
-                          Text("Bill Amount: "),
-                          Text("PHP $totalAmount")
-                        ],
-                      ),
-                      const SizedBox(
-                        height: 5,
-                      ),
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        children: [
-                          Text(
-                            "VAT 12% ",
-                            style: TextStyle(fontSize: 13),
-                          ),
-                          Text(
-                            (totalAmount! * 0.12).toStringAsFixed(2),
-                            style: TextStyle(fontSize: 13),
-                          )
-                        ],
-                      ),
-                      const SizedBox(
-                        height: 5,
-                      ),
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        children: [
-                          Text("Discount: "),
-                          Text(discountController.text.isEmpty
-                              ? "0%"
-                              : "${discountController.text}%"),
-                        ],
-                      ),
-                      const SizedBox(
-                        height: 5,
-                      ),
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        children: [
-                          Text("Total Amount: "),
-                          Text(discountedTotal.toStringAsFixed(2)),
-                        ],
-                      ),
-                      const SizedBox(
-                        height: 5,
-                      ),
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        children: [
-                          Text("Change: "),
-                          Text(
-                              "PHP ${(int.parse(cashController.text) - discountedTotal).toStringAsFixed(2)}"),
-                        ],
-                      ),
-                      const SizedBox(
-                        height: 15,
-                      ),
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        children: [
-                          StyledButton(
-                              btnText: "Back",
-                              onClick: () {
-                                Navigator.of(context).pop();
-                              }),
-                          StyledButton(
-                              btnText: "Confirm & Print",
-                              onClick: () {
-                                // ! DATAS THAT NEED TO BE SENT TO THE PRINT PAGE:
-                                // ! DATE
-                                // ! ORDER NUMBER
-                                // ! ORDER REFERENCE NUMBER
-                                // payment method
-                                // ! ROLE + WAITER NAME
-                                // ! ORDER DETAILS/DESCRIPTION
-                                // ! SUBTOTAL
-                                // ! VAT
-                                // ! DISCOUNTS
-                                // ! GRAND TOTAL
-                                // ! AMOUNT PAID
-                                // ! CASHIER NAME
-                                String referenceNumber =
-                                    generateUniqueReferenceNumber();
+                  Divider(height: 0),
+                  Container(
+                    padding: EdgeInsets.all(16.0),
+                    child: Column(
+                      children: [
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            Text(
+                              "Amount Received: ",
+                            ),
+                            Text(
+                                "PHP ${double.parse(cashController.text).toStringAsFixed(2)}"),
+                          ],
+                        ),
+                        const SizedBox(
+                          height: 5,
+                        ),
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            Text(
+                              "Bill Amount: ",
+                            ),
+                            Text("PHP ${totalAmount.toStringAsFixed(2)}")
+                          ],
+                        ),
+                        const SizedBox(
+                          height: 5,
+                        ),
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            Text(
+                              "VAT 12% ",
+                              style: TextStyle(
+                                fontSize: 13,
+                              ),
+                            ),
+                            Text(
+                              (totalAmount! * 0.12).toStringAsFixed(2),
+                              style: TextStyle(fontSize: 13),
+                            )
+                          ],
+                        ),
+                        const SizedBox(
+                          height: 5,
+                        ),
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            Text(
+                              "Discount: ",
+                            ),
+                            Text(discountController.text.isEmpty
+                                ? "0%"
+                                : "${discountController.text}%"),
+                          ],
+                        ),
+                        const SizedBox(
+                          height: 5,
+                        ),
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            Text(
+                              "Total Amount: ",
+                            ),
+                            Text("PHP ${discountedTotal.toStringAsFixed(2)}"),
+                          ],
+                        ),
+                        const SizedBox(
+                          height: 5,
+                        ),
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            Text(
+                              "Change: ",
+                            ),
+                            Text(
+                                "PHP ${(int.parse(cashController.text) - discountedTotal).toStringAsFixed(2)}"),
+                          ],
+                        ),
+                        const SizedBox(
+                          height: 15,
+                        ),
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            StyledButton(
+                                btnText: "Back",
+                                onClick: () {
+                                  Navigator.of(context).pop();
+                                }),
+                            StyledButton(
+                                btnText: "Confirm & Print",
+                                onClick: () {
+                                  // ! DATAS THAT NEED TO BE SENT TO THE PRINT PAGE:
+                                  // ! DATE
+                                  // ! ORDER NUMBER
+                                  // ! ORDER REFERENCE NUMBER
+                                  // payment method
+                                  // ! ROLE + WAITER NAME
+                                  // ! ORDER DETAILS/DESCRIPTION
+                                  // ! SUBTOTAL
+                                  // ! VAT
+                                  // ! DISCOUNTS
+                                  // ! GRAND TOTAL
+                                  // ! AMOUNT PAID
+                                  // ! CASHIER NAME
+                                  String referenceNumber =
+                                      generateUniqueReferenceNumber();
 
-                                double vatAmount = totalAmount * 0.12;
-                                double discountAmount = (totalAmount *
-                                    (double.parse(
-                                            discountController.text.isNotEmpty
-                                                ? discountController.text
-                                                : "0") /
-                                        100));
-                                double amountReceived =
-                                    double.parse(cashController.text);
-                                double changeAmount =
-                                    (int.parse(cashController.text) -
-                                        discountedTotal);
+                                  double vatAmount = totalAmount * 0.12;
+                                  double discountAmount = (totalAmount *
+                                      (double.parse(
+                                              discountController.text.isNotEmpty
+                                                  ? discountController.text
+                                                  : "0") /
+                                          100));
+                                  double amountReceived =
+                                      double.parse(cashController.text);
+                                  double changeAmount =
+                                      (int.parse(cashController.text) -
+                                          discountedTotal);
 
-                                DatabaseReference orderRef = FirebaseDatabase
-                                    .instance
-                                    .ref()
-                                    .child('orders')
-                                    .child(orderEntry.key);
+                                  DatabaseReference orderRef = FirebaseDatabase
+                                      .instance
+                                      .ref()
+                                      .child('orders')
+                                      .child(orderEntry.key);
 
-                                orderRef.update({'bill_amount': totalAmount});
-                                orderRef
-                                    .update({'total_amount': discountedTotal});
-                                orderRef.update({'discount': discountAmount});
-                                orderRef.update({'vat': vatAmount});
-                                orderRef.update({'payment_status': 'Paid'});
-                                orderRef
-                                    .update({'receipt_ref': referenceNumber});
+                                  orderRef.update({'bill_amount': totalAmount});
+                                  orderRef.update(
+                                      {'total_amount': discountedTotal});
+                                  orderRef.update({'discount': discountAmount});
+                                  orderRef.update({'vat': vatAmount});
+                                  orderRef.update({'payment_status': 'Paid'});
+                                  orderRef
+                                      .update({'receipt_ref': referenceNumber});
 
-                                Navigator.of(context).push(
-                                  MaterialPageRoute(
-                                      builder: (BuildContext context) {
-                                    return PrintPage(
-                                      formattedDate: formattedDate,
-                                      orderName: orderName,
-                                      receiptNum: referenceNumber,
-                                      waiterName: waiterName!,
-                                      orderDetails: orderDetails,
-                                      subtotal: totalAmount.toDouble(),
-                                      vatAmount: vatAmount,
-                                      discountAmount: discountAmount,
-                                      grandTotal: discountedTotal,
-                                      amountReceived: amountReceived,
-                                      changeAmount: changeAmount,
-                                      cashierName: cashierName!,
-                                    );
-                                  }),
-                                );
-                              }),
-                        ],
-                      )
-                    ],
+                                  Navigator.of(context).push(
+                                    MaterialPageRoute(
+                                        builder: (BuildContext context) {
+                                      return PrintPage(
+                                        formattedDate: formattedDate,
+                                        orderName: orderName,
+                                        receiptNum: referenceNumber,
+                                        waiterName: waiterName!,
+                                        orderDetails: orderDetails,
+                                        subtotal: totalAmount.toDouble(),
+                                        vatAmount: vatAmount,
+                                        discountAmount: discountAmount,
+                                        grandTotal: discountedTotal,
+                                        amountReceived: amountReceived,
+                                        changeAmount: changeAmount,
+                                        cashierName: cashierName!,
+                                      );
+                                    }),
+                                  );
+                                }),
+                          ],
+                        )
+                      ],
+                    ),
                   ),
-                ),
-              ],
+                ],
+              ),
             ),
           ),
         );
@@ -511,7 +528,7 @@ class OrderViewPage extends ConsumerWidget {
                             "SUBTOTAL",
                             style: TextStyle(fontWeight: FontWeight.w600),
                           ),
-                          Text("PHP $totalAmount")
+                          Text("PHP ${totalAmount.toStringAsFixed(2)}")
                         ],
                       ),
                     ],

@@ -159,7 +159,10 @@ class Categories extends ConsumerWidget {
                 return const Text(
                     "Error fetching categories"); // Show an error message
               },
-              loading: () => const CircularProgressIndicator()),
+              loading: () => Center(
+                      child: const CircularProgressIndicator(
+                    color: Color(0xFFE2B563),
+                  ))),
         ),
       ),
     );

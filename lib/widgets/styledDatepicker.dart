@@ -56,11 +56,28 @@ class _StyledDatepickerState extends State<StyledDatepicker> {
         ),
         onPressed: () async {
           final DateTime? dateTime = await showDatePicker(
-              context: context,
-              initialDate: initalDate,
-              firstDate: DateTime(2000),
-              lastDate: DateTime(3000));
-
+            context: context,
+            initialDate: initalDate,
+            firstDate: DateTime(2000),
+            lastDate: DateTime(3000),
+            builder: (context, child) {
+              return Theme(
+                data: Theme.of(context).copyWith(
+                  colorScheme: ColorScheme.light(
+                    primary: Color(0xFFE2B563), // <-- SEE HERE
+                    onPrimary: Color(0xff252525), // <-- SEE HERE
+                    onSurface: Color(0xff252525), // <-- SEE HERE
+                  ),
+                  textButtonTheme: TextButtonThemeData(
+                    style: TextButton.styleFrom(
+                      foregroundColor: Color(0xff252525), // button text color
+                    ),
+                  ),
+                ),
+                child: child!,
+              );
+            },
+          );
           if (dateTime != null) {
             setState(
               () {

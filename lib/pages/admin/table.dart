@@ -93,7 +93,10 @@ class _TablePageState extends State<TablePage> {
             future: fetchTablesFuture,
             builder: (context, snapshot) {
               if (snapshot.connectionState == ConnectionState.waiting) {
-                return CircularProgressIndicator();
+                return Center(
+                    child: CircularProgressIndicator(
+                  color: Color(0xFFE2B563),
+                ));
               } else if (snapshot.hasError) {
                 return Text('Error: ${snapshot.error}');
               } else {
