@@ -166,7 +166,7 @@ class _PrintPageState extends State<PrintPage> {
         PosColumn(text: order['quantity'], width: 1),
         PosColumn(text: order['variation'] ?? "-", width: 2),
         PosColumn(
-            text: order['productPrice'],
+            text: order['productPrice'].toString(),
             width: 2,
             styles: PosStyles(align: PosAlign.right)),
         PosColumn(
