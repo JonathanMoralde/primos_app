@@ -163,15 +163,15 @@ class _PrintPageState extends State<PrintPage> {
     for (final order in widget.orderDetails) {
       bytes += ticket.row([
         PosColumn(text: order['productName'], width: 5),
-        PosColumn(text: order['quantity'].toString(), width: 1),
+        PosColumn(text: order['quantity'] as String, width: 1),
         PosColumn(text: order['variation'] ?? "-", width: 2),
         PosColumn(
-            text: order['productPrice'].toString(),
+            text: order['productPrice'] as String,
             width: 2,
             styles: PosStyles(align: PosAlign.right)),
         PosColumn(
-            text: (double.parse(order['quantity']) *
-                    double.parse(order['productPrice']))
+            text: (double.parse(order['quantity'] as String) *
+                    double.parse(order['productPrice'] as String))
                 .toString(),
             width: 2,
             styles: PosStyles(align: PosAlign.right)),
