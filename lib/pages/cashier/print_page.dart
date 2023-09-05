@@ -163,7 +163,7 @@ class _PrintPageState extends State<PrintPage> {
     for (final order in widget.orderDetails) {
       bytes += ticket.row([
         PosColumn(text: order['productName'], width: 5),
-        PosColumn(text: order['quantity'], width: 1),
+        PosColumn(text: order['quantity'].toString(), width: 1),
         PosColumn(text: order['variation'] ?? "-", width: 2),
         PosColumn(
             text: order['productPrice'].toString(),
