@@ -110,32 +110,45 @@ class _PrintPageState extends State<PrintPage> {
 
     bytes += ticket.hr();
     bytes += ticket.row([
-      PosColumn(text: 'DATE:', styles: PosStyles(align: PosAlign.left)),
       PosColumn(
-          text: widget.formattedDate, styles: PosStyles(align: PosAlign.right)),
+          text: 'DATE:', width: 6, styles: PosStyles(align: PosAlign.left)),
+      PosColumn(
+          text: widget.formattedDate,
+          width: 6,
+          styles: PosStyles(align: PosAlign.right)),
     ]);
     bytes += ticket.row([
-      PosColumn(text: 'ORDER:', styles: PosStyles(align: PosAlign.left)),
       PosColumn(
-          text: widget.orderName, styles: PosStyles(align: PosAlign.right)),
+          text: 'ORDER:', width: 6, styles: PosStyles(align: PosAlign.left)),
+      PosColumn(
+          text: widget.orderName,
+          width: 6,
+          styles: PosStyles(align: PosAlign.right)),
     ]);
     if (widget.receiptNum != null) {
       bytes += ticket.row([
         PosColumn(
-            text: 'RECEIPT NO.:', styles: PosStyles(align: PosAlign.left)),
+            text: 'RECEIPT NO.:',
+            width: 12,
+            styles: PosStyles(align: PosAlign.left)),
         PosColumn(
-            text: widget.receiptNum!, styles: PosStyles(align: PosAlign.right)),
+            text: widget.receiptNum!,
+            width: 12,
+            styles: PosStyles(align: PosAlign.right)),
       ]);
     }
     bytes += ticket.row([
-      PosColumn(text: 'WAITER:', styles: PosStyles(align: PosAlign.left)),
       PosColumn(
-          text: widget.waiterName, styles: PosStyles(align: PosAlign.right)),
+          text: 'WAITER:', width: 6, styles: PosStyles(align: PosAlign.left)),
+      PosColumn(
+          text: widget.waiterName,
+          width: 6,
+          styles: PosStyles(align: PosAlign.right)),
     ]);
 
     bytes += ticket.hr();
     bytes += ticket.row([
-      PosColumn(text: 'ITEM NAME', width: 7),
+      PosColumn(text: 'ITEM NAME', width: 5),
       PosColumn(text: 'QTY', width: 1),
       PosColumn(text: 'VARIATION', width: 2),
       PosColumn(
@@ -149,7 +162,7 @@ class _PrintPageState extends State<PrintPage> {
     ]);
     for (final order in widget.orderDetails) {
       bytes += ticket.row([
-        PosColumn(text: order['productName'], width: 7),
+        PosColumn(text: order['productName'], width: 5),
         PosColumn(text: order['quantity'], width: 1),
         PosColumn(text: order['variation'] ?? "-", width: 2),
         PosColumn(
@@ -262,9 +275,14 @@ class _PrintPageState extends State<PrintPage> {
       ]);
       bytes += ticket.hr(linesAfter: 1);
       bytes += ticket.row([
-        PosColumn(text: 'CASHIER:', styles: PosStyles(align: PosAlign.left)),
         PosColumn(
-            text: widget.cashierName, styles: PosStyles(align: PosAlign.right)),
+            text: 'CASHIER:',
+            width: 6,
+            styles: PosStyles(align: PosAlign.left)),
+        PosColumn(
+            text: widget.cashierName,
+            width: 6,
+            styles: PosStyles(align: PosAlign.right)),
       ]);
     }
 
