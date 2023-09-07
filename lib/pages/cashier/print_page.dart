@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:esc_pos_bluetooth/esc_pos_bluetooth.dart';
 import 'package:esc_pos_utils/esc_pos_utils.dart';
 import 'package:intl/intl.dart';
+import 'package:primos_app/pages/cashier/orders.dart';
 
 class PrintPage extends StatefulWidget {
   final String formattedDate;
@@ -88,12 +89,6 @@ class _PrintPageState extends State<PrintPage> {
     final Generator ticket = Generator(paper, profile);
     List<int> bytes = [];
 
-    // Print image
-    // final ByteData data = await rootBundle.load('assets/rabbit_black.jpg');
-    // final Uint8List imageBytes = data.buffer.asUint8List();
-    // final Image? image = decodeImage(imageBytes);
-    // bytes += ticket.image(image);
-
     bytes += ticket.text('Primo\'s Bistro',
         styles: PosStyles(
           align: PosAlign.center,
@@ -129,11 +124,11 @@ class _PrintPageState extends State<PrintPage> {
       bytes += ticket.row([
         PosColumn(
             text: 'RECEIPT NO.:',
-            width: 12,
+            width: 6,
             styles: PosStyles(align: PosAlign.left)),
         PosColumn(
             text: widget.receiptNum!,
-            width: 12,
+            width: 6,
             styles: PosStyles(align: PosAlign.right)),
       ]);
     }
@@ -160,19 +155,24 @@ class _PrintPageState extends State<PrintPage> {
           width: 2,
           styles: PosStyles(align: PosAlign.right)),
     ]);
-    for (final order in widget.orderDetails) {
+    for (var i = 0; i < widget.orderDetails.length; i++) {
+      final String productName = widget.orderDetails[i]['productName'];
+      final String variation = widget.orderDetails[i]['variation'] ?? "-";
+      final String quantity = widget.orderDetails[i]['quantity'].toString();
+      final String productPrice =
+          widget.orderDetails[i]['productPrice'].toString();
+      final String totalPrice =
+          (int.parse(quantity) * int.parse(productPrice)).toString();
       bytes += ticket.row([
-        PosColumn(text: order['productName'], width: 5),
-        PosColumn(text: order['quantity'] as String, width: 1),
-        PosColumn(text: order['variation'] ?? "-", width: 2),
+        PosColumn(text: productName, width: 5),
+        PosColumn(text: quantity, width: 1),
+        PosColumn(text: variation, width: 2),
         PosColumn(
-            text: order['productPrice'] as String,
+            text: productPrice,
             width: 2,
             styles: PosStyles(align: PosAlign.right)),
         PosColumn(
-            text: (double.parse(order['quantity'] as String) *
-                    double.parse(order['productPrice'] as String))
-                .toString(),
+            text: totalPrice,
             width: 2,
             styles: PosStyles(align: PosAlign.right)),
       ]);
@@ -185,16 +185,16 @@ class _PrintPageState extends State<PrintPage> {
             text: 'BILL AMOUNT:',
             width: 6,
             styles: PosStyles(
-              height: PosTextSize.size2,
-              width: PosTextSize.size2,
+              height: PosTextSize.size1,
+              width: PosTextSize.size1,
             )),
         PosColumn(
             text: 'PHP ${widget.subtotal}',
             width: 6,
             styles: PosStyles(
               align: PosAlign.right,
-              height: PosTextSize.size2,
-              width: PosTextSize.size2,
+              height: PosTextSize.size1,
+              width: PosTextSize.size1,
             )),
       ]);
     } else {
@@ -239,16 +239,16 @@ class _PrintPageState extends State<PrintPage> {
             text: 'GRAND TOTAL',
             width: 6,
             styles: PosStyles(
-              height: PosTextSize.size2,
-              width: PosTextSize.size2,
+              height: PosTextSize.size1,
+              width: PosTextSize.size1,
             )),
         PosColumn(
             text: 'PHP ${widget.grandTotal}',
             width: 6,
             styles: PosStyles(
               align: PosAlign.right,
-              height: PosTextSize.size2,
-              width: PosTextSize.size2,
+              height: PosTextSize.size1,
+              width: PosTextSize.size1,
             )),
       ]);
       bytes += ticket.hr(ch: '=', linesAfter: 1);
@@ -257,21 +257,21 @@ class _PrintPageState extends State<PrintPage> {
         PosColumn(
             text: 'CASH:',
             width: 7,
-            styles: PosStyles(align: PosAlign.right, width: PosTextSize.size2)),
+            styles: PosStyles(align: PosAlign.right, width: PosTextSize.size1)),
         PosColumn(
             text: 'PHP ${widget.amountReceived}',
             width: 5,
-            styles: PosStyles(align: PosAlign.right, width: PosTextSize.size2)),
+            styles: PosStyles(align: PosAlign.right, width: PosTextSize.size1)),
       ]);
       bytes += ticket.row([
         PosColumn(
             text: 'CHANGE:',
             width: 7,
-            styles: PosStyles(align: PosAlign.right, width: PosTextSize.size2)),
+            styles: PosStyles(align: PosAlign.right, width: PosTextSize.size1)),
         PosColumn(
             text: 'PHP ${widget.changeAmount}',
             width: 5,
-            styles: PosStyles(align: PosAlign.right, width: PosTextSize.size2)),
+            styles: PosStyles(align: PosAlign.right, width: PosTextSize.size1)),
       ]);
       bytes += ticket.hr(linesAfter: 1);
       bytes += ticket.row([
@@ -285,10 +285,10 @@ class _PrintPageState extends State<PrintPage> {
             styles: PosStyles(align: PosAlign.right)),
       ]);
     }
-
-    bytes += ticket.feed(2);
     bytes += ticket.text('Thank you!',
         styles: PosStyles(align: PosAlign.center, bold: true));
+
+    bytes += ticket.feed(2);
 
     ;
 
@@ -309,7 +309,16 @@ class _PrintPageState extends State<PrintPage> {
       print("Printing result: ${res.msg}");
 
       // ONCE PRINTED
-      Navigator.of(context).pop();
+      if (widget.receiptNum == null) {
+        Navigator.of(context).pop();
+      } else {
+        Navigator.of(context).pushAndRemoveUntil(
+          MaterialPageRoute(builder: (context) {
+            return OrdersPage();
+          }),
+          (Route<dynamic> route) => false,
+        );
+      }
     } catch (e) {
       print("Printing error: $e");
     }

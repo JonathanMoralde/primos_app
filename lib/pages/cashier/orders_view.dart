@@ -6,9 +6,12 @@ import 'dart:math';
 
 import 'package:firebase_database/firebase_database.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_blue_plus/flutter_blue_plus.dart';
 // import 'package:flutter_blue_plus/flutter_blue_plus.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:geolocator/geolocator.dart';
 import 'package:intl/intl.dart';
+// import 'package:location/location.dart';
 import 'package:primos_app/pages/cashier/orders.dart';
 import 'package:primos_app/pages/cashier/print_page.dart';
 import 'package:primos_app/providers/session/user_provider.dart';
@@ -26,6 +29,22 @@ class OrderViewPage extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    late bool servicePermission = false;
+    late LocationPermission permission;
+
+    Future<Position> getCurrentLocation() async {
+      servicePermission = await Geolocator.isLocationServiceEnabled();
+      if (!servicePermission) {
+        print('service disabled');
+      }
+      permission = await Geolocator.checkPermission();
+
+      if (permission == LocationPermission.denied) {
+        permission = await Geolocator.requestPermission();
+      }
+      return await Geolocator.getCurrentPosition();
+    }
+
     // Extract the order details from orderEntry.value
     final orderDetails = orderEntry.value['order_details'] as List<dynamic>?;
     final orderName = orderEntry.value['order_name'] as String?;
@@ -200,7 +219,7 @@ class OrderViewPage extends ConsumerWidget {
                                 }),
                             StyledButton(
                                 btnText: "Confirm & Print",
-                                onClick: () {
+                                onClick: () async {
                                   // ! DATAS THAT NEED TO BE SENT TO THE PRINT PAGE:
                                   // ! DATE
                                   // ! ORDER NUMBER
@@ -244,6 +263,25 @@ class OrderViewPage extends ConsumerWidget {
                                   orderRef.update({'payment_status': 'Paid'});
                                   orderRef
                                       .update({'receipt_ref': referenceNumber});
+
+                                  // Location location = new Location();
+                                  // bool _serviceEnabled;
+                                  // LocationData _locationData;
+
+                                  // _serviceEnabled =
+                                  //     await location.serviceEnabled();
+                                  // if (!_serviceEnabled) {
+                                  //   _serviceEnabled =
+                                  //       await location.requestService();
+                                  //   if (!_serviceEnabled) {
+                                  //     debugPrint('Location Denied once');
+                                  //   }
+                                  // }
+
+                                  await getCurrentLocation();
+                                  if (Platform.isAndroid) {
+                                    await FlutterBluePlus.turnOn();
+                                  }
 
                                   Navigator.of(context).push(
                                     MaterialPageRoute(
@@ -673,8 +711,21 @@ class OrderViewPage extends ConsumerWidget {
 
                         // turn on bluetooth ourself if we can
                         // for iOS, the user controls bluetooth enable/disable
+                        // Location location = new Location();
+                        // bool _serviceEnabled;
+                        // LocationData _locationData;
+
+                        // _serviceEnabled = await location.serviceEnabled();
+                        // if (!_serviceEnabled) {
+                        //   _serviceEnabled = await location.requestService();
+                        //   if (!_serviceEnabled) {
+                        //     debugPrint('Location Denied once');
+                        //   }
+                        // }
+
+                        await getCurrentLocation();
                         if (Platform.isAndroid) {
-                          // await FlutterBluePlus.turnOn();
+                          await FlutterBluePlus.turnOn();
                           Navigator.of(context).push(
                             MaterialPageRoute(
                               builder: (BuildContext context) => PrintPage(

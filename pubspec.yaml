@@ -54,6 +54,8 @@ dependencies:
   esc_pos_utils: ^1.1.0
   esc_pos_bluetooth: ^0.4.1
   fluttertoast: ^8.2.2
+  flutter_blue_plus: ^1.14.23
+  geolocator: ^10.0.1
 
 dev_dependencies:
   flutter_test:
