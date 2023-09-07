@@ -1,10 +1,14 @@
+import 'package:firebase_database/firebase_database.dart';
 import 'package:flutter/material.dart';
 import 'package:esc_pos_bluetooth/esc_pos_bluetooth.dart';
 import 'package:esc_pos_utils/esc_pos_utils.dart';
 import 'package:intl/intl.dart';
 import 'package:primos_app/pages/cashier/orders.dart';
+import 'package:primos_app/widgets/bottomBar.dart';
+import 'package:primos_app/widgets/styledButton.dart';
 
 class PrintPage extends StatefulWidget {
+  DatabaseReference? orderRef;
   final String formattedDate;
   final String orderName;
   final String? receiptNum;
@@ -18,8 +22,9 @@ class PrintPage extends StatefulWidget {
   final double? amountReceived;
   final double? changeAmount;
 
-  const PrintPage(
+  PrintPage(
       {super.key,
+      this.orderRef,
       required this.formattedDate,
       required this.orderName,
       this.receiptNum,
@@ -52,7 +57,13 @@ class _PrintPageState extends State<PrintPage> {
     _printerManager.startScan(Duration(seconds: 2));
     _printerManager.scanResults.listen((val) {
       print(val);
-      if (!mounted) return;
+      if (!mounted) {
+        CircularProgressIndicator(
+          color: Color(0xFFE2B563),
+        );
+        return;
+      }
+      ;
       setState(() {
         _devices = val;
       });
@@ -64,6 +75,7 @@ class _PrintPageState extends State<PrintPage> {
     return Scaffold(
       appBar: AppBar(
         title: Text("SELECT PRINTER"),
+        automaticallyImplyLeading: false,
       ),
       body: _devices.isEmpty
           ? Center(
@@ -81,6 +93,38 @@ class _PrintPageState extends State<PrintPage> {
                   },
                 );
               }),
+      bottomNavigationBar: BottomBar(
+        height: 100,
+        child: Padding(
+          padding: const EdgeInsets.all(8.0),
+          child: Row(children: [
+            Expanded(
+                child: StyledButton(
+              btnText:
+                  widget.orderRef != null ? "CONFIRM & BACK TO ORDERS" : "BACK",
+              onClick: () {
+                if (widget.orderRef != null) {
+                  widget.orderRef!.update({'payment_status': 'Paid'});
+                  Navigator.of(context).pushAndRemoveUntil(
+                    MaterialPageRoute(builder: (context) {
+                      return OrdersPage();
+                    }),
+                    (Route<dynamic> route) => false,
+                  );
+                } else {
+                  Navigator.of(context).pop();
+                }
+                // ONCE PRINTED
+                // if (widget.receiptNum == null) {
+                // } else {
+                //
+                // }
+              },
+              btnColor: Color(0xfff8f8f7),
+            ))
+          ]),
+        ),
+      ),
     );
   }
 
@@ -147,13 +191,9 @@ class _PrintPageState extends State<PrintPage> {
       PosColumn(text: 'QTY', width: 1),
       PosColumn(text: 'VARIATION', width: 2),
       PosColumn(
-          text: 'UNIT PRICE',
-          width: 2,
-          styles: PosStyles(align: PosAlign.right)),
+          text: 'PRICE', width: 2, styles: PosStyles(align: PosAlign.right)),
       PosColumn(
-          text: 'TOTAL PRICE',
-          width: 2,
-          styles: PosStyles(align: PosAlign.right)),
+          text: 'TOTAL', width: 2, styles: PosStyles(align: PosAlign.right)),
     ]);
     for (var i = 0; i < widget.orderDetails.length; i++) {
       final String productName = widget.orderDetails[i]['productName'];
@@ -285,7 +325,7 @@ class _PrintPageState extends State<PrintPage> {
             styles: PosStyles(align: PosAlign.right)),
       ]);
     }
-    bytes += ticket.text('Thank you!',
+    bytes += ticket.text('DIOS MABALOS PO SAINDO GABOS!',
         styles: PosStyles(align: PosAlign.center, bold: true));
 
     bytes += ticket.feed(2);
@@ -307,18 +347,6 @@ class _PrintPageState extends State<PrintPage> {
       final PosPrintResult res =
           await _printerManager.printTicket(await demoReceipt(paper, profile));
       print("Printing result: ${res.msg}");
-
-      // ONCE PRINTED
-      if (widget.receiptNum == null) {
-        Navigator.of(context).pop();
-      } else {
-        Navigator.of(context).pushAndRemoveUntil(
-          MaterialPageRoute(builder: (context) {
-            return OrdersPage();
-          }),
-          (Route<dynamic> route) => false,
-        );
-      }
     } catch (e) {
       print("Printing error: $e");
     }

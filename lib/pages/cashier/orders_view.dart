@@ -260,23 +260,8 @@ class OrderViewPage extends ConsumerWidget {
                                       {'total_amount': discountedTotal});
                                   orderRef.update({'discount': discountAmount});
                                   orderRef.update({'vat': vatAmount});
-                                  orderRef.update({'payment_status': 'Paid'});
                                   orderRef
                                       .update({'receipt_ref': referenceNumber});
-
-                                  // Location location = new Location();
-                                  // bool _serviceEnabled;
-                                  // LocationData _locationData;
-
-                                  // _serviceEnabled =
-                                  //     await location.serviceEnabled();
-                                  // if (!_serviceEnabled) {
-                                  //   _serviceEnabled =
-                                  //       await location.requestService();
-                                  //   if (!_serviceEnabled) {
-                                  //     debugPrint('Location Denied once');
-                                  //   }
-                                  // }
 
                                   await getCurrentLocation();
                                   if (Platform.isAndroid) {
@@ -287,6 +272,7 @@ class OrderViewPage extends ConsumerWidget {
                                     MaterialPageRoute(
                                         builder: (BuildContext context) {
                                       return PrintPage(
+                                        orderRef: orderRef,
                                         formattedDate: formattedDate,
                                         orderName: orderName,
                                         receiptNum: referenceNumber,
