@@ -2,20 +2,23 @@
 // ignore_for_file: prefer_const_constructors
 
 import 'dart:io';
+import 'dart:math';
 
-import 'package:cloud_firestore/cloud_firestore.dart' as firestore;
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_database/firebase_database.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 import 'package:flutter_blue_plus/flutter_blue_plus.dart';
+// import 'package:flutter_blue_plus/flutter_blue_plus.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:fluttertoast/fluttertoast.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:intl/intl.dart';
+// import 'package:location/location.dart';
+import 'package:primos_app/pages/cashier/orders.dart';
 import 'package:primos_app/pages/cashier/print_page.dart';
 import 'package:primos_app/providers/cashier/discountAmount_provider.dart';
-import 'package:primos_app/providers/cashier/vatPercentage_provider.dart';
+import 'package:primos_app/providers/cashier/isVoid_provider.dart';
+import 'package:primos_app/providers/cashier/voidValue_provider.dart';
 import 'package:primos_app/providers/kitchen/orderDetails_Provider.dart';
 import 'package:primos_app/providers/session/user_provider.dart';
 import 'package:primos_app/widgets/bottomBar.dart';
@@ -40,26 +43,10 @@ class OrderViewPage extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final ordersStream = ref.watch(ordersProvider);
-    final cashierName = ref.read(userNameProvider);
-    final vatPercentage = ref.watch(vatPercentageProvider);
+    final orderStream = ref.watch(ordersProvider);
     late bool servicePermission = false;
     late LocationPermission permission;
 
-    double? percentage;
-
-    // ! GET VAT PERCENTAGE
-    if (vatPercentage is AsyncData<int>) {
-      percentage = (vatPercentage.value / 100);
-      // Now you can use 'percentage' as the VAT percentage value
-      print('VAT Percentage: $percentage');
-    } else if (vatPercentage is AsyncError) {
-      final error = vatPercentage.error;
-      // Handle the error if needed
-      print('Error: $error');
-    }
-
-    // ! TURN ON LOCATION
     Future<Position> getCurrentLocation() async {
       servicePermission = await Geolocator.isLocationServiceEnabled();
       if (!servicePermission) {
@@ -73,66 +60,77 @@ class OrderViewPage extends ConsumerWidget {
       return await Geolocator.getCurrentPosition();
     }
 
+    // Extract the order details from orderEntry.value
+    final orderDetails = orderEntry.value['order_details'] as List<dynamic>?;
+    final orderName = orderEntry.value['order_name'] as String?;
+    // final totalAmount = orderEntry.value['total_amount'] as int?;
+    final orderDate = DateTime.parse(orderEntry.value['order_date']);
+    final waiterName = orderEntry.value['served_by'] as String?;
+    String formattedDate =
+        DateFormat('dd-MM-yyyy hh:mm a').format(orderDate.toLocal());
+    final cashierName = ref.read(userNameProvider);
+
+    if (orderDetails == null || orderName == null) {
+      return SizedBox.shrink(); // Handle if the data is missing
+    }
+
+    if (orderDetails == null || orderName == null) {
+      return SizedBox.shrink(); // Handle if the data is missing
+    }
+
+    final List<Order> ordersList = orderDetails.map<Order>((orderDetail) {
+      final productId = orderDetail['productId'] ?? "No id";
+      final name = orderDetail['productName'] ?? 'No Name';
+      final quantity = orderDetail['quantity'] ?? 0;
+      final variation = orderDetail['variation'] ?? '-';
+      final serveStatus = orderDetail['serve_status'] ?? 'Pending';
+      final price = orderDetail['productPrice'] ?? 0;
+
+      return Order(
+        productId: productId,
+        name: name,
+        quantity: quantity,
+        variation: variation,
+        serveStatus: serveStatus,
+        price: price,
+        // orderName: orderName,
+      );
+    }).toList();
+
+    // ! BILL AMOUNT
+    int totalAmount = ordersList.fold(0, (int sum, Order order) {
+      return sum + (order.quantity * order.price!.toInt());
+    });
+
     // ! DISCOUNT AMOUNT
     double discountAmount = ref.watch(discountAmountProvider);
 
     double calculateDiscountedAmount(
         double originalPrice, double personNum, double seniorOrPwdNum) {
-      double vat = (1 + percentage!);
-      return originalPrice / personNum * seniorOrPwdNum / vat * 0.32;
+      return originalPrice / personNum * seniorOrPwdNum / 1.12 * 0.32;
     }
 
     double calculateTakeoutDiscountAmout(double price) {
-      double vat = (1 + percentage!);
-      return price / vat * 0.32;
+      return price / 1.12 * 0.32;
     }
 
-// ! GENERATE RECEIPT NUMBER
-    Future<String> generateReceiptNumber() async {
-      // Fetch the latest incrementing number from Firestore
-      final firestore.DocumentReference docRef = firestore
-          .FirebaseFirestore.instance
-          .collection('receiptNumbers')
-          .doc('counter');
+    String generateUniqueReferenceNumber() {
+      // Generate a timestamp
+      DateTime now = DateTime.now();
+      String timestamp = now.microsecondsSinceEpoch.toString();
 
-      // Use a transaction to ensure atomicity
-      final firestore.DocumentSnapshot docSnapshot = await firestore
-          .FirebaseFirestore.instance
-          .runTransaction((firestore.Transaction transaction) async {
-        return await transaction.get(docRef);
-      });
+      // Generate a random number
+      Random random = Random();
+      String randomComponent = random.nextInt(1000).toString().padLeft(3, '0');
 
-      int receiptNumberCounter = 1;
+      // Combine timestamp and random number to create the reference number
+      String referenceNumber = '$timestamp$randomComponent';
 
-      // If there is a previous counter, increment it
-      if (docSnapshot.exists) {
-        final data = docSnapshot.data() as Map<String, dynamic>;
-        receiptNumberCounter = data['counter'] as int;
-        receiptNumberCounter++; // Increment the counter
-      }
-
-      // Store the new incremented counter in Firestore
-      await docRef.set({'counter': receiptNumberCounter});
-
-      final DateTime now = DateTime.now();
-      final DateFormat dateFormat = DateFormat('ddMMyyyy');
-      final String formattedDate = dateFormat.format(now);
-
-      // Create the receipt number string
-      final String receiptNumber = '$formattedDate$receiptNumberCounter';
-
-      return receiptNumber;
+      return referenceNumber;
     }
 
     Future nextModal(
-            double discountedTotal,
-            String method,
-            String? referenceNum,
-            int totalAmount,
-            String formattedDate,
-            String orderName,
-            String waiterName,
-            List<dynamic> orderDetails) =>
+            double discountedTotal, String method, String? referenceNum) =>
         showDialog(
           barrierDismissible: false, // Prevent dismissal by tapping outside
           barrierColor: Colors.black54.withOpacity(
@@ -174,13 +172,13 @@ class OrderViewPage extends ConsumerWidget {
                           mainAxisAlignment: MainAxisAlignment.spaceBetween,
                           children: [
                             Text(
-                              "VAT ${(percentage! * 100).toInt()}% ",
+                              "VAT 12% ",
                               style: TextStyle(
                                 fontSize: 13,
                               ),
                             ),
                             Text(
-                              (discountedTotal * percentage).toStringAsFixed(2),
+                              (discountedTotal * 0.12).toStringAsFixed(2),
                               style: TextStyle(fontSize: 13),
                             )
                           ],
@@ -260,7 +258,7 @@ class OrderViewPage extends ConsumerWidget {
                                   // ! DATE
                                   // ! ORDER NUMBER
                                   // ! ORDER REFERENCE NUMBER
-                                  //! payment method
+                                  // payment method
                                   // ! ROLE + WAITER NAME
                                   // ! ORDER DETAILS/DESCRIPTION
                                   // ! SUBTOTAL
@@ -270,10 +268,9 @@ class OrderViewPage extends ConsumerWidget {
                                   // ! AMOUNT PAID
                                   // ! CASHIER NAME
                                   String receiptRefNum =
-                                      await generateReceiptNumber();
+                                      generateUniqueReferenceNumber();
 
-                                  double vatAmount =
-                                      discountedTotal * percentage!;
+                                  double vatAmount = discountedTotal * 0.12;
 
                                   double amountReceived =
                                       double.parse(cashController.text);
@@ -318,7 +315,6 @@ class OrderViewPage extends ConsumerWidget {
                                         waiterName: waiterName!,
                                         orderDetails: orderDetails,
                                         subtotal: totalAmount.toDouble(),
-                                        vatPerc: (percentage! * 100).toInt(),
                                         vatAmount: vatAmount,
                                         discountAmount: discountAmount,
                                         grandTotal: discountedTotal,
@@ -345,10 +341,7 @@ class OrderViewPage extends ConsumerWidget {
         );
 
     // ! CASH METHOD
-    Future cashMethod(int totalAmount, String formattedDate, String orderName,
-            String waiterName, List<dynamic> orderDetails) =>
-        showDialog(
-          barrierDismissible: false,
+    Future cashMethod() => showDialog(
           context: context,
           builder: (context) => AlertDialog(
             contentPadding: EdgeInsets.zero,
@@ -405,9 +398,11 @@ class OrderViewPage extends ConsumerWidget {
                                 btnText: "Next",
                                 onClick: () {
                                   if (cashController.text.isEmpty) {
-                                    Fluttertoast.showToast(
-                                        msg: "Please enter the amount received",
-                                        gravity: ToastGravity.CENTER);
+                                    ScaffoldMessenger.of(context).showSnackBar(
+                                      SnackBar(
+                                          content: Text(
+                                              "Please enter amount received!")),
+                                    );
                                   } else {
                                     double discountedTotal = discountAmount != 0
                                         ? (totalAmount.toDouble() -
@@ -416,19 +411,14 @@ class OrderViewPage extends ConsumerWidget {
 
                                     if (double.parse(cashController.text) <
                                         discountedTotal) {
-                                      Fluttertoast.showToast(
-                                          msg: "Please enter the right amount!",
-                                          gravity: ToastGravity.CENTER);
+                                      ScaffoldMessenger.of(context)
+                                          .showSnackBar(
+                                        SnackBar(
+                                            content: Text(
+                                                "Please enter the right amount!")),
+                                      );
                                     } else {
-                                      nextModal(
-                                          discountedTotal,
-                                          "Cash",
-                                          null,
-                                          totalAmount,
-                                          formattedDate,
-                                          orderName,
-                                          waiterName,
-                                          orderDetails);
+                                      nextModal(discountedTotal, "Cash", null);
                                     }
                                   }
                                 }),
@@ -444,10 +434,7 @@ class OrderViewPage extends ConsumerWidget {
         );
 
     // ! GCASH OR CARD METHOD
-    Future onlinePayment(String method, int totalAmount, String formattedDate,
-            String orderName, String waiterName, List<dynamic> orderDetails) =>
-        showDialog(
-          barrierDismissible: false,
+    Future onlinePayment(String method) => showDialog(
           context: context,
           builder: (context) => AlertDialog(
             contentPadding: EdgeInsets.zero,
@@ -511,9 +498,11 @@ class OrderViewPage extends ConsumerWidget {
                                 btnText: "Next",
                                 onClick: () {
                                   if (cashController.text.isEmpty) {
-                                    Fluttertoast.showToast(
-                                        msg: "Please enter the amount received",
-                                        gravity: ToastGravity.CENTER);
+                                    ScaffoldMessenger.of(context).showSnackBar(
+                                      SnackBar(
+                                          content: Text(
+                                              "Please enter amount received!")),
+                                    );
                                   } else {
                                     double discountedTotal = discountAmount != 0
                                         ? (totalAmount.toDouble() -
@@ -521,26 +510,17 @@ class OrderViewPage extends ConsumerWidget {
                                         : totalAmount.toDouble();
 
                                     if (double.parse(cashController.text) <
-                                        discountedTotal) {
-                                      Fluttertoast.showToast(
-                                          msg: "Please enter the right amount!",
-                                          gravity: ToastGravity.CENTER);
-                                    } else if (referenceNumController
-                                        .text.isEmpty) {
-                                      Fluttertoast.showToast(
-                                          msg:
-                                              "Please enter the reference number!",
-                                          gravity: ToastGravity.CENTER);
+                                            discountedTotal &&
+                                        referenceNumController.text.isEmpty) {
+                                      ScaffoldMessenger.of(context)
+                                          .showSnackBar(
+                                        SnackBar(
+                                            content: Text(
+                                                "Please enter the right amount and details")),
+                                      );
                                     } else {
-                                      nextModal(
-                                          discountedTotal,
-                                          method,
-                                          referenceNumController.text,
-                                          totalAmount,
-                                          formattedDate,
-                                          orderName,
-                                          waiterName,
-                                          orderDetails);
+                                      nextModal(discountedTotal, method,
+                                          referenceNumController.text);
                                     }
                                   }
                                 }),
@@ -556,9 +536,7 @@ class OrderViewPage extends ConsumerWidget {
         );
 
     // ! CHOOSE PAYMENT METHOD
-    Future paymentMethod(int totalAmount, String formattedDate,
-            String orderName, String waiterName, List<dynamic> orderDetails) =>
-        showDialog(
+    Future paymentMethod() => showDialog(
           context: context,
           builder: (context) => AlertDialog(
             contentPadding: EdgeInsets.zero,
@@ -592,8 +570,7 @@ class OrderViewPage extends ConsumerWidget {
                         btnText: "CASH",
                         onClick: () {
                           Navigator.of(context).pop();
-                          cashMethod(totalAmount, formattedDate, orderName,
-                              waiterName, orderDetails);
+                          cashMethod();
                         },
                         btnWidth: double.infinity,
                       ),
@@ -604,8 +581,7 @@ class OrderViewPage extends ConsumerWidget {
                         btnText: "GCASH",
                         onClick: () {
                           Navigator.of(context).pop();
-                          onlinePayment("Gcash", totalAmount, formattedDate,
-                              orderName, waiterName, orderDetails);
+                          onlinePayment("Gcash");
                         },
                         btnWidth: double.infinity,
                       ),
@@ -616,8 +592,7 @@ class OrderViewPage extends ConsumerWidget {
                         btnText: "CARD",
                         onClick: () {
                           Navigator.of(context).pop();
-                          onlinePayment("Card", totalAmount, formattedDate,
-                              orderName, waiterName, orderDetails);
+                          onlinePayment("Card");
                         },
                         btnWidth: double.infinity,
                       ),
@@ -630,7 +605,7 @@ class OrderViewPage extends ConsumerWidget {
         );
 
     // ! HANDLE VOID
-    Future<void> voidModal(List<Order> ordersList) async {
+    Future<void> voidModal() async {
       String? voidValue;
       List<String> items = ordersList.map((order) => order.name).toList();
 
@@ -669,6 +644,32 @@ class OrderViewPage extends ConsumerWidget {
                           const SizedBox(
                             height: 15,
                           ),
+                          const SizedBox(
+                            height: 5,
+                          ),
+                          const Row(
+                            children: [
+                              Icon(
+                                Icons.info_outline,
+                                size: 20,
+                              ),
+                              SizedBox(
+                                  width:
+                                      4), // Adding a small gap between the icon and text
+                              Flexible(
+                                child: Text(
+                                  "Please enter your password to proceed",
+                                  style: TextStyle(
+                                    fontSize: 12,
+                                    letterSpacing: 1,
+                                  ),
+                                ),
+                              ),
+                            ],
+                          ),
+                          const SizedBox(
+                            height: 15,
+                          ),
                           Row(
                             children: [
                               Expanded(
@@ -687,58 +688,50 @@ class OrderViewPage extends ConsumerWidget {
                                 child: StyledButton(
                                     btnText: "Next",
                                     onClick: () async {
-                                      if (voidValue != null) {
-                                        final isAuthorized =
-                                            await _showPasswordAuthenticationDialog(
-                                                context);
-                                        if (isAuthorized) {
-                                          // Find the index of the selected item in the ordersList
-                                          final int selectedIndex =
-                                              ordersList.indexWhere(
-                                            (order) => order.name == voidValue,
-                                          );
+                                      final isAuthorized =
+                                          await _showPasswordAuthenticationDialog(
+                                              context);
+                                      if (voidValue != null && isAuthorized) {
+                                        // Find the index of the selected item in the ordersList
+                                        final int selectedIndex =
+                                            ordersList.indexWhere(
+                                          (order) => order.name == voidValue,
+                                        );
 
-                                          if (selectedIndex != -1) {
-                                            // Remove the selected item from ordersList
-                                            ordersList.removeAt(selectedIndex);
+                                        if (selectedIndex != -1) {
+                                          // Remove the selected item from ordersList
+                                          ordersList.removeAt(selectedIndex);
 
-                                            // Update the orderEntry.value['order_details'] with the new list
-                                            final updatedOrderDetails =
-                                                ordersList.map((order) {
-                                              return {
-                                                'productId': order.productId,
-                                                'productName': order.name,
-                                                'quantity': order.quantity,
-                                                'variation': order.variation,
-                                                'serve_status':
-                                                    order.serveStatus,
-                                                'productPrice': order.price,
-                                              };
-                                            }).toList();
+                                          // Update the orderEntry.value['order_details'] with the new list
+                                          final updatedOrderDetails =
+                                              ordersList.map((order) {
+                                            return {
+                                              'productId': order.productId,
+                                              'productName': order.name,
+                                              'quantity': order.quantity,
+                                              'variation': order.variation,
+                                              'serve_status': order.serveStatus,
+                                              'productPrice': order.price,
+                                            };
+                                          }).toList();
 
-                                            FirebaseDatabase.instance
-                                                .ref()
-                                                .child('orders')
-                                                .child(orderEntry.key)
-                                                .update({
-                                              'order_details':
-                                                  updatedOrderDetails
-                                            });
+                                          FirebaseDatabase.instance
+                                              .ref()
+                                              .child('orders')
+                                              .child(orderEntry.key)
+                                              .update({
+                                            'order_details': updatedOrderDetails
+                                          });
 
-                                            Fluttertoast.showToast(
-                                                msg: "Item voided",
-                                                gravity: ToastGravity.CENTER);
+                                          ref
+                                              .read(isVoidProvider.notifier)
+                                              .state = true;
 
-                                            ref.refresh(ordersProvider);
-                                            Navigator.of(context)
-                                                .pop(); // Close the dialog
-                                          }
+                                          Navigator.of(context)
+                                              .pop(); // Close the dialog
                                         }
-                                      } else {
-                                        Fluttertoast.showToast(
-                                            msg: "Please select an Item",
-                                            gravity: ToastGravity.CENTER);
                                       }
+                                      ref.refresh(ordersProvider);
                                     }),
                               ),
                             ],
@@ -752,7 +745,7 @@ class OrderViewPage extends ConsumerWidget {
     }
 
     // ! HANDLE DISCOUNT / ADD DISCOUNT
-    Future handleDiscount(int totalAmount) => showDialog(
+    Future handleDiscount() => showDialog(
           context: context,
           builder: (context) => AlertDialog(
             contentPadding: EdgeInsets.zero,
@@ -918,318 +911,255 @@ class OrderViewPage extends ConsumerWidget {
           ),
         );
 
-    return ordersStream.when(
-      data: (ordersMap) {
-        final orderEntries = ordersMap.entries.toList();
-
-        final singleOrderEntry = orderEntries.firstWhere(
-          (entry) => entry.key == orderEntry.key,
-        );
-
-        // Extract the order details from orderEntry.value
-        final orderDetails =
-            singleOrderEntry.value['order_details'] as List<dynamic>?;
-        final orderName = singleOrderEntry.value['order_name'] as String?;
-        // final totalAmount = orderEntry.value['total_amount'] as int?;
-        final orderDate = DateTime.parse(singleOrderEntry.value['order_date']);
-        final waiterName = singleOrderEntry.value['served_by'] as String?;
-        String formattedDate =
-            DateFormat('dd-MM-yyyy hh:mm a').format(orderDate.toLocal());
-
-        if (orderDetails == null || orderName == null) {
-          return SizedBox.shrink(); // Handle if the data is missing
-        }
-
-        if (orderDetails == null || orderName == null) {
-          return SizedBox.shrink(); // Handle if the data is missing
-        }
-
-        final List<Order> ordersList = orderDetails.map<Order>((orderDetail) {
-          final productId = orderDetail['productId'] ?? "No id";
-          final name = orderDetail['productName'] ?? 'No Name';
-          final quantity = orderDetail['quantity'] ?? 0;
-          final variation = orderDetail['variation'] ?? '-';
-          final serveStatus = orderDetail['serve_status'] ?? 'Pending';
-          final price = orderDetail['productPrice'] ?? 0;
-
-          return Order(
-            productId: productId,
-            name: name,
-            quantity: quantity,
-            variation: variation,
-            serveStatus: serveStatus,
-            price: price,
-            // orderName: orderName,
-          );
-        }).toList();
-
-        // ! BILL AMOUNT
-        int totalAmount = ordersList.fold(0, (int sum, Order order) {
-          return sum + (order.quantity * order.price!.toInt());
-        });
-
-        return Scaffold(
-          appBar: AppBar(
-            leading: IconButton(
-              //manual handle back button
-              icon: const Icon(Icons.keyboard_arrow_left),
-              iconSize: 35,
-              onPressed: () {
-                ref.read(discountAmountProvider.notifier).state = 0;
-                Navigator.of(context).pop();
-              },
-            ),
-            title: (Text("ORDER DETAILS ${orderName.toUpperCase()}")),
-          ),
-          body: SafeArea(
-            child: SingleChildScrollView(
-              child: Padding(
-                padding: const EdgeInsets.all(16.0),
-                child: Column(
-                  children: [
-                    // ORDER DETAILS
-                    Container(
-                      width: double.infinity,
-                      padding: EdgeInsets.all(10),
-                      decoration: BoxDecoration(
-                          color: Colors.grey.shade300,
-                          borderRadius:
-                              const BorderRadius.all(Radius.circular(8))),
-                      child: Column(
-                        children: [
-                          Row(
-                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                            children: [
-                              Text(
-                                "WAITER",
-                                style: TextStyle(fontWeight: FontWeight.w600),
-                              ),
-                              Text(waiterName ?? "Waiter")
-                            ],
-                          ),
-                          SizedBox(
-                            height: 10,
-                          ),
-                          Row(
-                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                            children: [
-                              Text(
-                                "ORDER DATE & TIME",
-                                style: TextStyle(fontWeight: FontWeight.w600),
-                              ),
-                              Text(formattedDate)
-                            ],
-                          ),
-                          SizedBox(
-                            height: 10,
-                          ),
-                          Row(
-                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                            children: [
-                              Text(
-                                "SUBTOTAL",
-                                style: TextStyle(fontWeight: FontWeight.w600),
-                              ),
-                              Text("PHP ${discountAmount != 0 ? (totalAmount.toDouble() - discountAmount).toStringAsFixed(2) : totalAmount.toStringAsFixed(2)}")
-                                  .animate(target: discountAmount != 0 ? 1 : 0)
-                                  .shake()
-                            ],
-                          ),
-                        ],
-                      ),
-                    ),
-                    const SizedBox(height: 20),
-                    // ORDER ITEMS
-                    const Row(
-                      children: [
-                        Expanded(
-                            flex: 2,
-                            child: Text(
-                              "ITEM",
-                              style: TextStyle(fontWeight: FontWeight.w700),
-                            )),
-                        Expanded(
-                            flex: 1,
-                            child: Text(
-                              "QTY",
-                              textAlign: TextAlign.center,
-                              style: TextStyle(fontWeight: FontWeight.w700),
-                            )),
-                        Expanded(
-                            flex: 1,
-                            child: Text(
-                              "VARIANT",
-                              textAlign: TextAlign.center,
-                              style: TextStyle(fontWeight: FontWeight.w700),
-                            )),
-                        Expanded(
-                            flex: 1,
-                            child: Text(
-                              "UNIT PRICE",
-                              textAlign: TextAlign.end,
-                              style: TextStyle(fontWeight: FontWeight.w700),
-                            )),
-                        Expanded(
-                            flex: 1,
-                            child: Text(
-                              "TOTAL PRICE",
-                              textAlign: TextAlign.end,
-                              style: TextStyle(fontWeight: FontWeight.w700),
-                            )),
-                      ],
-                    ),
-                    const SizedBox(
-                      height: 2,
-                    ),
-                    Container(
-                      decoration: BoxDecoration(
-                          border: Border.all(
-                              color: const Color(0xff252525), width: 0.5)),
-                    ),
-                    const SizedBox(
-                      height: 10,
-                    ),
-
-                    for (final order in ordersList)
+    return Scaffold(
+      appBar: AppBar(
+        leading: IconButton(
+          //manual handle back button
+          icon: const Icon(Icons.keyboard_arrow_left),
+          iconSize: 35,
+          onPressed: () {
+            ref.read(discountAmountProvider.notifier).state = 0;
+            Navigator.of(context).pop();
+          },
+        ),
+        title: (Text("ORDER DETAILS ${orderName.toUpperCase()}")),
+      ),
+      body: SafeArea(
+        child: SingleChildScrollView(
+          child: Padding(
+            padding: const EdgeInsets.all(16.0),
+            child: Column(
+              children: [
+                // ORDER DETAILS
+                Container(
+                  width: double.infinity,
+                  padding: EdgeInsets.all(10),
+                  decoration: BoxDecoration(
+                      color: Colors.grey.shade300,
+                      borderRadius: const BorderRadius.all(Radius.circular(8))),
+                  child: Column(
+                    children: [
                       Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
-                          Expanded(flex: 2, child: Text(order.name)),
-                          Expanded(
-                              flex: 1,
-                              child: Text(
-                                order.quantity.toString(),
-                                textAlign: TextAlign.center,
-                              )),
-                          Expanded(
-                              flex: 1,
-                              child: Text(
-                                order.variation == "No Variation"
-                                    ? "-"
-                                    : order.variation,
-                                textAlign: TextAlign.center,
-                              )),
-                          Expanded(
-                              flex: 1,
-                              child: Text(
-                                order.price.toString(),
-                                textAlign: TextAlign.end,
-                              )),
-                          Expanded(
-                              flex: 1,
-                              child: Text(
-                                (order.price! * order.quantity).toString(),
-                                textAlign: TextAlign.end,
-                              )),
+                          Text(
+                            "WAITER",
+                            style: TextStyle(fontWeight: FontWeight.w600),
+                          ),
+                          Text(waiterName ?? "Waiter")
                         ],
                       ),
+                      SizedBox(
+                        height: 10,
+                      ),
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          Text(
+                            "ORDER DATE & TIME",
+                            style: TextStyle(fontWeight: FontWeight.w600),
+                          ),
+                          Text(formattedDate)
+                        ],
+                      ),
+                      SizedBox(
+                        height: 10,
+                      ),
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          Text(
+                            "SUBTOTAL",
+                            style: TextStyle(fontWeight: FontWeight.w600),
+                          ),
+                          Text("PHP ${discountAmount != 0 ? (totalAmount.toDouble() - discountAmount).toStringAsFixed(2) : totalAmount.toStringAsFixed(2)}")
+                              .animate(target: discountAmount != 0 ? 1 : 0)
+                              .shake()
+                        ],
+                      ),
+                    ],
+                  ),
+                ),
+                const SizedBox(height: 20),
+                // ORDER ITEMS
+                const Row(
+                  children: [
+                    Expanded(
+                        flex: 2,
+                        child: Text(
+                          "ITEM",
+                          style: TextStyle(fontWeight: FontWeight.w700),
+                        )),
+                    Expanded(
+                        flex: 1,
+                        child: Text(
+                          "QTY",
+                          textAlign: TextAlign.center,
+                          style: TextStyle(fontWeight: FontWeight.w700),
+                        )),
+                    Expanded(
+                        flex: 1,
+                        child: Text(
+                          "VARIANT",
+                          textAlign: TextAlign.center,
+                          style: TextStyle(fontWeight: FontWeight.w700),
+                        )),
+                    Expanded(
+                        flex: 1,
+                        child: Text(
+                          "UNIT PRICE",
+                          textAlign: TextAlign.end,
+                          style: TextStyle(fontWeight: FontWeight.w700),
+                        )),
+                    Expanded(
+                        flex: 1,
+                        child: Text(
+                          "TOTAL PRICE",
+                          textAlign: TextAlign.end,
+                          style: TextStyle(fontWeight: FontWeight.w700),
+                        )),
                   ],
                 ),
-              ),
-            ),
-          ),
-          bottomNavigationBar: BottomBar(
-            height: 150,
-            child: Padding(
-              padding: const EdgeInsets.all(16.0),
-              child: Column(
-                children: [
+                const SizedBox(
+                  height: 2,
+                ),
+                Container(
+                  decoration: BoxDecoration(
+                      border: Border.all(
+                          color: const Color(0xff252525), width: 0.5)),
+                ),
+                const SizedBox(
+                  height: 10,
+                ),
+
+                for (final order in ordersList)
                   Row(
                     children: [
+                      Expanded(flex: 2, child: Text(order.name)),
                       Expanded(
-                        child: StyledButton(
-                          btnText: "DISCOUNT",
-                          onClick: () {
-                            if (orderName.contains("Takeout")) {
-                              handleTakeoutDiscount();
-                            } else {
-                              handleDiscount(totalAmount);
-                            }
-                          },
-                          btnIcon: Icon(Icons.money),
-                          btnColor: const Color(0xfff8f8f7),
-                          noShadow: true,
-                        ),
-                      ),
-                      const SizedBox(
-                        width: 10,
-                      ),
+                          flex: 1,
+                          child: Text(
+                            order.quantity.toString(),
+                            textAlign: TextAlign.center,
+                          )),
                       Expanded(
-                        child: StyledButton(
-                          btnIcon: const Icon(Icons.payments),
-                          btnText: "PAYMENT",
-                          onClick: () {
-                            paymentMethod(totalAmount, formattedDate, orderName,
-                                waiterName!, orderDetails);
-                          },
-                          btnColor: const Color(0xFFf8f8f7),
-                          noShadow: true,
-                          btnWidth: double.infinity,
-                        ),
-                      ),
+                          flex: 1,
+                          child: Text(
+                            order.variation == "No Variation"
+                                ? "-"
+                                : order.variation,
+                            textAlign: TextAlign.center,
+                          )),
+                      Expanded(
+                          flex: 1,
+                          child: Text(
+                            order.price.toString(),
+                            textAlign: TextAlign.end,
+                          )),
+                      Expanded(
+                          flex: 1,
+                          child: Text(
+                            (order.price! * order.quantity).toString(),
+                            textAlign: TextAlign.end,
+                          )),
                     ],
+                  ),
+              ],
+            ),
+          ),
+        ),
+      ),
+      bottomNavigationBar: BottomBar(
+        height: 150,
+        child: Padding(
+          padding: const EdgeInsets.all(16.0),
+          child: Column(
+            children: [
+              Row(
+                children: [
+                  Expanded(
+                    child: StyledButton(
+                      btnText: "DISCOUNT",
+                      onClick: () {
+                        if (orderName.contains("Takeout")) {
+                          handleTakeoutDiscount();
+                        } else {
+                          handleDiscount();
+                        }
+                      },
+                      btnIcon: Icon(Icons.money),
+                      btnColor: const Color(0xfff8f8f7),
+                      noShadow: true,
+                    ),
                   ),
                   const SizedBox(
-                    height: 10,
+                    width: 10,
                   ),
-                  Row(
-                    children: [
-                      Expanded(
-                        flex: 1,
-                        child: StyledButton(
-                          btnIcon: Icon(Icons.remove_circle),
-                          btnText: "VOID",
-                          onClick: () {
-                            voidModal(ordersList);
-                          },
-                          btnColor: const Color(0xFFf8f8f7),
-                          noShadow: true,
-                        ),
-                      ),
-                      const SizedBox(
-                        width: 10,
-                      ),
-                      Expanded(
-                        flex: 1,
-                        child: StyledButton(
-                          btnIcon: Icon(Icons.print),
-                          btnText: "PRINT BILL",
-                          onClick: () async {
-                            await getCurrentLocation();
-                            if (Platform.isAndroid) {
-                              await FlutterBluePlus.turnOn();
-                              Navigator.of(context).push(
-                                MaterialPageRoute(
-                                  builder: (BuildContext context) => PrintPage(
-                                    formattedDate: formattedDate,
-                                    orderName: orderName,
-                                    waiterName: waiterName!,
-                                    orderDetails: orderDetails,
-                                    subtotal: discountAmount != 0
-                                        ? (totalAmount.toDouble() -
-                                            discountAmount)
-                                        : totalAmount.toDouble(),
-                                    cashierName: cashierName!,
-                                  ),
-                                ),
-                              );
-                            }
-                          },
-                          btnColor: const Color(0xFFf8f8f7),
-                          noShadow: true,
-                        ),
-                      ),
-                    ],
-                  )
+                  Expanded(
+                    child: StyledButton(
+                      btnIcon: const Icon(Icons.payments),
+                      btnText: "PAYMENT",
+                      onClick: paymentMethod,
+                      btnColor: const Color(0xFFf8f8f7),
+                      noShadow: true,
+                      btnWidth: double.infinity,
+                    ),
+                  ),
                 ],
               ),
-            ),
+              const SizedBox(
+                height: 10,
+              ),
+              Row(
+                children: [
+                  Expanded(
+                    flex: 1,
+                    child: StyledButton(
+                      btnIcon: Icon(Icons.remove_circle),
+                      btnText: "VOID",
+                      onClick: () {
+                        voidModal();
+                      },
+                      btnColor: const Color(0xFFf8f8f7),
+                      noShadow: true,
+                    ),
+                  ),
+                  const SizedBox(
+                    width: 10,
+                  ),
+                  Expanded(
+                    flex: 1,
+                    child: StyledButton(
+                      btnIcon: Icon(Icons.print),
+                      btnText: "PRINT BILL",
+                      onClick: () async {
+                        await getCurrentLocation();
+                        if (Platform.isAndroid) {
+                          await FlutterBluePlus.turnOn();
+                          Navigator.of(context).push(
+                            MaterialPageRoute(
+                              builder: (BuildContext context) => PrintPage(
+                                formattedDate: formattedDate,
+                                orderName: orderName,
+                                waiterName: waiterName!,
+                                orderDetails: orderDetails,
+                                subtotal: discountAmount != 0
+                                    ? (totalAmount.toDouble() - discountAmount)
+                                    : totalAmount.toDouble(),
+                                cashierName: cashierName!,
+                              ),
+                            ),
+                          );
+                        }
+                      },
+                      btnColor: const Color(0xFFf8f8f7),
+                      noShadow: true,
+                    ),
+                  ),
+                ],
+              )
+            ],
           ),
-        );
-      },
-      error: (error, stackTrace) => Text('Error: $error'),
-      loading: () => Center(
-        child: CircularProgressIndicator(
-          color: Color(0xFFE2B563),
         ),
       ),
     );
@@ -1268,7 +1198,13 @@ class OrderViewPage extends ConsumerWidget {
       builder: (BuildContext context) {
         return AlertDialog(
           title: const Text("Enter Your Password"),
-          content: Column(
+          content:
+              // TextField(
+              //   controller: passwordController,
+              //   obscureText: true,
+              //   decoration: const InputDecoration(labelText: "Password"),
+              // )
+              Column(
             mainAxisSize: MainAxisSize.min,
             children: [
               StyledTextField(
@@ -1305,7 +1241,7 @@ class OrderViewPage extends ConsumerWidget {
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
                 StyledButton(
-                    btnText: "Back",
+                    btnText: "Cancel",
                     onClick: () {
                       Navigator.of(context).pop();
                     }),
@@ -1315,13 +1251,7 @@ class OrderViewPage extends ConsumerWidget {
                 StyledButton(
                     btnText: "Confirm",
                     onClick: () {
-                      if (passwordController.text.isEmpty) {
-                        Fluttertoast.showToast(
-                            msg: "Please enter your password to proceed",
-                            gravity: ToastGravity.CENTER);
-                      } else {
-                        Navigator.of(context).pop(passwordController.text);
-                      }
+                      Navigator.of(context).pop(passwordController.text);
                     }),
               ],
             ),

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:fluttertoast/fluttertoast.dart';
 import 'package:primos_app/providers/filter/isDateRange_provider.dart';
 import 'package:primos_app/providers/filter/isSingleDate_provider.dart';
 import 'package:primos_app/widgets/styledButton.dart';
@@ -116,11 +117,22 @@ class FilterExpansion extends ConsumerWidget {
                             noShadow: true,
                             btnText: "FILTER",
                             onClick: () {
-                              ref.read(isSingleDateProvider.notifier).state =
-                                  false;
-                              ref.read(isDateRangeProvider.notifier).state =
-                                  true;
-                              // TODO FILTER BY DATE RANGE API
+                              if (ref.watch(selectedDate1Provider) == null ||
+                                  ref.watch(selectedDate2Provider) == null) {
+                                Fluttertoast.showToast(
+                                    msg: "Please select a date",
+                                    toastLength: Toast.LENGTH_SHORT,
+                                    gravity: ToastGravity.CENTER,
+                                    timeInSecForIosWeb: 1,
+                                    backgroundColor: Colors.greenAccent,
+                                    textColor: Color(0xff252525),
+                                    fontSize: 16.0);
+                              } else {
+                                ref.read(isSingleDateProvider.notifier).state =
+                                    false;
+                                ref.read(isDateRangeProvider.notifier).state =
+                                    true;
+                              }
                             }),
                       ),
                       const SizedBox(
@@ -151,11 +163,22 @@ class FilterExpansion extends ConsumerWidget {
                               noShadow: true,
                               btnText: "FILTER",
                               onClick: () {
-                                ref.read(isDateRangeProvider.notifier).state =
-                                    false;
-                                ref.read(isSingleDateProvider.notifier).state =
-                                    true;
-                                //TODO FILTER BY SINGLE DATE API
+                                if (ref.watch(selectedDate3Provider) == null) {
+                                  Fluttertoast.showToast(
+                                      msg: "Please select a date",
+                                      toastLength: Toast.LENGTH_SHORT,
+                                      gravity: ToastGravity.CENTER,
+                                      timeInSecForIosWeb: 1,
+                                      backgroundColor: Colors.greenAccent,
+                                      textColor: Color(0xff252525),
+                                      fontSize: 16.0);
+                                } else {
+                                  ref.read(isDateRangeProvider.notifier).state =
+                                      false;
+                                  ref
+                                      .read(isSingleDateProvider.notifier)
+                                      .state = true;
+                                }
                               },
                             ),
                           )

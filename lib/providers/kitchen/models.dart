@@ -1,4 +1,5 @@
 class Order {
+  final String? productId;
   final String name;
   final int quantity;
   final String variation;
@@ -6,6 +7,7 @@ class Order {
   final String? serveStatus;
 
   Order({
+    this.productId,
     required this.name,
     required this.quantity,
     required this.variation,

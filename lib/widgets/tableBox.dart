@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_animate/flutter_animate.dart';
-import 'package:fluttertoast/fluttertoast.dart';
 import 'package:primos_app/pages/waiter/orderDetails.dart';
 import 'package:primos_app/pages/waiter/waiter_menu.dart';
 import 'package:primos_app/providers/isAdditionalOrder/existingOrderId_provider.dart';
@@ -41,16 +40,6 @@ class TableBox extends ConsumerWidget {
               tableEntryId = entry.key;
               orderData = entry.value['order_details'];
               orderStatus = entry.value['order_status'];
-              if (orderStatus == "DONE") {
-                Fluttertoast.showToast(
-                    msg: "Orders for $tableName is ready to be served",
-                    toastLength: Toast.LENGTH_SHORT,
-                    gravity: ToastGravity.CENTER,
-                    timeInSecForIosWeb: 1,
-                    backgroundColor: Colors.greenAccent,
-                    textColor: Color(0xff252525),
-                    fontSize: 16.0);
-              }
 
               break;
             }

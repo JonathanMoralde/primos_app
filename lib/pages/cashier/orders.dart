@@ -36,8 +36,12 @@ class OrdersPage extends ConsumerWidget {
                 for (final entry in orderEntries)
                   if (entry.value['payment_status'] ==
                       'Unpaid') // Filter by order_status
-                    OrdersCashier(
-                      orderEntry: entry,
+                    Consumer(
+                      builder: (context, ref, child) {
+                        return OrdersCashier(
+                          orderEntry: entry,
+                        );
+                      },
                     ),
               ],
             );
