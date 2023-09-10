@@ -21,10 +21,8 @@ class SalesReportPage extends ConsumerWidget {
     final ordersStream = ref.watch(ordersProvider);
 
 // FILTERING
-    final isSingleDate = ref.watch(isSingleDateProvider);
     final isDateRange = ref.watch(isDateRangeProvider);
 
-    final singleDate = ref.watch(selectedDate3Provider);
     final dateRange1 = ref.watch(selectedDate1Provider);
     final dateRange2 = ref.watch(selectedDate2Provider);
     return Scaffold(
@@ -100,14 +98,7 @@ class SalesReportPage extends ConsumerWidget {
                     // Inside the ordersStream.when data callback
                     List<SalesObject> filteredSalesObjects = [];
 
-                    if (isSingleDate) {
-                      // Display only selected single date
-
-                      filteredSalesObjects = salesObjects.where((object) {
-                        final toDate = DateTime.parse(object.date);
-                        return toDate.isAtSameMomentAs(singleDate!);
-                      }).toList();
-                    } else if (isDateRange) {
+                    if (isDateRange) {
                       // Display sales objects falling within the selected date range
                       filteredSalesObjects = salesObjects.where((object) {
                         final dateParsed = DateTime.parse(object.date);

@@ -23,5 +23,4 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 final selectedDate1Provider = StateProvider<DateTime?>((ref) => null);
 final selectedDate2Provider = StateProvider<DateTime?>((ref) => null);
-final selectedDate3Provider = StateProvider<DateTime?>((ref) => null);
 final isReset = StateProvider<bool>((ref) => false);

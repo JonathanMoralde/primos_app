@@ -162,9 +162,14 @@ class _SalesCardState extends State<SalesCard> {
                     Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
-                        const Text("Net Income:"),
+                        const Text(
+                          "Total Sales:",
+                          style: TextStyle(fontWeight: FontWeight.w600),
+                        ),
                         Text(
-                            'PHP ${(widget.totalAmount - widget.totalVat).toStringAsFixed(2)}'),
+                          'PHP ${(widget.totalAmount - widget.totalVat).toStringAsFixed(2)}',
+                          style: TextStyle(fontWeight: FontWeight.w600),
+                        ),
                       ],
                     ),
                     const Divider(
