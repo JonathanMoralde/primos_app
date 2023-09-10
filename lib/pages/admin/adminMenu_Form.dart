@@ -206,118 +206,111 @@ class _AdminMenuFormState extends State<AdminMenuForm> {
             ? Text("EDIT ITEM")
             : Text("ADD ITEM"),
       ),
-      body: Stack(
-        children: [
-          SafeArea(
-            child: SizedBox(
-              width: double.infinity,
-              child: Column(
+      body: SafeArea(
+        child: SizedBox(
+          width: double.infinity,
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              if (selectedImageFile != null)
+                Column(
+                  children: [
+                    ClipRRect(
+                      borderRadius: BorderRadius.circular(8),
+                      child: Image.file(
+                        selectedImageFile!,
+                        width: 250,
+                        height: 250,
+                        fit: BoxFit.cover,
+                      ),
+                    ),
+                    const SizedBox(
+                      height: 30,
+                    )
+                  ],
+                ),
+              StyledTextField(
+                controller: itemNameController,
+                hintText: "Item Name",
+                obscureText: false,
+              ),
+              const SizedBox(
+                height: 10,
+              ),
+              StyledTextField(
+                controller: itemPriceController,
+                hintText: "Item Price",
+                obscureText: false,
+                keyboardType: TextInputType.number,
+              ),
+              const SizedBox(
+                height: 10,
+              ),
+              StyledDropdown(
+                value: category,
+                onChange: (String? newValue) {
+                  setState(() {
+                    category = newValue;
+                  });
+                },
+                hintText: "Category",
+                items: [],
+              ),
+              const SizedBox(
+                height: 10,
+              ),
+              UploadImage(
+                onPressed: _pickImage,
+                text: selectedImagePath,
+              ),
+              const SizedBox(
+                height: 20,
+              ),
+              // Show circular progress indicator when isLoading is true
+              if (isLoading)
+                CircularProgressIndicator(), // Add a circular progress indicator
+
+              // Show the button only when not loading
+              if (!isLoading)
+                StyledButton(
+                  btnIcon:
+                      widget.productName != null && widget.productPrice != null
+                          ? Icon(Icons.save_alt_rounded)
+                          : Icon(Icons.add),
+                  btnText:
+                      widget.productName != null && widget.productPrice != null
+                          ? "EDIT"
+                          : "ADD",
+                  onClick: _uploadImageAndUpdateMenu,
+                  btnWidth: 250,
+                ),
+              const SizedBox(
+                height: 30,
+              ),
+              const Row(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  if (selectedImageFile != null)
-                    Column(
-                      children: [
-                        ClipRRect(
-                          borderRadius: BorderRadius.circular(8),
-                          child: Image.file(
-                            selectedImageFile!,
-                            width: 250,
-                            height: 250,
-                            fit: BoxFit.cover,
-                          ),
-                        ),
-                        const SizedBox(
-                          height: 30,
-                        )
-                      ],
+                  Icon(
+                    Icons.info_outline,
+                    size: 20,
+                  ),
+                  SizedBox(
+                      width: 4), // Adding a small gap between the icon and text
+                  SizedBox(
+                    width: 250,
+                    child: Text(
+                      "If the item has variations, you can leave the item price blank for now.",
+                      style: TextStyle(
+                        fontSize: 12,
+                        letterSpacing: 1,
+                      ),
                     ),
-                  StyledTextField(
-                    controller: itemNameController,
-                    hintText: "Item Name",
-                    obscureText: false,
-                  ),
-                  const SizedBox(
-                    height: 10,
-                  ),
-                  StyledTextField(
-                    controller: itemPriceController,
-                    hintText: "Item Price",
-                    obscureText: false,
-                    keyboardType: TextInputType.number,
-                  ),
-                  const SizedBox(
-                    height: 10,
-                  ),
-                  StyledDropdown(
-                    value: category,
-                    onChange: (String? newValue) {
-                      setState(() {
-                        category = newValue;
-                      });
-                    },
-                    hintText: "Category",
-                    items: [],
-                  ),
-                  const SizedBox(
-                    height: 10,
-                  ),
-                  UploadImage(
-                    onPressed: _pickImage,
-                    text: selectedImagePath,
-                  ),
-                  const SizedBox(
-                    height: 20,
-                  ),
-                  StyledButton(
-                    btnIcon: widget.productName != null &&
-                            widget.productPrice != null
-                        ? Icon(Icons.save_alt_rounded)
-                        : Icon(Icons.add),
-                    btnText: widget.productName != null &&
-                            widget.productPrice != null
-                        ? "EDIT"
-                        : "ADD",
-                    onClick: _uploadImageAndUpdateMenu,
-                    btnWidth: 250,
-                  ),
-                  const SizedBox(
-                    height: 30,
-                  ),
-                  const Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      Icon(
-                        Icons.info_outline,
-                        size: 20,
-                      ),
-                      SizedBox(
-                          width:
-                              4), // Adding a small gap between the icon and text
-                      SizedBox(
-                        width: 250,
-                        child: Flexible(
-                          child: Text(
-                            "If the item has variations, you can leave the item price blank for now.",
-                            style: TextStyle(
-                              fontSize: 12,
-                              letterSpacing: 1,
-                            ),
-                          ),
-                        ),
-                      ),
-                    ],
                   ),
                 ],
               ),
-            ),
+            ],
           ),
-          if (isLoading)
-            Center(
-              child: CircularProgressIndicator(
-                color: Color(0xFFE2B563),
-              ),
-            )
-        ],
+        ),
       ),
     );
   }

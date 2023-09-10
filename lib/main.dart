@@ -9,6 +9,7 @@ import 'package:primos_app/widgets/main_page.dart';
 Future main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await Firebase.initializeApp();
+  await Future.delayed(const Duration(milliseconds: 300));
 
   runApp(
     const ProviderScope(
