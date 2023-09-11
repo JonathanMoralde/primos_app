@@ -445,13 +445,15 @@ class OrderViewPage extends ConsumerWidget {
 
     // ! GCASH OR CARD METHOD
     Future onlinePayment(String method, int totalAmount, String formattedDate,
-            String orderName, String waiterName, List<dynamic> orderDetails) =>
-        showDialog(
-          barrierDismissible: false,
-          context: context,
-          builder: (context) => AlertDialog(
-            contentPadding: EdgeInsets.zero,
-            content: Column(
+        String orderName, String waiterName, List<dynamic> orderDetails) {
+      String? selectedMethod;
+      return showDialog(
+        barrierDismissible: false,
+        context: context,
+        builder: (context) => AlertDialog(
+          contentPadding: EdgeInsets.zero,
+          content: StatefulBuilder(builder: (context, setState) {
+            return Column(
               mainAxisSize: MainAxisSize.min,
               children: [
                 Row(
@@ -477,6 +479,19 @@ class OrderViewPage extends ConsumerWidget {
                   padding: EdgeInsets.all(16.0),
                   child: Column(
                     children: [
+                      if (method == "E-wallet")
+                        StyledDropdown(
+                          value: selectedMethod,
+                          onChange: (newValue) {
+                            setState(() {
+                              selectedMethod = newValue;
+                            });
+                          },
+                          hintText: "Select E-wallet",
+                          items: ["Gcash", "Paymaya"],
+                          showFetchedCategories: false,
+                        ),
+                      const SizedBox(height: 10),
                       StyledTextField(
                           keyboardType: TextInputType.number,
                           controller: cashController,
@@ -531,10 +546,14 @@ class OrderViewPage extends ConsumerWidget {
                                           msg:
                                               "Please enter the reference number!",
                                           gravity: ToastGravity.CENTER);
+                                    } else if (selectedMethod == null) {
+                                      Fluttertoast.showToast(
+                                          msg: "Please select the E-wallet!",
+                                          gravity: ToastGravity.CENTER);
                                     } else {
                                       nextModal(
                                           discountedTotal,
-                                          method,
+                                          selectedMethod!,
                                           referenceNumController.text,
                                           totalAmount,
                                           formattedDate,
@@ -551,9 +570,11 @@ class OrderViewPage extends ConsumerWidget {
                   ),
                 ),
               ],
-            ),
-          ),
-        );
+            );
+          }),
+        ),
+      );
+    }
 
     // ! CHOOSE PAYMENT METHOD
     Future paymentMethod(int totalAmount, String formattedDate,
@@ -601,10 +622,10 @@ class OrderViewPage extends ConsumerWidget {
                         height: 10,
                       ),
                       StyledButton(
-                        btnText: "GCASH",
+                        btnText: "E-WALLET",
                         onClick: () {
                           Navigator.of(context).pop();
-                          onlinePayment("Gcash", totalAmount, formattedDate,
+                          onlinePayment("E-wallet", totalAmount, formattedDate,
                               orderName, waiterName, orderDetails);
                         },
                         btnWidth: double.infinity,

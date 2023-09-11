@@ -44,6 +44,11 @@ List<SideMenuPage> adminPages = [
       name: "Employee",
       page: EmployeePage(),
       icon: Icon(Icons.account_circle_rounded)),
+  SideMenuPage(
+    name: "Change VAT %",
+    page: VatForm(),
+    icon: Icon(Icons.edit),
+  ),
 ];
 
 // END OF ADMIN PAGES
@@ -54,11 +59,6 @@ List<SideMenuPage> cashierPages = [
     name: "Orders",
     page: OrdersPage(),
     icon: Icon(Icons.fastfood),
-  ),
-  SideMenuPage(
-    name: "Change VAT %",
-    page: VatForm(),
-    icon: Icon(Icons.edit),
   ),
 ];
 // END OF CASHIER PAGES
