@@ -35,33 +35,30 @@ class EmployeePage extends StatelessWidget {
               } else if (!snapshot.hasData || snapshot.data!.docs.isEmpty) {
                 return Text('No employees found.');
               } else {
-                return Expanded(
-                  // Wrap the ListView.builder with an Expanded widget
-                  child: ListView.builder(
-                    itemCount: snapshot.data!.docs.length,
-                    itemBuilder: (context, index) {
-                      var employeeData = snapshot.data!.docs[index].data()
-                          as Map<String, dynamic>;
-                      var employeeName = employeeData['fullName'] ?? 'N/A';
-                      var employeeRole = employeeData['role'] ?? 'N/A';
-                      var employeeEmail = employeeData['email'] ?? 'N/A';
-                      var userId = snapshot.data!.docs[index].id;
+                return ListView.builder(
+                  itemCount: snapshot.data!.docs.length,
+                  itemBuilder: (context, index) {
+                    var employeeData = snapshot.data!.docs[index].data()
+                        as Map<String, dynamic>;
+                    var employeeName = employeeData['fullName'] ?? 'N/A';
+                    var employeeRole = employeeData['role'] ?? 'N/A';
+                    var employeeEmail = employeeData['email'] ?? 'N/A';
+                    var userId = snapshot.data!.docs[index].id;
 
-                      return Column(
-                        children: [
-                          EmployeeDisplay(
-                            employeeName: employeeName,
-                            employeeRole: employeeRole,
-                            employeeEmail: employeeEmail,
-                            userId: userId,
-                          ),
-                          const SizedBox(
-                            height: 10,
-                          ),
-                        ],
-                      );
-                    },
-                  ),
+                    return Column(
+                      children: [
+                        EmployeeDisplay(
+                          employeeName: employeeName,
+                          employeeRole: employeeRole,
+                          employeeEmail: employeeEmail,
+                          userId: userId,
+                        ),
+                        const SizedBox(
+                          height: 10,
+                        ),
+                      ],
+                    );
+                  },
                 );
               }
             },
