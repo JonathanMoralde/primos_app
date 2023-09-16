@@ -49,6 +49,7 @@ class WaiterTablePage extends ConsumerWidget {
                       (index) => FractionallySizedBox(
                         widthFactor: 0.31, // Take up 30% of available width
                         child: TableBox(
+                          tableList: itemDocs,
                           tableName: itemDocs[index],
                         ), // You can use 'index + 1' if you want table numbers to start from 1
                       ),

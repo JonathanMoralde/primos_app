@@ -1,3 +1,4 @@
+import 'package:firebase_database/firebase_database.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 import 'package:primos_app/pages/waiter/orderDetails.dart';
@@ -12,10 +13,12 @@ import 'package:primos_app/widgets/styledButton.dart';
 
 // STATE MANAGEMENT
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:primos_app/widgets/styledDropdown.dart';
 
 class TableBox extends ConsumerWidget {
   final String tableName;
-  TableBox({super.key, required this.tableName});
+  final List<String> tableList;
+  TableBox({super.key, required this.tableName, required this.tableList});
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -70,6 +73,102 @@ class TableBox extends ConsumerWidget {
           price: price,
         );
       }).toList();
+    }
+
+    Future<void> transferModal() async {
+      String? tableValue;
+      List<String> availableTables = [];
+
+      // Filter tables that are not occupied
+      ordersStream.when(
+          data: (ordersMap) {
+            final orderEntries = ordersMap.entries.toList();
+            for (final entry in orderEntries) {
+              if (entry.value['payment_status'] == 'Unpaid') {
+                availableTables.add(entry.value['order_name']);
+              }
+            }
+          },
+          error: (error, stackTrace) => Text('Error: $error'),
+          loading: () => CircularProgressIndicator());
+      // Exclude occupied tables from the tableList
+      final unoccupiedTables =
+          tableList.where((table) => !availableTables.contains(table)).toList();
+
+      showDialog(
+        context: context,
+        builder: (context) => AlertDialog(
+          contentPadding: EdgeInsets.zero,
+          content: StatefulBuilder(builder: (context, setState) {
+            return Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Container(
+                  padding: EdgeInsets.all(16.0),
+                  child: Text(
+                    "Transfer ${tableEntry!['order_name']}",
+                    textAlign: TextAlign.left,
+                  ),
+                ),
+                Divider(height: 0),
+                Container(
+                  padding: EdgeInsets.all(16.0),
+                  child: Column(
+                    children: [
+                      StyledDropdown(
+                        value: tableValue,
+                        onChange: (newValue) {
+                          setState(() {
+                            tableValue = newValue;
+                          });
+                          print(tableValue);
+                        },
+                        hintText: "Select Table",
+                        items: unoccupiedTables,
+                        showFetchedCategories: false,
+                      ),
+                      const SizedBox(
+                        height: 15,
+                      ),
+                      Row(
+                        children: [
+                          Expanded(
+                            flex: 1,
+                            child: StyledButton(
+                                btnText: "Cancel",
+                                onClick: () {
+                                  Navigator.of(context).pop();
+                                }),
+                          ),
+                          const SizedBox(
+                            width: 10,
+                          ),
+                          Expanded(
+                            flex: 1,
+                            child: StyledButton(
+                                btnText: "Confirm",
+                                onClick: () async {
+                                  DatabaseReference orderRef =
+                                      await FirebaseDatabase.instance
+                                          .ref()
+                                          .child('orders')
+                                          .child(tableEntryId!);
+
+                                  orderRef.update({'order_name': tableValue});
+                                  Navigator.pop(context);
+                                  // ref.refresh(order)
+                                }),
+                          ),
+                        ],
+                      )
+                    ],
+                  ),
+                ),
+              ],
+            );
+          }),
+        ),
+      );
     }
 
     Future tableModal() => showDialog(
@@ -172,6 +271,18 @@ class TableBox extends ConsumerWidget {
                             },
                             btnWidth: double.infinity,
                           ),
+                        ),
+                        const SizedBox(
+                          height: 10,
+                        ),
+                        StyledButton(
+                          btnIcon: const Icon(Icons.move_down),
+                          btnText: "Transfer Table",
+                          onClick: () {
+                            Navigator.pop(context);
+                            transferModal();
+                          },
+                          btnWidth: double.infinity,
                         ),
                         const SizedBox(
                           height: 30,

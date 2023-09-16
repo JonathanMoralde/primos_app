@@ -122,6 +122,7 @@ class TakeoutPage extends ConsumerWidget {
                 );
               }
             },
+            unselectedItemColor: Color(0xFF252525),
             selectedItemColor: Color(0xFFFE3034),
             backgroundColor: Color(0xFFE2B563),
             items: const [

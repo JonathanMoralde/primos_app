@@ -525,41 +525,83 @@ class OrderViewPage extends ConsumerWidget {
                             child: StyledButton(
                                 btnText: "Next",
                                 onClick: () {
-                                  if (cashController.text.isEmpty) {
-                                    Fluttertoast.showToast(
-                                        msg: "Please enter the amount received",
-                                        gravity: ToastGravity.CENTER);
-                                  } else {
-                                    double discountedTotal = discountAmount != 0
-                                        ? (totalAmount.toDouble() -
-                                            discountAmount)
-                                        : totalAmount.toDouble();
-
-                                    if (double.parse(cashController.text) <
-                                        discountedTotal) {
-                                      Fluttertoast.showToast(
-                                          msg: "Please enter the right amount!",
-                                          gravity: ToastGravity.CENTER);
-                                    } else if (referenceNumController
-                                        .text.isEmpty) {
+                                  if (method == "E-wallet") {
+                                    if (cashController.text.isEmpty) {
                                       Fluttertoast.showToast(
                                           msg:
-                                              "Please enter the reference number!",
-                                          gravity: ToastGravity.CENTER);
-                                    } else if (selectedMethod == null) {
-                                      Fluttertoast.showToast(
-                                          msg: "Please select the E-wallet!",
+                                              "Please enter the amount received",
                                           gravity: ToastGravity.CENTER);
                                     } else {
-                                      nextModal(
-                                          discountedTotal,
-                                          selectedMethod!,
-                                          referenceNumController.text,
-                                          totalAmount,
-                                          formattedDate,
-                                          orderName,
-                                          waiterName,
-                                          orderDetails);
+                                      double discountedTotal =
+                                          discountAmount != 0
+                                              ? (totalAmount.toDouble() -
+                                                  discountAmount)
+                                              : totalAmount.toDouble();
+
+                                      if (double.parse(cashController.text) <
+                                          discountedTotal) {
+                                        Fluttertoast.showToast(
+                                            msg:
+                                                "Please enter the right amount!",
+                                            gravity: ToastGravity.CENTER);
+                                      } else if (referenceNumController
+                                          .text.isEmpty) {
+                                        Fluttertoast.showToast(
+                                            msg:
+                                                "Please enter the reference number!",
+                                            gravity: ToastGravity.CENTER);
+                                      } else if (selectedMethod == null) {
+                                        Fluttertoast.showToast(
+                                            msg: "Please select the E-wallet!",
+                                            gravity: ToastGravity.CENTER);
+                                      } else {
+                                        nextModal(
+                                            discountedTotal,
+                                            selectedMethod!,
+                                            referenceNumController.text,
+                                            totalAmount,
+                                            formattedDate,
+                                            orderName,
+                                            waiterName,
+                                            orderDetails);
+                                      }
+                                    }
+                                  } else {
+                                    if (cashController.text.isEmpty) {
+                                      Fluttertoast.showToast(
+                                          msg:
+                                              "Please enter the amount received",
+                                          gravity: ToastGravity.CENTER);
+                                    } else {
+                                      double discountedTotal =
+                                          discountAmount != 0
+                                              ? (totalAmount.toDouble() -
+                                                  discountAmount)
+                                              : totalAmount.toDouble();
+
+                                      if (double.parse(cashController.text) <
+                                          discountedTotal) {
+                                        Fluttertoast.showToast(
+                                            msg:
+                                                "Please enter the right amount!",
+                                            gravity: ToastGravity.CENTER);
+                                      } else if (referenceNumController
+                                          .text.isEmpty) {
+                                        Fluttertoast.showToast(
+                                            msg:
+                                                "Please enter the reference number!",
+                                            gravity: ToastGravity.CENTER);
+                                      } else {
+                                        nextModal(
+                                            discountedTotal,
+                                            method,
+                                            referenceNumController.text,
+                                            totalAmount,
+                                            formattedDate,
+                                            orderName,
+                                            waiterName,
+                                            orderDetails);
+                                      }
                                     }
                                   }
                                 }),
