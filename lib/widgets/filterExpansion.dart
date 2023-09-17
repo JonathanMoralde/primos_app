@@ -30,7 +30,7 @@ class FilterExpansion extends ConsumerWidget {
     }
 
     // bool isExpanded = false;
-    String headerText = "Filter Options";
+    String headerText = "Filter by Date";
 
     return Container(
       decoration: BoxDecoration(

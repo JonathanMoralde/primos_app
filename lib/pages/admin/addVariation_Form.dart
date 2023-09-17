@@ -22,6 +22,8 @@ class _AddVariationFormState extends State<AddVariationForm> {
   List<String> prices = [];
   bool isConfirmButtonEnabled = false; // Add this variable
   bool isLoading = false;
+  bool isPriceEnabled = false;
+  bool isVarEnabled = true;
 
   void _resetUI() {
     setState(() {
@@ -115,12 +117,16 @@ class _AddVariationFormState extends State<AddVariationForm> {
                     noShadow: true,
                     btnIcon: const Icon(Icons.add),
                     btnText: 'ADD',
-                    onClick: () {
-                      setState(() {
-                        variations.add(variationController.text);
-                        variationController.clear();
-                      });
-                    },
+                    onClick: isVarEnabled
+                        ? () {
+                            setState(() {
+                              variations.add(variationController.text);
+                              variationController.clear();
+                              isPriceEnabled = true;
+                              isVarEnabled = false;
+                            });
+                          }
+                        : null,
                   ),
                 ],
               ),
@@ -148,14 +154,18 @@ class _AddVariationFormState extends State<AddVariationForm> {
                     noShadow: true,
                     btnIcon: const Icon(Icons.add),
                     btnText: 'ADD',
-                    onClick: () {
-                      setState(() {
-                        prices.add(varPriceController.text);
-                        varPriceController.clear();
-                        isConfirmButtonEnabled =
-                            true; // Enable the "CONFIRM" button
-                      });
-                    },
+                    onClick: isPriceEnabled
+                        ? () {
+                            setState(() {
+                              prices.add(varPriceController.text);
+                              varPriceController.clear();
+                              isConfirmButtonEnabled =
+                                  true; // Enable the "CONFIRM" button
+                              isPriceEnabled = false; //reset
+                              isVarEnabled = true; //reset
+                            });
+                          }
+                        : null,
                   ),
                 ],
               ),
@@ -207,7 +217,7 @@ class _AddVariationFormState extends State<AddVariationForm> {
                   SizedBox(
                     width: 250,
                     child: Text(
-                      "Enter price at the same order as you've entered variation.",
+                      "Confirm once you've entered all the variations and prices.",
                       style: TextStyle(
                         fontSize: 12,
                         letterSpacing: 1,

@@ -31,3 +31,27 @@ final mergedTablesProvider = FutureProvider<List<String>>((ref) async {
 
   return tableNames;
 });
+
+final allTableItemsProvider =
+    FutureProvider<List<Map<String, Object>>>((ref) async {
+  final tablesCollection = FirebaseFirestore.instance.collection('tables');
+  final tablesSnapshot = await tablesCollection.get();
+
+  final fetchedData = tablesSnapshot.docs.map((doc) {
+    final data = doc.data() as Map<String, dynamic>;
+    return {
+      'tableId': doc.id,
+      'tableName': data['tableName'] as String,
+      'tableNumber': data['tableNumber'] as int,
+    };
+  }).toList();
+
+  print("Fetched tables: $fetchedData");
+
+  // Sort the fetchedData in ascending order by tableNumber
+  fetchedData.sort((a, b) {
+    return (a['tableNumber'] as int).compareTo(b['tableNumber'] as int);
+  });
+
+  return fetchedData;
+});

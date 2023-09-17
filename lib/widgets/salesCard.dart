@@ -134,8 +134,14 @@ class _SalesCardState extends State<SalesCard> {
                     Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
-                        const Text("Grand Total:"),
-                        Text('PHP ${widget.totalAmount.toStringAsFixed(2)}'),
+                        const Text(
+                          "Grand Total:",
+                          style: TextStyle(fontWeight: FontWeight.w600),
+                        ),
+                        Text(
+                          'PHP ${widget.totalAmount.toStringAsFixed(2)}',
+                          style: TextStyle(fontWeight: FontWeight.w600),
+                        ),
                       ],
                     ),
                     const Divider(

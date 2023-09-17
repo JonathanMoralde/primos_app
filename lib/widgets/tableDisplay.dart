@@ -1,27 +1,28 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:fluttertoast/fluttertoast.dart';
+import 'package:primos_app/providers/table/table_provider.dart';
 
-class TableDisplay extends StatefulWidget {
+class TableDisplay extends ConsumerWidget {
   final String tableId;
   final int tableNum;
   final String tableName;
-  final VoidCallback refreshCallback;
 
   const TableDisplay({
     Key? key,
     required this.tableId,
     required this.tableNum,
     required this.tableName,
-    required this.refreshCallback,
   }) : super(key: key);
 
-  @override
-  State<TableDisplay> createState() => _TableDisplayState();
-}
+//   @override
+//   State<TableDisplay> createState() => _TableDisplayState();
+// }
 
-class _TableDisplayState extends State<TableDisplay> {
+// class _TableDisplayState extends State<TableDisplay> {
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
     return Container(
       decoration: const BoxDecoration(
         borderRadius: BorderRadius.all(
@@ -37,11 +38,11 @@ class _TableDisplayState extends State<TableDisplay> {
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           crossAxisAlignment: CrossAxisAlignment.center,
           children: [
-            Text("Table: ${widget.tableNum}"),
+            Text("Table: ${tableNum}"),
             IconButton(
               icon: Icon(Icons.delete),
               onPressed: () async {
-                await deleteTable();
+                await deleteTable(context, ref);
               },
             ),
           ],
@@ -50,19 +51,19 @@ class _TableDisplayState extends State<TableDisplay> {
     );
   }
 
-  Future<void> deleteTable() async {
+  Future<void> deleteTable(BuildContext context, WidgetRef ref) async {
     try {
       // Delete the Firestore document associated with the user
       final tableDocRef =
-          FirebaseFirestore.instance.collection('tables').doc(widget.tableId);
+          FirebaseFirestore.instance.collection('tables').doc(tableId);
       await tableDocRef.delete().then((value) {
-        ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
-          content: Text("Table deleted successfully."),
-          duration: Duration(seconds: 2),
-        ));
-
-        // Call the callback function to refresh the table data
-        widget.refreshCallback();
+        // ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
+        //   content: Text("Table deleted successfully."),
+        //   duration: Duration(seconds: 2),
+        // ));
+        Fluttertoast.showToast(msg: "Table deleted successfully.");
+        ref.refresh(tableItemsProvider);
+        ref.refresh(allTableItemsProvider);
       });
     } catch (e) {
       print("Error deleting table: $e");
