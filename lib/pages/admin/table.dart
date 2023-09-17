@@ -39,6 +39,8 @@ class _TablePageState extends State<TablePage> {
       await tablesCollection.add({
         'tableName': 'Table $newTableNumber',
         'tableNumber': newTableNumber,
+        'status': 'active',
+        'mergedWith': [],
       });
     }
 

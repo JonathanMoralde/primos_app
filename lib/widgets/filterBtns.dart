@@ -45,8 +45,9 @@ class FilterBtns extends ConsumerWidget {
           ),
         );
       },
-      loading: () =>
-          const CircularProgressIndicator(), // Show a loading indicator while fetching data
+      loading: () => const CircularProgressIndicator(
+        color: const Color(0xFFE2B563),
+      ), // Show a loading indicator while fetching data
       error: (error, stackTrace) {
         print("Error fetching categories: $error");
         return const Text("Error fetching categories"); // Show an error message

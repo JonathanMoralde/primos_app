@@ -11,6 +11,7 @@ import 'package:primos_app/pages/kitchen/kitchen.dart';
 
 import 'package:primos_app/pages/waiter/tables.dart';
 import 'package:primos_app/pages/waiter/takeout.dart';
+import 'package:primos_app/widgets/customDialogBox.dart';
 
 class SideMenuPage {
   final String name;
@@ -75,6 +76,12 @@ List<SideMenuPage> waiterPages = [
     page: TakeoutPage(),
     icon: Icon(Icons.takeout_dining),
   ),
+  // SideMenuPage(
+  //   name: "Merge Tables",
+  //   page: CustomDialogBox(),
+  //   icon: Icon(Icons.edit),
+  // ),
+  // SideMenuPage(name: "Merge Tables", page: mergeModal(),)
 ];
 // END OF WAITER PAGES
 

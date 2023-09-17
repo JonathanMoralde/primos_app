@@ -46,13 +46,55 @@ class WaiterTablePage extends ConsumerWidget {
                     runSpacing: 10,
                     children: List.generate(
                       itemDocs.length,
-                      (index) => FractionallySizedBox(
-                        widthFactor: 0.31, // Take up 30% of available width
-                        child: TableBox(
-                          tableList: itemDocs,
-                          tableName: itemDocs[index],
-                        ), // You can use 'index + 1' if you want table numbers to start from 1
-                      ),
+                      (index) {
+                        final tableData =
+                            ref.watch(tableDataProvider(itemDocs[index]));
+
+                        String? status;
+                        List<String> mergedWithStringList = [];
+
+                        tableData.when(
+                          data: (itemSnap) {
+                            if (itemSnap != null) {
+                              final documentSnapshot = itemSnap.docs[
+                                  0]; // Get the first document in the QuerySnapshot
+                              final data = documentSnapshot.data()
+                                  as Map<String, dynamic>;
+                              status = data['status'] as String;
+                              final mergedWith =
+                                  data['mergedWith'] as List<dynamic> ?? [];
+
+                              mergedWithStringList =
+                                  mergedWith.map((dynamic item) {
+                                return item
+                                    .toString(); // Convert each item to a String
+                              }).toList();
+                            } else {
+                              // Handle the case where the document does not exist
+                              print(
+                                  "TABLE DATA $index - Document does not exist");
+                            }
+                          },
+                          error: (error, stackTrace) => Text("Error: $error"),
+                          loading: () => Center(
+                            child: CircularProgressIndicator(
+                              color: Color(0xFFE2B563),
+                            ),
+                          ),
+                        );
+
+                        return FractionallySizedBox(
+                          widthFactor: status == 'merged'
+                              ? 1
+                              : 0.31, // Take up 30% of available width
+                          child: TableBox(
+                            status: status ?? "active",
+                            mergedWith: mergedWithStringList,
+                            tableList: itemDocs,
+                            tableName: itemDocs[index],
+                          ), // You can use 'index + 1' if you want table numbers to start from 1
+                        );
+                      },
                     ),
                   ),
                 );
