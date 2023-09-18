@@ -6,6 +6,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:primos_app/main.dart';
 import 'package:primos_app/pages/waiter/tables.dart';
+import 'package:primos_app/providers/loading/isLoading_provider.dart';
 import 'package:primos_app/providers/selectedTabletoMerge/mainTable_provider.dart';
 import 'package:primos_app/providers/selectedTabletoMerge/selectedTable_provider.dart';
 import 'package:primos_app/providers/selectedTabletoMerge/tablesToMerge_provider.dart';
@@ -56,7 +57,7 @@ class SideMenu extends ConsumerWidget {
 
     // ! WAITER MERGE TABLES
     final ordersStream = ref.watch(ordersProvider);
-    final tableItems = ref.watch(tableItemsProvider);
+    final tableItems = ref.watch(tableItemsProvider2);
     List<String> tableList = [];
 
     // ? GET TABLE LIST
@@ -132,6 +133,7 @@ class SideMenu extends ConsumerWidget {
 
       return showDialog(
         barrierDismissible: false,
+        barrierColor: Colors.black54.withOpacity(0),
         context: context,
         builder: (context) => AlertDialog(
           contentPadding: EdgeInsets.zero,
@@ -211,23 +213,6 @@ class SideMenu extends ConsumerWidget {
 
     Future<void> mergeModal(BuildContext context, WidgetRef ref) async {
       String? tableValue;
-      List<String> availableTables = [];
-
-      // get the occupied orders
-      ordersStream.when(
-          data: (ordersMap) {
-            final orderEntries = ordersMap.entries.toList();
-            for (final entry in orderEntries) {
-              if (entry.value['payment_status'] == 'Unpaid') {
-                availableTables.add(entry.value['order_name']);
-              }
-            }
-          },
-          error: (error, stackTrace) => Text('Error: $error'),
-          loading: () => CircularProgressIndicator());
-      // Exclude occupied tables from the tableList
-      final unoccupiedTables =
-          tableList.where((table) => !availableTables.contains(table)).toList();
 
       showDialog(
         context: context,
@@ -330,7 +315,16 @@ class SideMenu extends ConsumerWidget {
                                   } catch (e) {
                                     print('error line 330: $e');
                                   }
+
+                                  ref
+                                      .read(selectedTableProvider.notifier)
+                                      .state = [];
+                                  ref
+                                      .read(tablesToMergeProvider.notifier)
+                                      .state = [];
+                                  ref.refresh(mergedTablesProvider);
                                   ref.refresh(tableItemsProvider);
+                                  ref.refresh(tableItemsProvider2);
                                   ref.refresh(tableDataProvider(mainTable!));
 
                                   Navigator.pop(context);
@@ -466,6 +460,8 @@ class SideMenu extends ConsumerWidget {
                             child: StyledButton(
                                 btnText: "Unmerge",
                                 onClick: () async {
+                                  ref.read(isLoadingProvider.notifier).state =
+                                      true;
                                   final firestore = FirebaseFirestore.instance;
                                   List<String> mergedTableId = [];
                                   final mainTable =
@@ -502,7 +498,11 @@ class SideMenu extends ConsumerWidget {
                                   } catch (e) {
                                     print("ERROR LINE 506: $e");
                                   }
+                                  ref.read(isLoadingProvider.notifier).state =
+                                      false;
+                                  ref.refresh(mergedTablesProvider);
                                   ref.refresh(tableItemsProvider);
+                                  ref.refresh(tableItemsProvider2);
                                   ref.refresh(tableDataProvider(mainTable!));
                                   Navigator.pop(context);
                                 }),

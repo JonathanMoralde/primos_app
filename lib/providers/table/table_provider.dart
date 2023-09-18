@@ -55,3 +55,14 @@ final allTableItemsProvider =
 
   return fetchedData;
 });
+
+final tableItemsProvider2 = FutureProvider<List<String>>((ref) async {
+  final tablesCollection = FirebaseFirestore.instance.collection('tables');
+  final tablesSnapshot =
+      await tablesCollection.where('status', whereIn: ['active']).get();
+
+  final tableNames =
+      tablesSnapshot.docs.map((doc) => doc.get('tableName') as String).toList();
+
+  return tableNames;
+});
