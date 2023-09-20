@@ -410,10 +410,12 @@ class SideMenu extends ConsumerWidget {
                             tableData.when(
                               data: (itemSnap) {
                                 if (itemSnap != null) {
-                                  final documentSnapshot = itemSnap.docs[
-                                      0]; // Get the first document in the QuerySnapshot
-                                  final data = documentSnapshot.data()
-                                      as Map<String, dynamic>;
+                                  final data =
+                                      itemSnap.data() as Map<String, dynamic>;
+                                  // final documentSnapshot = itemSnap.docs[
+                                  //     0]; // Get the first document in the QuerySnapshot
+                                  // final data = documentSnapshot.data()
+                                  //     as Map<String, dynamic>;
                                   status = data['status'] as String;
                                   final mergedWith =
                                       data['mergedWith'] as List<dynamic> ?? [];
