@@ -180,7 +180,7 @@ class OrderViewPage extends ConsumerWidget {
                               ),
                             ),
                             Text(
-                              (discountedTotal * percentage).toStringAsFixed(2),
+                              (totalAmount * percentage).toStringAsFixed(2),
                               style: TextStyle(fontSize: 13),
                             )
                           ],
@@ -272,8 +272,7 @@ class OrderViewPage extends ConsumerWidget {
                                   String receiptRefNum =
                                       await generateReceiptNumber();
 
-                                  double vatAmount =
-                                      discountedTotal * percentage!;
+                                  double vatAmount = totalAmount * percentage!;
 
                                   double amountReceived =
                                       double.parse(cashController.text);
@@ -879,18 +878,26 @@ class OrderViewPage extends ConsumerWidget {
                             child: StyledButton(
                                 btnText: "Confirm",
                                 onClick: () {
-                                  print(discountAmount);
-                                  double result = calculateDiscountedAmount(
-                                      totalAmount.toDouble(),
-                                      double.parse(
-                                          tablePersonNumController.text),
-                                      double.parse(
-                                          seniorOrPwdNumController.text));
-                                  ref
-                                      .read(discountAmountProvider.notifier)
-                                      .state = result;
-                                  print(discountAmount);
-                                  Navigator.of(context).pop();
+                                  if (int.parse(seniorOrPwdNumController.text) >
+                                      int.parse(
+                                          tablePersonNumController.text)) {
+                                    Fluttertoast.showToast(
+                                        msg:
+                                            "Invalid # of person w/ PWD/Senior Card",
+                                        gravity: ToastGravity.CENTER);
+                                  } else {
+                                    double result = calculateDiscountedAmount(
+                                        totalAmount.toDouble(),
+                                        double.parse(
+                                            tablePersonNumController.text),
+                                        double.parse(
+                                            seniorOrPwdNumController.text));
+                                    ref
+                                        .read(discountAmountProvider.notifier)
+                                        .state = result;
+                                    print(discountAmount);
+                                    Navigator.of(context).pop();
+                                  }
                                 }),
                           ),
                         ],
@@ -937,7 +944,7 @@ class OrderViewPage extends ConsumerWidget {
                       StyledTextField(
                           keyboardType: TextInputType.number,
                           controller: highestPriceController,
-                          hintText: "Amount of item w/ highest price",
+                          hintText: "Amount of highest unit price",
                           obscureText: false),
                       const SizedBox(
                         height: 15,
