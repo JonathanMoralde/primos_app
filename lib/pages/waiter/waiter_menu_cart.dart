@@ -130,6 +130,7 @@ class WaiterMenuCart extends ConsumerWidget {
                     productName: order.name,
                     productPrice: order.price,
                     imageUrl: order.imageUrl,
+                    status: order.status!,
                     isRow: true,
                     cardHeight: order.variation != null ? 130 : 110,
                     footerSection: Column(

@@ -50,7 +50,8 @@ class WaiterMenu extends ConsumerWidget {
       productName,
       productPrice,
       List<String> productVariations,
-      imageUrl) async {
+      imageUrl,
+      String status) async {
     print('Add modal function called.');
     final currentOrders = ref.watch(currentOrdersProvider);
 
@@ -208,6 +209,7 @@ class WaiterMenu extends ConsumerWidget {
                                       variation: localVariation,
                                       quantity: localQuantity,
                                       imageUrl: imageUrl,
+                                      status: status,
                                     );
 
                                     ref
@@ -312,6 +314,8 @@ class WaiterMenu extends ConsumerWidget {
                                     ? itemPrice.toDouble()
                                     : 0.0;
                             final imageUrl = itemDoc['imageURL'] as String;
+                            final productStatus =
+                                itemDoc['itemStatus'] as String;
 
                             return variationsStream.when(
                                 data: (varDoc) {
@@ -344,6 +348,7 @@ class WaiterMenu extends ConsumerWidget {
                                         : null,
                                     prices: prices.isNotEmpty ? prices : null,
                                     imageUrl: imageUrl,
+                                    status: productStatus,
                                     footerSection: Column(children: [
                                       StyledButton(
                                           btnIcon: Icon(Icons.add),
@@ -351,29 +356,33 @@ class WaiterMenu extends ConsumerWidget {
                                           btnWidth: double.infinity,
                                           btnHeight: 35,
                                           btnText: "Add",
-                                          onClick: () {
-                                            if (variations.isNotEmpty) {
-                                              addModal(
-                                                context,
-                                                ref,
-                                                productId,
-                                                productName,
-                                                prices,
-                                                variations, // Pass the fetched variations
-                                                imageUrl,
-                                              );
-                                            } else {
-                                              addModal(
-                                                context,
-                                                ref,
-                                                productId,
-                                                productName,
-                                                productPrice,
-                                                variations, // Pass the fetched variations
-                                                imageUrl,
-                                              );
-                                            }
-                                          })
+                                          onClick: productStatus == "Unavail"
+                                              ? null
+                                              : () {
+                                                  if (variations.isNotEmpty) {
+                                                    addModal(
+                                                      context,
+                                                      ref,
+                                                      productId,
+                                                      productName,
+                                                      prices,
+                                                      variations, // Pass the fetched variations
+                                                      imageUrl,
+                                                      productStatus,
+                                                    );
+                                                  } else {
+                                                    addModal(
+                                                      context,
+                                                      ref,
+                                                      productId,
+                                                      productName,
+                                                      productPrice,
+                                                      variations, // Pass the fetched variations
+                                                      imageUrl,
+                                                      productStatus,
+                                                    );
+                                                  }
+                                                })
                                     ]),
                                   );
                                 },

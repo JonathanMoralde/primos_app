@@ -20,6 +20,7 @@ class ItemCard extends ConsumerWidget {
   final double? cardWidth;
   final List<String>? variations;
   final List<String>? prices;
+  final String status;
 
   const ItemCard({
     Key? key,
@@ -33,6 +34,7 @@ class ItemCard extends ConsumerWidget {
     this.cardWidth,
     this.variations,
     this.prices,
+    required this.status,
   }) : super(key: key);
 
   Future<void> delModal(BuildContext context, WidgetRef ref) => showDialog(
@@ -143,259 +145,335 @@ class ItemCard extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     print(variations);
-    return Container(
-      height: cardHeight ?? 300,
-      width: isRow == true ? double.infinity : cardWidth ?? 170,
-      decoration: BoxDecoration(
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withOpacity(0.25),
-            spreadRadius: 0,
-            blurRadius: 5,
-            offset: const Offset(0, 2), // Changes the position of the shadow
+    return Stack(
+      children: [
+        Container(
+          height: cardHeight ?? 360,
+          width: isRow == true ? double.infinity : cardWidth ?? 170,
+          decoration: BoxDecoration(
+            boxShadow: [
+              BoxShadow(
+                color: Colors.black.withOpacity(0.25),
+                spreadRadius: 0,
+                blurRadius: 5,
+                offset:
+                    const Offset(0, 2), // Changes the position of the shadow
+              ),
+            ],
+            borderRadius: BorderRadius.circular(8),
+            color: Colors.grey.shade300,
           ),
-        ],
-        borderRadius: BorderRadius.circular(8),
-        color: Colors.grey.shade300,
-      ),
-      child: isRow == true
-          ? Row(
-              children: [
-                Expanded(
-                  flex: 1,
-                  child: ClipRRect(
-                      borderRadius: isRow == true
-                          ? const BorderRadius.only(
-                              topLeft: Radius.circular(8),
-                              bottomLeft: Radius.circular(8),
-                            )
-                          : const BorderRadius.only(
-                              topLeft: Radius.circular(8),
-                              topRight: Radius.circular(8),
-                            ),
-                      child: CachedNetworkImage(
-                        imageUrl: imageUrl,
-                        width: double.infinity,
-                        fit: BoxFit.cover,
-                      )),
-                ),
-                Expanded(
-                  flex: 1,
-                  child: SizedBox(
-                    width: double.infinity,
-                    child: Padding(
-                      padding: const EdgeInsets.only(
-                        left: 16,
-                        right: 16,
-                        top: 15,
-                        bottom: 8,
-                      ), //modified this for row
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          SingleChildScrollView(
-                            scrollDirection: Axis.horizontal,
-                            child: Text(
-                              productName,
-                              overflow: TextOverflow.clip,
-                              softWrap: false,
-                              style: TextStyle(
-                                  fontWeight: FontWeight.w600,
-                                  letterSpacing: 1),
-                            ),
-                          ),
-                          const SizedBox(
-                            height: 8,
-                          ),
-                          if (variations == null)
-                            Text("PHP ${productPrice.toStringAsFixed(2)}"),
-                          if (variations != null)
-                            // Add a for loop to display variations and prices
-                            if (variations != null && prices != null)
-                              SingleChildScrollView(
-                                scrollDirection: Axis.horizontal,
-                                child: Row(
-                                  children: [
-                                    for (int i = 0; i < variations!.length; i++)
-                                      Text(
-                                          "${variations![i]} - PHP ${double.parse(prices![i]).toStringAsFixed(2)}"),
-                                  ],
+          child: isRow == true
+              ? Row(
+                  children: [
+                    Expanded(
+                      flex: 1,
+                      child: ClipRRect(
+                          borderRadius: isRow == true
+                              ? const BorderRadius.only(
+                                  topLeft: Radius.circular(8),
+                                  bottomLeft: Radius.circular(8),
+                                )
+                              : const BorderRadius.only(
+                                  topLeft: Radius.circular(8),
+                                  topRight: Radius.circular(8),
                                 ),
-                              ),
-                          const SizedBox(
-                            height: 8,
-                          ),
-                          // Footer section
-                          footerSection ??
-                              Row(
-                                mainAxisAlignment:
-                                    MainAxisAlignment.spaceBetween,
-                                children: [
-                                  StyledButton(
-                                    noShadow: true,
-                                    btnText: "Edit",
-                                    onClick: () {
-                                      Navigator.of(context).push(
-                                        MaterialPageRoute(
-                                          builder: (BuildContext context) {
-                                            return AdminMenuForm(
-                                              productId: productId,
-                                              productName: productName,
-                                              productPrice: productPrice,
-                                            );
-                                          },
-                                        ),
-                                      );
-                                    },
-                                    btnHeight: 30,
-                                  ),
-                                  StyledButton(
-                                    noShadow: true,
-                                    btnText: "Delete",
-                                    onClick: () {
-                                      // Call the delete function when the "Delete" button is pressed
-                                      // _deleteMenuItem(context);
-                                      delModal(context, ref);
-                                    },
-                                    btnHeight: 30,
-                                  ),
-                                ],
-                              ),
-                        ],
-                      ),
+                          child: CachedNetworkImage(
+                            imageUrl: imageUrl,
+                            width: double.infinity,
+                            fit: BoxFit.cover,
+                          )),
                     ),
-                  ),
-                ),
-              ],
-            )
-          : Column(
-              //DEFAULT LAYOUT OF ITEM CARD
-              children: [
-                Expanded(
-                  flex: 1,
-                  child: ClipRRect(
-                      borderRadius: const BorderRadius.only(
-                        topLeft: Radius.circular(8),
-                        topRight: Radius.circular(8),
-                      ),
-                      child: CachedNetworkImage(
-                        imageUrl: imageUrl,
+                    Expanded(
+                      flex: 1,
+                      child: SizedBox(
                         width: double.infinity,
-                        fit: BoxFit.cover,
-                      )),
-                ),
-                Expanded(
-                  flex: 1,
-                  child: SizedBox(
-                    width: double.infinity,
-                    child: Padding(
-                      padding: const EdgeInsets.all(8.0),
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          SingleChildScrollView(
-                            scrollDirection: Axis.horizontal,
-                            child: Text(
-                              productName,
-                              overflow: TextOverflow.clip,
-                              softWrap: false,
-                              style: TextStyle(
-                                  fontWeight: FontWeight.w600,
-                                  letterSpacing: 1),
-                            ),
-                          ),
-                          const SizedBox(
-                            height: 8,
-                          ),
-                          if (variations == null)
-                            Text("PHP ${productPrice.toStringAsFixed(2)}"),
-                          if (variations != null)
-                            // Add a for loop to display variations and prices
-                            if (variations != null && prices != null)
+                        child: Padding(
+                          padding: const EdgeInsets.only(
+                            left: 16,
+                            right: 16,
+                            top: 15,
+                            bottom: 8,
+                          ), //modified this for row
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
                               SingleChildScrollView(
                                 scrollDirection: Axis.horizontal,
-                                child: Row(
-                                  children: [
-                                    for (int i = 0; i < variations!.length; i++)
-                                      Text(
-                                          "${variations![i]} - PHP ${double.parse(prices![i]).toStringAsFixed(2)}"),
-                                  ],
+                                child: Text(
+                                  productName,
+                                  overflow: TextOverflow.clip,
+                                  softWrap: false,
+                                  style: TextStyle(
+                                      fontWeight: FontWeight.w600,
+                                      letterSpacing: 1),
                                 ),
                               ),
-                          const SizedBox(
-                            height: 8,
-                          ),
-                          // Footer section
-                          Column(
-                            children: [
+                              const SizedBox(
+                                height: 8,
+                              ),
+                              if (variations == null)
+                                Text("PHP ${productPrice.toStringAsFixed(2)}"),
+                              if (variations != null)
+                                // Add a for loop to display variations and prices
+                                if (variations != null && prices != null)
+                                  SingleChildScrollView(
+                                    scrollDirection: Axis.horizontal,
+                                    child: Row(
+                                      children: [
+                                        for (int i = 0;
+                                            i < variations!.length;
+                                            i++)
+                                          Text(
+                                              "${variations![i]} - PHP ${double.parse(prices![i]).toStringAsFixed(2)}"),
+                                      ],
+                                    ),
+                                  ),
+                              const SizedBox(
+                                height: 8,
+                              ),
+                              // Footer section
                               footerSection ??
-                                  Column(
+                                  Row(
+                                    mainAxisAlignment:
+                                        MainAxisAlignment.spaceBetween,
                                     children: [
-                                      Row(
-                                        mainAxisAlignment:
-                                            MainAxisAlignment.spaceBetween,
-                                        children: [
-                                          StyledButton(
-                                            noShadow: true,
-                                            btnText: "Edit",
-                                            onClick: () {
-                                              Navigator.of(context).push(
-                                                MaterialPageRoute(
-                                                  builder:
-                                                      (BuildContext context) {
-                                                    return AdminMenuForm(
-                                                      productId: productId,
-                                                      productName: productName,
-                                                      productPrice:
-                                                          productPrice,
-                                                    );
-                                                  },
-                                                ),
-                                              );
-                                            },
-                                            btnHeight: 30,
-                                          ),
-                                          StyledButton(
-                                            noShadow: true,
-                                            btnText: "Delete",
-                                            onClick: () {
-                                              // Call the delete function when the "Delete" button is pressed
-                                              // _deleteMenuItem(context);
-                                              delModal(context, ref);
-                                            },
-                                            btnHeight: 30,
-                                          ),
-                                        ],
-                                      ),
-                                      SizedBox(
-                                          height:
-                                              12), // Adjust the spacing as needed
                                       StyledButton(
-                                        btnHeight: 30,
-                                        btnText: 'Add Variation',
+                                        noShadow: true,
+                                        btnText: "Edit",
                                         onClick: () {
                                           Navigator.of(context).push(
                                             MaterialPageRoute(
                                               builder: (BuildContext context) {
-                                                return AddVariationForm(
+                                                return AdminMenuForm(
                                                   productId: productId,
+                                                  productName: productName,
+                                                  productPrice: productPrice,
                                                 );
                                               },
                                             ),
                                           );
                                         },
-                                      )
+                                        btnHeight: 30,
+                                      ),
+                                      StyledButton(
+                                        noShadow: true,
+                                        btnText: "Delete",
+                                        onClick: () {
+                                          // Call the delete function when the "Delete" button is pressed
+                                          // _deleteMenuItem(context);
+                                          delModal(context, ref);
+                                        },
+                                        btnHeight: 30,
+                                      ),
                                     ],
                                   ),
                             ],
                           ),
-                        ],
+                        ),
                       ),
+                    ),
+                  ],
+                )
+              : Column(
+                  //!DEFAULT LAYOUT OF ITEM CARD
+                  children: [
+                    Expanded(
+                      flex: 1,
+                      child: ClipRRect(
+                          borderRadius: const BorderRadius.only(
+                            topLeft: Radius.circular(8),
+                            topRight: Radius.circular(8),
+                          ),
+                          child: CachedNetworkImage(
+                            imageUrl: imageUrl,
+                            width: double.infinity,
+                            fit: BoxFit.cover,
+                          )),
+                    ),
+                    Expanded(
+                      flex: 1,
+                      child: SizedBox(
+                        width: double.infinity,
+                        child: Padding(
+                          padding: const EdgeInsets.all(8.0),
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              SingleChildScrollView(
+                                scrollDirection: Axis.horizontal,
+                                child: Text(
+                                  productName,
+                                  overflow: TextOverflow.clip,
+                                  softWrap: false,
+                                  style: TextStyle(
+                                      fontWeight: FontWeight.w600,
+                                      letterSpacing: 1),
+                                ),
+                              ),
+                              const SizedBox(
+                                height: 8,
+                              ),
+                              if (variations == null)
+                                Text("PHP ${productPrice.toStringAsFixed(2)}"),
+                              if (variations != null)
+                                // Add a for loop to display variations and prices
+                                if (variations != null && prices != null)
+                                  SingleChildScrollView(
+                                    scrollDirection: Axis.horizontal,
+                                    child: Row(
+                                      children: [
+                                        for (int i = 0;
+                                            i < variations!.length;
+                                            i++)
+                                          Text(
+                                              "${variations![i]} - PHP ${double.parse(prices![i]).toStringAsFixed(2)}"),
+                                      ],
+                                    ),
+                                  ),
+                              const SizedBox(
+                                height: 8,
+                              ),
+                              // Footer section
+                              Column(
+                                children: [
+                                  footerSection ??
+                                      Column(
+                                        children: [
+                                          Row(
+                                            mainAxisAlignment:
+                                                MainAxisAlignment.spaceBetween,
+                                            children: [
+                                              Expanded(
+                                                child: StyledButton(
+                                                  noShadow: true,
+                                                  btnText: "Edit",
+                                                  onClick: () {
+                                                    Navigator.of(context).push(
+                                                      MaterialPageRoute(
+                                                        builder: (BuildContext
+                                                            context) {
+                                                          return AdminMenuForm(
+                                                            productId:
+                                                                productId,
+                                                            productName:
+                                                                productName,
+                                                            productPrice:
+                                                                productPrice,
+                                                          );
+                                                        },
+                                                      ),
+                                                    );
+                                                  },
+                                                  btnHeight: 30,
+                                                ),
+                                              ),
+                                              const SizedBox(
+                                                width: 5,
+                                              ),
+                                              Expanded(
+                                                child: StyledButton(
+                                                  noShadow: true,
+                                                  btnText: "Del",
+                                                  onClick: () {
+                                                    // Call the delete function when the "Delete" button is pressed
+                                                    // _deleteMenuItem(context);
+                                                    delModal(context, ref);
+                                                  },
+                                                  btnHeight: 30,
+                                                ),
+                                              ),
+                                            ],
+                                          ),
+                                          SizedBox(
+                                              height:
+                                                  5), // Adjust the spacing as needed
+                                          StyledButton(
+                                            btnWidth: double.infinity,
+                                            noShadow: true,
+                                            btnHeight: 30,
+                                            btnText: 'Add Variation',
+                                            onClick: () {
+                                              Navigator.of(context).push(
+                                                MaterialPageRoute(
+                                                  builder:
+                                                      (BuildContext context) {
+                                                    return AddVariationForm(
+                                                      productId: productId,
+                                                    );
+                                                  },
+                                                ),
+                                              );
+                                            },
+                                          ),
+                                          SizedBox(height: 5),
+                                          StyledButton(
+                                              btnWidth: double.infinity,
+                                              noShadow: true,
+                                              btnHeight: 30,
+                                              btnText: status == "Avail"
+                                                  ? "Mark Unavail"
+                                                  : "Mark Avail",
+                                              onClick: () async {
+                                                if (status == "Avail") {
+                                                  await FirebaseFirestore
+                                                      .instance
+                                                      .collection('menu')
+                                                      .doc(productId)
+                                                      .update({
+                                                    'itemStatus': 'Unavail'
+                                                  });
+                                                } else {
+                                                  await FirebaseFirestore
+                                                      .instance
+                                                      .collection('menu')
+                                                      .doc(productId)
+                                                      .update({
+                                                    'itemStatus': 'Avail'
+                                                  });
+                                                }
+                                                ref.refresh(
+                                                    menuItemsStreamProvider);
+                                              })
+                                        ],
+                                      ),
+                                ],
+                              ),
+                            ],
+                          ),
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+        ),
+        if (status == 'Unavail')
+          Positioned(
+            top: footerSection != null ? 35 : 75,
+            left: 18,
+            child: Container(
+              width: 130,
+              height: 50,
+              decoration: BoxDecoration(
+                  color: Colors.red.shade400,
+                  borderRadius: BorderRadius.circular(50)),
+              child: Center(
+                child: Padding(
+                  padding: const EdgeInsets.all(8.0),
+                  child: Text(
+                    'UNAVAILABLE',
+                    style: TextStyle(
+                      fontSize: 16,
+                      fontWeight: FontWeight.normal,
+                      color: Colors.black, // Customize the color
+                      letterSpacing: 1,
                     ),
                   ),
                 ),
-              ],
+              ),
             ),
+          ),
+      ],
     );
   }
 }

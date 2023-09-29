@@ -5,6 +5,7 @@ class OrderObject {
   final String? variation;
   int quantity;
   final String imageUrl;
+  final String? status;
 
   OrderObject(
       {required this.id,
@@ -12,5 +13,6 @@ class OrderObject {
       required this.price,
       this.variation,
       required this.quantity,
-      required this.imageUrl});
+      required this.imageUrl,
+      this.status});
 }

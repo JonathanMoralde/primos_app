@@ -77,6 +77,8 @@ class AdminMenuPage extends ConsumerWidget {
                                             ? itemPrice.toDouble()
                                             : 0.0;
                                 final imageUrl = itemDoc['imageURL'] as String;
+                                final productStatus =
+                                    itemDoc['itemStatus'] as String;
 
                                 return variationsStream.when(
                                     data: (varDoc) {
@@ -109,6 +111,7 @@ class AdminMenuPage extends ConsumerWidget {
                                         prices:
                                             prices.isNotEmpty ? prices : null,
                                         imageUrl: imageUrl,
+                                        status: productStatus,
                                       );
                                     },
                                     error: (error, stackTrace) =>
