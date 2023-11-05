@@ -4,6 +4,7 @@ import 'package:intl/intl.dart';
 import 'package:primos_app/pages/admin/salesObject.dart';
 import 'package:primos_app/providers/filter/isDateRange_provider.dart';
 import 'package:primos_app/providers/filter/isSingleDate_provider.dart';
+import 'package:primos_app/providers/filter/mode_provider.dart';
 import 'package:primos_app/providers/filter/selectedDate_provider.dart';
 import 'package:primos_app/providers/kitchen/orderDetails_Provider.dart';
 import 'package:primos_app/providers/sales/allSales_provider.dart';
@@ -21,6 +22,7 @@ class SalesReportPage extends ConsumerWidget {
     final ordersStream = ref.watch(ordersProvider);
 
 // FILTERING
+    final viewMode = ref.watch(modeProvider);
     final isDateRange = ref.watch(isDateRangeProvider);
 
     final dateRange1 = ref.watch(selectedDate1Provider);
@@ -121,21 +123,52 @@ class SalesReportPage extends ConsumerWidget {
                           .compareTo(dateA); // Compare in descending order
                     });
 
-                    return Wrap(
-                      runSpacing: 10,
-                      spacing: 10,
-                      children: [
-                        for (final object in filteredSalesObjects)
-                          SalesCard(
-                              date: object.date,
-                              totalBillAmount: object.totalBillAmount,
-                              totalDiscount: object.totalDiscount,
-                              totalAmount: object.totalAmount,
-                              totalVat: object.totalVat,
-                              orderKey: object.orderKey,
-                              allOrders: ordersStream)
-                      ],
-                    );
+                    if (viewMode == "Summary") {
+                      // TODO CALCULATE THE SUM AND PASS TO SALESCARD
+                      String formattedDate1 =
+                          DateFormat('MMMM dd, yyyy').format(dateRange1!);
+                      String formattedDate2 =
+                          DateFormat('MMMM dd, yyyy').format(dateRange2!);
+                      final String dateSum =
+                          '$formattedDate1 - $formattedDate2';
+                      int totalBillAmount = 0;
+                      double totalDiscount = 0;
+                      double totalAmount = 0;
+                      double totalVat = 0;
+                      int totalOrders = 0;
+
+                      for (final object in filteredSalesObjects) {
+                        totalBillAmount += object.totalBillAmount;
+                        totalDiscount += object.totalDiscount;
+                        totalAmount += object.totalAmount;
+                        totalVat += object.totalVat;
+                        totalOrders += object.orderKey.length;
+                      }
+                      return SalesCard(
+                          date: dateSum,
+                          totalBillAmount: totalBillAmount,
+                          totalDiscount: totalDiscount,
+                          totalAmount: totalAmount,
+                          totalVat: totalVat,
+                          totalOrders: totalOrders,
+                          allOrders: ordersStream);
+                    } else {
+                      return Wrap(
+                        runSpacing: 10,
+                        spacing: 10,
+                        children: [
+                          for (final object in filteredSalesObjects)
+                            SalesCard(
+                                date: object.date,
+                                totalBillAmount: object.totalBillAmount,
+                                totalDiscount: object.totalDiscount,
+                                totalAmount: object.totalAmount,
+                                totalVat: object.totalVat,
+                                totalOrders: object.orderKey.length,
+                                allOrders: ordersStream)
+                        ],
+                      );
+                    }
                   },
                   loading: () => Center(
                       child: CircularProgressIndicator(

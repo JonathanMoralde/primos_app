@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:primos_app/providers/filter/isDateRange_provider.dart';
 import 'package:primos_app/providers/filter/isSingleDate_provider.dart';
+import 'package:primos_app/providers/filter/mode_provider.dart';
 import 'package:primos_app/widgets/styledButton.dart';
 import 'package:primos_app/widgets/styledDatepicker.dart';
 
@@ -16,6 +17,7 @@ class FilterExpansion extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final isExpanded = ref.watch(isExpandedProvider);
+    final currentMode = ref.watch(modeProvider);
 
     void onDateSelected1(DateTime? date) {
       // selectedDate1.setDate(date);
@@ -150,6 +152,53 @@ class FilterExpansion extends ConsumerWidget {
                       const SizedBox(
                         height: 10,
                       ),
+                      Divider(
+                        height: 0,
+                        color: Colors.grey,
+                      ),
+                      const SizedBox(
+                        height: 10,
+                      ),
+                      SizedBox(
+                        width: double.infinity,
+                        child: const Text("Select View Mode"),
+                      ),
+                      Row(
+                        children: [
+                          Expanded(
+                            child: ListTile(
+                              title: const Text("Individual"),
+                              contentPadding: EdgeInsets.all(0),
+                              leading: Radio(
+                                  activeColor: Color(0xFFE2B563),
+                                  value: "Individual",
+                                  groupValue: currentMode,
+                                  onChanged: (value) {
+                                    ref.read(modeProvider.notifier).state =
+                                        value.toString();
+                                    print(value);
+                                    print(currentMode);
+                                  }),
+                            ),
+                          ),
+                          Expanded(
+                            child: ListTile(
+                              title: const Text("Summary"),
+                              contentPadding: EdgeInsets.all(0),
+                              leading: Radio(
+                                  activeColor: Color(0xFFE2B563),
+                                  value: "Summary",
+                                  groupValue: currentMode,
+                                  onChanged: (value) {
+                                    ref.read(modeProvider.notifier).state =
+                                        value.toString();
+                                    print(value);
+                                    print(currentMode);
+                                  }),
+                            ),
+                          )
+                        ],
+                      )
                     ],
                   ),
                 ),

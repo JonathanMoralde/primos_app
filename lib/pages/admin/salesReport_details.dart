@@ -5,12 +5,12 @@ import 'package:primos_app/providers/kitchen/orderDetails_Provider.dart';
 
 class SalesReportDetails extends ConsumerWidget {
   final String date;
-  final List<String> orderKey;
+  // final List<String> orderKey;
   // final AsyncValue<Map<dynamic, dynamic>> ordersStream;
   SalesReportDetails({
     super.key,
     required this.date,
-    required this.orderKey,
+    // required this.orderKey,
     // required this.ordersStream,
   });
 
