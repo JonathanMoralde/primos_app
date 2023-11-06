@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:intl/intl.dart';
+import 'package:primos_app/providers/filter/mode_provider.dart';
 import 'package:primos_app/providers/kitchen/orderDetails_Provider.dart';
 
 class SalesReportDetails extends ConsumerWidget {
@@ -17,6 +18,27 @@ class SalesReportDetails extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final ordersStream = ref.watch(ordersProvider);
+    final viewMode = ref.watch(modeProvider);
+
+    if (viewMode == "Summary") {
+      return Scaffold(
+        appBar: AppBar(
+          leading: IconButton(
+            //manual handle back button
+            icon: const Icon(Icons.keyboard_arrow_left),
+            iconSize: 35,
+            onPressed: () {
+              ref.refresh(ordersProvider);
+              Navigator.of(context).pop();
+            },
+          ),
+          title: Text(date),
+        ),
+        body: Center(
+          child: const Text("This section is under maintenance"),
+        ),
+      );
+    }
 
     DateTime originalDate = DateTime.parse(date);
 

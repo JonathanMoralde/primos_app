@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:fluttertoast/fluttertoast.dart';
 import 'package:intl/intl.dart';
 import 'package:primos_app/pages/admin/salesObject.dart';
 import 'package:primos_app/providers/filter/isDateRange_provider.dart';
@@ -125,6 +126,15 @@ class SalesReportPage extends ConsumerWidget {
 
                     if (viewMode == "Summary") {
                       // TODO CALCULATE THE SUM AND PASS TO SALESCARD
+                      if (dateRange1 == null && dateRange2 == null) {
+                        return Center(
+                          child: const Text("Please select a date range."),
+                        );
+                      } else if (dateRange1 == null || dateRange2 == null) {
+                        return Center(
+                          child: const Text("Please select a date range."),
+                        );
+                      }
                       String formattedDate1 =
                           DateFormat('MMMM dd, yyyy').format(dateRange1!);
                       String formattedDate2 =
