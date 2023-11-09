@@ -135,6 +135,7 @@ class SalesReportPage extends ConsumerWidget {
                           child: const Text("Please select a date range."),
                         );
                       }
+                      print(filteredSalesObjects);
                       String formattedDate1 =
                           DateFormat('MMMM dd, yyyy').format(dateRange1!);
                       String formattedDate2 =

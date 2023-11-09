@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:intl/intl.dart';
+import 'package:primos_app/pages/admin/salesObject.dart';
 import 'package:primos_app/providers/filter/mode_provider.dart';
+import 'package:primos_app/providers/filter/selectedDate_provider.dart';
 import 'package:primos_app/providers/kitchen/orderDetails_Provider.dart';
 
 class SalesReportDetails extends ConsumerWidget {
@@ -20,29 +22,18 @@ class SalesReportDetails extends ConsumerWidget {
     final ordersStream = ref.watch(ordersProvider);
     final viewMode = ref.watch(modeProvider);
 
-    if (viewMode == "Summary") {
-      return Scaffold(
-        appBar: AppBar(
-          leading: IconButton(
-            //manual handle back button
-            icon: const Icon(Icons.keyboard_arrow_left),
-            iconSize: 35,
-            onPressed: () {
-              ref.refresh(ordersProvider);
-              Navigator.of(context).pop();
-            },
-          ),
-          title: Text(date),
-        ),
-        body: Center(
-          child: const Text("This section is under maintenance"),
-        ),
-      );
+    final dateRange1 = ref.watch(selectedDate1Provider);
+    final dateRange2 = ref.watch(selectedDate2Provider);
+
+    // TODO SPLIT DATE RANGE 1 & 2 AND GET [0] to GRAB THE DATE, THEN USE IT TO GRAB THE ORDER DETAILS FOR DATES IN RANGE
+
+    String formattedDate = '';
+
+    if (viewMode == "Individual") {
+      DateTime originalDate = DateTime.parse(date);
+
+      formattedDate = DateFormat('MMMM dd, yyyy').format(originalDate);
     }
-
-    DateTime originalDate = DateTime.parse(date);
-
-    String formattedDate = DateFormat('MMMM dd, yyyy').format(originalDate);
 
     return Scaffold(
       appBar: AppBar(
@@ -55,7 +46,7 @@ class SalesReportDetails extends ConsumerWidget {
             Navigator.of(context).pop();
           },
         ),
-        title: Text(formattedDate),
+        title: Text(viewMode == "Summary" ? date : formattedDate),
       ),
       body: SafeArea(
           child: SingleChildScrollView(
@@ -66,38 +57,51 @@ class SalesReportDetails extends ConsumerWidget {
                 final orderEntries = ordersMap.entries.toList();
                 List<Map<Object?, Object?>> orderData = [];
 
+                if (viewMode == "Summary") {
+                  final String stringDate1 =
+                      dateRange1.toString().split(" ")[0];
+                  final String stringDate2 =
+                      dateRange2.toString().split(" ")[0];
+
+                  print(stringDate1);
+                  print(stringDate2);
+
+                  return Center(
+                    child: const Text("This section is under maintenance"),
+                  );
+                }
+
                 for (final entry in orderEntries) {
                   final entryDate =
                       entry.value['order_date'].toString().split(' ')[0];
                   if (entryDate == date) {
                     for (final order in entry.value['order_details']) {
                       orderData.add(order);
-                      // ! BUG: QUANTITY KEEPS ADDING WHEN NAVIGATING BACK TO THIS PAGE
-                      // ! CAUSE: ordersStream?
-
-                      //   final productName = order['productName'];
-                      //   final variation = order['variation'];
-                      //   final quantity = order['quantity'];
-
-                      //   bool found = false;
-
-                      //   for (final o in orderData) {
-                      //     if (o['productName'] == productName &&
-                      //         o['variation'] == variation) {
-                      //       o['quantity'] = (o['quantity'] as int) + quantity;
-                      //       print("Updated quantity: $o");
-                      //       found = true;
-                      //       break;
-                      //     }
-                      //   }
-
-                      //   if (!found) {
-                      //     orderData.add(order);
-                      //     print("Added new order: $order");
-                      //   }
                     }
                   }
                 }
+
+                // after getting each order details, its time to merge those with the same values for product name & variation
+                Map<String, Map<String, dynamic>> mergedData = {};
+
+                for (var entry in orderData) {
+                  String key = "${entry['productName']}_${entry['variation']}";
+
+                  if (!mergedData.containsKey(key)) {
+                    mergedData[key] = {
+                      "productName": entry["productName"],
+                      "variation": entry["variation"],
+                      "quantity": entry["quantity"],
+                    };
+                  } else {
+                    mergedData[key]!["quantity"] += entry["quantity"];
+                  }
+                }
+
+                List<Map<String, dynamic>> result = mergedData.values.toList();
+                // print(orderData);
+                // print("merged DATA:");
+                // print(result);
 
                 return Column(
                   children: [
@@ -142,7 +146,7 @@ class SalesReportDetails extends ConsumerWidget {
                     const SizedBox(
                       height: 5,
                     ),
-                    for (final order in orderData)
+                    for (final order in result)
                       Column(
                         children: [
                           Row(
