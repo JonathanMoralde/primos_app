@@ -1,20 +1,15 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:intl/intl.dart';
-import 'package:primos_app/pages/admin/salesObject.dart';
 import 'package:primos_app/providers/filter/mode_provider.dart';
 import 'package:primos_app/providers/filter/selectedDate_provider.dart';
 import 'package:primos_app/providers/kitchen/orderDetails_Provider.dart';
 
 class SalesReportDetails extends ConsumerWidget {
   final String date;
-  // final List<String> orderKey;
-  // final AsyncValue<Map<dynamic, dynamic>> ordersStream;
   SalesReportDetails({
     super.key,
     required this.date,
-    // required this.orderKey,
-    // required this.ordersStream,
   });
 
   @override
@@ -24,8 +19,6 @@ class SalesReportDetails extends ConsumerWidget {
 
     final dateRange1 = ref.watch(selectedDate1Provider);
     final dateRange2 = ref.watch(selectedDate2Provider);
-
-    // TODO SPLIT DATE RANGE 1 & 2 AND GET [0] to GRAB THE DATE, THEN USE IT TO GRAB THE ORDER DETAILS FOR DATES IN RANGE
 
     String formattedDate = '';
 
@@ -42,11 +35,14 @@ class SalesReportDetails extends ConsumerWidget {
           icon: const Icon(Icons.keyboard_arrow_left),
           iconSize: 35,
           onPressed: () {
+            // ignore: unused_result
             ref.refresh(ordersProvider);
             Navigator.of(context).pop();
           },
         ),
-        title: Text(viewMode == "Summary" ? date : formattedDate),
+        title: SingleChildScrollView(
+            scrollDirection: Axis.horizontal,
+            child: Text(viewMode == "Summary" ? date : formattedDate)),
       ),
       body: SafeArea(
           child: SingleChildScrollView(
@@ -57,26 +53,24 @@ class SalesReportDetails extends ConsumerWidget {
                 final orderEntries = ordersMap.entries.toList();
                 List<Map<Object?, Object?>> orderData = [];
 
-                if (viewMode == "Summary") {
-                  final String stringDate1 =
-                      dateRange1.toString().split(" ")[0];
-                  final String stringDate2 =
-                      dateRange2.toString().split(" ")[0];
-
-                  print(stringDate1);
-                  print(stringDate2);
-
-                  return Center(
-                    child: const Text("This section is under maintenance"),
-                  );
-                }
-
                 for (final entry in orderEntries) {
-                  final entryDate =
-                      entry.value['order_date'].toString().split(' ')[0];
-                  if (entryDate == date) {
-                    for (final order in entry.value['order_details']) {
-                      orderData.add(order);
+                  if (viewMode == "Summary") {
+                    final DateTime entryDate =
+                        DateTime.parse(entry.value['order_date']);
+
+                    if (entryDate.isAfter(dateRange1!) &&
+                        entryDate.isBefore(dateRange2!)) {
+                      for (final order in entry.value['order_details']) {
+                        orderData.add(order);
+                      }
+                    }
+                  } else {
+                    final entryDate =
+                        entry.value['order_date'].toString().split(' ')[0];
+                    if (entryDate == date) {
+                      for (final order in entry.value['order_details']) {
+                        orderData.add(order);
+                      }
                     }
                   }
                 }
@@ -99,10 +93,6 @@ class SalesReportDetails extends ConsumerWidget {
                 }
 
                 List<Map<String, dynamic>> result = mergedData.values.toList();
-                // print(orderData);
-                // print("merged DATA:");
-                // print(result);
-
                 return Column(
                   children: [
                     const Row(
