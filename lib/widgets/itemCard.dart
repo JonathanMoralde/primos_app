@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:full_screen_image/full_screen_image.dart';
 import 'package:primos_app/pages/admin/adminMenu_Form.dart';
 import 'package:primos_app/providers/waiter_menu/menuItems_provider.dart';
 import 'package:primos_app/widgets/imageLoader.dart';
@@ -168,21 +169,24 @@ class ItemCard extends ConsumerWidget {
                   children: [
                     Expanded(
                       flex: 1,
-                      child: ClipRRect(
-                          borderRadius: isRow == true
-                              ? const BorderRadius.only(
-                                  topLeft: Radius.circular(8),
-                                  bottomLeft: Radius.circular(8),
-                                )
-                              : const BorderRadius.only(
-                                  topLeft: Radius.circular(8),
-                                  topRight: Radius.circular(8),
-                                ),
-                          child: CachedNetworkImage(
-                            imageUrl: imageUrl,
-                            width: double.infinity,
-                            fit: BoxFit.cover,
-                          )),
+                      child: FullScreenWidget(
+                        disposeLevel: DisposeLevel.High,
+                        child: ClipRRect(
+                            borderRadius: isRow == true
+                                ? const BorderRadius.only(
+                                    topLeft: Radius.circular(8),
+                                    bottomLeft: Radius.circular(8),
+                                  )
+                                : const BorderRadius.only(
+                                    topLeft: Radius.circular(8),
+                                    topRight: Radius.circular(8),
+                                  ),
+                            child: CachedNetworkImage(
+                              imageUrl: imageUrl,
+                              width: double.infinity,
+                              fit: BoxFit.cover,
+                            )),
+                      ),
                     ),
                     Expanded(
                       flex: 1,
@@ -280,16 +284,19 @@ class ItemCard extends ConsumerWidget {
                   children: [
                     Expanded(
                       flex: 1,
-                      child: ClipRRect(
-                          borderRadius: const BorderRadius.only(
-                            topLeft: Radius.circular(8),
-                            topRight: Radius.circular(8),
-                          ),
-                          child: CachedNetworkImage(
-                            imageUrl: imageUrl,
-                            width: double.infinity,
-                            fit: BoxFit.cover,
-                          )),
+                      child: FullScreenWidget(
+                        disposeLevel: DisposeLevel.High,
+                        child: ClipRRect(
+                            borderRadius: const BorderRadius.only(
+                              topLeft: Radius.circular(8),
+                              topRight: Radius.circular(8),
+                            ),
+                            child: CachedNetworkImage(
+                              imageUrl: imageUrl,
+                              width: double.infinity,
+                              fit: BoxFit.cover,
+                            )),
+                      ),
                     ),
                     Expanded(
                       flex: 1,

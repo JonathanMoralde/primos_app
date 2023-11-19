@@ -56,6 +56,7 @@ dependencies:
   fluttertoast: ^8.2.2
   flutter_blue_plus: ^1.14.23
   geolocator: ^10.0.1
+  full_screen_image: ^2.0.0
 
 dev_dependencies:
   flutter_test:

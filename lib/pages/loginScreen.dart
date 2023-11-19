@@ -203,9 +203,11 @@ class LoginSreen extends ConsumerWidget {
                       height: 10,
                     ),
                     StyledTextField(
-                        controller: passwordController,
-                        hintText: "Password",
-                        obscureText: true),
+                      controller: passwordController,
+                      hintText: "Password",
+                      obscureText: true,
+                      isPassword: true,
+                    ),
                     const SizedBox(
                       height: 20,
                     ),
