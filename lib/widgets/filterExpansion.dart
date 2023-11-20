@@ -34,6 +34,7 @@ class FilterExpansion extends ConsumerWidget {
     // bool isExpanded = false;
     String headerText = "Filter by Date";
 
+    print(isExpanded);
     return Container(
       decoration: BoxDecoration(
         boxShadow: [
@@ -50,7 +51,7 @@ class FilterExpansion extends ConsumerWidget {
         child: ExpansionPanelList(
           expandedHeaderPadding: EdgeInsets.all(0),
           expansionCallback: (int index, bool currentlyExpanded) {
-            ref.read(isExpandedProvider.notifier).state = !currentlyExpanded;
+            ref.read(isExpandedProvider.notifier).state = currentlyExpanded;
           },
           children: [
             ExpansionPanel(

@@ -70,7 +70,7 @@ class SalesCard extends ConsumerWidget {
             expandedHeaderPadding: EdgeInsets.all(0),
             expansionCallback: (int index, bool currentlyExpanded) {
               setState(() {
-                isExpanded = !currentlyExpanded;
+                isExpanded = currentlyExpanded;
               });
             },
             children: [
