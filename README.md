@@ -1,16 +1,33 @@
-# primos_app
+# Android-based Restaurant POS System
 
-A new Flutter project.
+This is my capstone project. This system digitized the restaurant's operation transforming it from the traditional method of writing orders, processing orders, and other operations.
 
-## Getting Started
+## Features include:
 
-This project is a starting point for a Flutter application.
+Firebase Authentication
 
-A few resources to get you started if this is your first Flutter project:
+Waiter UI
 
-- [Lab: Write your first Flutter app](https://docs.flutter.dev/get-started/codelab)
-- [Cookbook: Useful Flutter samples](https://docs.flutter.dev/cookbook)
+-Dine In/Take out orders
 
-For help getting started with Flutter development, view the
-[online documentation](https://docs.flutter.dev/), which offers tutorials,
-samples, guidance on mobile development, and a full API reference.
+-Merge/Unmerge Table
+
+Cashier UI
+
+-Payment processing
+
+-Print bill & receipt to thermal printer
+
+-Void Order
+
+-Apply discount
+
+Admin UI
+
+-Sales Report
+
+-Menu management
+
+-Table management
+
+-Employee account management
