@@ -4,15 +4,15 @@ This is my capstone project. This system digitized the restaurant's operation tr
 
 ## Features include:
 
-Firebase Authentication
+**Firebase Authentication**
 
-Waiter UI
+**Waiter UI**
 
 -Dine In/Take out orders
 
 -Merge/Unmerge Table
 
-Cashier UI
+**Cashier UI**
 
 -Payment processing
 
@@ -22,7 +22,11 @@ Cashier UI
 
 -Apply discount
 
-Admin UI
+**Kitchen UI**
+
+-Real-time display of orders
+
+**Admin UI**
 
 -Sales Report
 
